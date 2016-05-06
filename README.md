@@ -1,2 +1,2 @@
-# SenseNet
-Custom features for Sense/Net ECMS
+# SenseNet Project Installer
+Visual Studio dev project installer for Sense/Net ECMS
