@@ -40,6 +40,7 @@ for /f "tokens=1,* delims=¶" %%A in ( '"type %FROM%"') do (
 	SETLOCAL ENABLEDELAYEDEXPANSION
 	SET line=!line:%SEARCHTEXT1%=%REPLACETEXT1%!
 	SET line=!line:%SEARCHTEXT2%=%REPLACETEXT2%!
+	rem ECHO !line! >> !TO!
 	>> %TO% echo(!line!
 	ENDLOCAL
 )

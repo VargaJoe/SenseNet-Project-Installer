@@ -1,5 +1,9 @@
 ECHO OFF
 
+Rem ================================== Important Note!
+Rem #1 Before running this batch file 
+Rem Check the connectionstrings section of the Import tool.
+
 ECHO ===============================================================================
 ECHO         Load Project Variables, Set Full Install Flag, Stop IIS Site
 ECHO ===============================================================================
@@ -12,50 +16,13 @@ ECHO ===========================================================================
 ECHO                              Call Database Restore Script
 ECHO ===============================================================================
 
-call RestoreDb.bat
+call RestoreDb.bat %1
 
-rem ECHO ===============================================================================
-rem ECHO             				Call Project Files Importer
-rem ECHO ===============================================================================
+ECHO ===============================================================================
+ECHO                              Call LuceneIndex Script
+ECHO ===============================================================================
 
-rem call BuildProject.bat
-
-rem ECHO ===============================================================================
-rem ECHO             				Call Project Files Importer
-rem ECHO ===============================================================================
-
-rem call ImportProject.bat
-
-IF EXIST %LUCENEDIRLOCATION% (
-	ECHO ===============================================================================
-	ECHO                                Restore LuceneIndex
-	ECHO ===============================================================================
-	
-	ECHO Remove read-only flags...
-	attrib -r "%PROJECTAPPDATAPATH%\LuceneIndex\*.*" /s
-	attrib -r "%PROJECTAPPDATAPATH%\BakLuceneIndex\*.*" /s
-	attrib -r "%PROJECTAPPDATAPATH%\BakLuceneIndex_Backup\*.*" /s
-	
-	ECHO Delete backup folders...
-	rmdir "%PROJECTAPPDATAPATH%\BakLuceneIndex\" /S /Q
-	rmdir "%PROJECTAPPDATAPATH%\BakLuceneIndex_Backup\" /S /Q
-	
-	ECHO Backup local lucene folders...
-	move /Y "%PROJECTAPPDATAPATH%\LuceneIndex" "%PROJECTAPPDATAPATH%\BakLuceneIndex" 
-	move /Y "%PROJECTAPPDATAPATH%\LuceneIndex_Backup" "%PROJECTAPPDATAPATH%\BakLuceneIndex_Backup" 
-	
-	ECHO Restore lucene folders from remote backup...
-	xcopy "%LUCENEDIRLOCATION%" "%PROJECTAPPDATAPATH%\LuceneIndex" /Y /E /I
-	xcopy "%LUCENEDIRLOCATION%_Backup" "%PROJECTAPPDATAPATH%\LuceneIndex_Backup" /Y /E /I
-) ELSE (
-	IF NOT "%fullinstall%"=="yes" (
-	ECHO ===============================================================================
-	ECHO             				Call Index Populating
-	ECHO ===============================================================================
-	
-	call indexpopulator.bat
-	)
-)
+call RestoreLucene.bat %1
 
 ECHO ===============================================================================
 ECHO             				IIS And Hosts File Setup

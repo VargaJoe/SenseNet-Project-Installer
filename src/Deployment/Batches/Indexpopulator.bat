@@ -13,5 +13,6 @@ ECHO                                Populate index
 ECHO ===============================================================================
 
 %PROJECTTOOLSPATH%\IndexPopulator.exe -ASM %ASSEMBLYPATH%
+rem %ASSEMBLYPATH%\IndexPopulator.exe -NOBACKUP
 
 ECHO Done.

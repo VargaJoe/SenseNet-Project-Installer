@@ -1,5 +1,9 @@
 ECHO OFF
 
+Rem ================================== Important Note!
+Rem #1 Before running this batch file 
+Rem Check the connectionstrings section of the Import tool.
+
 IF NOT "%PRJVARSLOADED%"=="Yes" (
 	ECHO ===============================================================================
 	ECHO                                Load Project Variables
@@ -9,25 +13,46 @@ IF NOT "%PRJVARSLOADED%"=="Yes" (
 )
 
 ECHO ===============================================================================
-ECHO                              Call Install Sense/Net 
+ECHO                              Install Sense/Net 6.0 
 ECHO ===============================================================================
 
-attrib -r "%SNSRCTOOLSPATH%\Import.exe.config"
-xcopy "%CONFIGSPATH%\Import.exe.config"  "%SNSRCTOOLSPATH%" /Y
+Echo.
 
-attrib -r "%SNSRCTOOLSPATH%\Indexpopulator.exe.config"
-xcopy "%CONFIGSPATH%\Indexpopulator.exe.config"  "%SNSRCTOOLSPATH%" /Y
+ECHO ===============================================================================
+ECHO                                Install Database
+ECHO ===============================================================================
 
-PUSHD %SNSRCBASEPATH%\Deployment
-call InstallSenseNet.bat DATASOURCE:%DATASOURCE% INITIALCATALOG:%INITIALCATALOG%
-POPD
+ECHO Creating database...
 
+sqlcmd.exe -S %DATASOURCE% -i "%SNSRCDBSCRIPTSPATH%\Create_SenseNet_Database.sql" -v dbname = %INITIALCATALOG%
+sqlcmd.exe -S %DATASOURCE% -d %INITIALCATALOG% -i "%SNSRCDBSCRIPTSPATH%\Install_01_Schema.sql"
+sqlcmd.exe -S %DATASOURCE% -d %INITIALCATALOG% -i "%SNSRCDBSCRIPTSPATH%\Install_02_Procs.sql"
+sqlcmd.exe -S %DATASOURCE% -d %INITIALCATALOG% -i "%SNSRCDBSCRIPTSPATH%\Install_03_Data_Phase1.sql"
+sqlcmd.exe -S %DATASOURCE% -d %INITIALCATALOG% -i "%SNSRCDBSCRIPTSPATH%\Install_04_Data_Phase2.sql"
+sqlcmd.exe -S %DATASOURCE% -d %INITIALCATALOG% -i "%SNSRCDBSCRIPTSPATH%\Install_TaskDatabase_Schema.sql"
+
+ECHO ===============================================================================
+ECHO			         Install Workflow Store
+ECHO ===============================================================================
+
+sqlcmd.exe -S %DATASOURCE% -d %INITIALCATALOG% -i "%SNSRCDBSCRIPTSPATH%\SqlWorkflowInstanceStoreSchema.sql"
+sqlcmd.exe -S %DATASOURCE% -d %INITIALCATALOG% -i "%SNSRCDBSCRIPTSPATH%\SqlWorkflowInstanceStoreLogic.sql"
+
+
+ECHO ===============================================================================
+ECHO             Install FieldConfig and ContentTypes, Import Demo Files
+ECHO ===============================================================================
+
+"%PROJECTTOOLSPATH%\Import.exe" -SCHEMA "%DEFAULTSTRUCTUREPATH%\System\Schema" -SOURCE "%DEFAULTSTRUCTUREPATH%" -TARGET /Root -ASM "%ASSEMBLYPATH%" 
+sqlcmd.exe -S %DATASOURCE% -d %INITIALCATALOG% -i "%SNSRCDBSCRIPTSPATH%\Install_05_Data_Phase3.sql"
 
 IF NOT "%FULLINSTALL%"=="Yes" (
 	ECHO ===============================================================================
 	ECHO             Call Index Populating
 	ECHO ===============================================================================
-	
+
+
+
 	call Indexpopulator.bat
 )
 

@@ -1,12 +1,16 @@
+rem sql variables for database connection
+SET DATASOURCE=MySenseNetContentRepositoryDatasource
+SET INITIALCATALOG=ProjectName
+
+rem initiate sensenet product files for install
 SET SNRELEASESPATH=..\..\Releases
-SET SNSRCNAME=sn-enterprise-src-6.5.3.8855
+SET SNSRCNAME=sn-enterprise-src-6.5.4.9851
 SET INSTALLERTOOLSFOLDER=..\Tools
 SET REFERENCESFOLDER=..\..\References
 SET COREREFERENCESPATH=%REFERENCESFOLDER%\Core
 
 rem initiate solution environment for install
 SET SNSRCBASEPATH=%SNRELEASESPATH%\%SNSRCNAME%
-
 SET DEFAULTSTRUCTUREPATH=%SNSRCBASEPATH%\Source\SenseNet\WebSite\Root
 SET SNSRCDBSCRIPTSPATH=%SNSRCBASEPATH%\Source\SenseNet\Storage\Data\SqlClient\Scripts
 SET SNSRCTOOLSPATH=%SNSRCBASEPATH%\Source\SenseNet\WebSite\Tools
@@ -14,9 +18,15 @@ SET SNSRCADMINPATH=%SNSRCBASEPATH%\Source\SenseNet\WebSite\Admin
 SET SNSRCTASKMANAGEMENTPATH=%SNSRCBASEPATH%\Source\SenseNet\WebSite\TaskManagement
 SET SNSRCASSEMBLYPATH=%SNSRCBASEPATH%\Source\SenseNet\WebSite\bin
 
-rem sql variables for database connection -- osszeakad-e a termek installerrel
-SET DATASOURCE=MySenseNetContentRepositoryDatasource
-SET INITIALCATALOG=TestDb
+REM ************ Install DB from backup ****************
+SET DBBAKFILENAME=
+SET BACKUPREMOTEFOLDERLOCATION=\\snbppc068\RestorePoints\%INITIALCATALOG%\ProjectName
+SET SQLDATAPATH=e:\MSSQL\2012Data
+SET LUCENEDIRLOCATION=%BACKUPREMOTEFOLDERLOCATION%\LuceneIndex
+
+rem default:
+SET ROWSDATANAME=%INITIALCATALOG%
+SET LOGNAME=%INITIALCATALOG%_log
 
 rem project variables for installation and import processes
 SET SOLUTIONDIR=..\..\Source
@@ -28,17 +38,19 @@ SET PROJECTSTRUCTUREPATH=%PROJECTPATH%\Root
 SET PROJECTADMINPATH=%PROJECTPATH%\Admin
 SET PROJECTTOOLSPATH=%PROJECTPATH%\Tools
 SET PROJECTTASKMANAGEMENTPATH=%PROJECTPATH%\TaskManagement
+SET PROJECTAPPDATAPATH=%PROJECTPATH%\App_Data
 
 SET CONFIGSPATH=%PROJECTPATH%\configs
+SET TESTPATH=%PROJECTPATH%\configs2
 
 rem IIS setup variables
-SET SITENAME=TestSite
-SET APPPOOLNAME=%INITIALCATALOG%
+SET SITENAME=ProjectName
+SET APPPOOLNAME=%SITENAME%
 SET APPPOOLUSER=
 SET APPPOOLPSW=
 SET BINDINGPORT=80
 SET BINDINGTYPE=http
-SET HOSTNAME=testsite
+SET HOSTNAME=projectname
 SET APPCMD=CALL %WINDIR%\system32\inetsrv\appcmd
 FOR /F %%i IN ("%PROJECTPATH%") DO SET SITEPATH=%%~fi
 

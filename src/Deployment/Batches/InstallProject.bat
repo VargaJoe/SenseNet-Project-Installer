@@ -1,12 +1,16 @@
 ECHO OFF
 
+Rem ================================== Important Note!
+Rem #1 Before running this batch file 
+Rem Check the connectionstrings section of the Import tool.
+
 ECHO ===============================================================================
 ECHO         Load Project Variables, Set Full Install Flag, Initiate Sn Files
 ECHO ===============================================================================
 
 call ProjectVariables.bat
 SET FULLINSTALL=Yes
-call InitiateSnFiles.bat 		rem extract packages
+rem call InitiateSnFiles.bat 		rem extract packages
 call BuildSnPackage.bat 		rem get basic webstructures and assemblies
 call GetBaseConfigs.bat 		rem create custom configs by basic package configs and predefined variables
 call InitiateAssemblies.bat 	rem copy base assemblies from package and configs from custom configs
@@ -19,10 +23,22 @@ ECHO ===========================================================================
 call InstallSenseNet.bat
 
 rem ECHO ===============================================================================
-rem ECHO             				Call Project Files Importer
+rem ECHO             				Call Admin User Importer
 rem ECHO ===============================================================================
 
-rem call BuildProject.bat
+rem call ImportAdminUsers.bat
+
+ECHO ===============================================================================
+ECHO             		Call Live Export / Import Tool Importer
+ECHO ===============================================================================
+
+call ImportLiveFeature.bat
+
+ECHO ===============================================================================
+ECHO             				Call Project Files Importer
+ECHO ===============================================================================
+
+call BuildProject.bat
 
 
 rem ECHO ===============================================================================

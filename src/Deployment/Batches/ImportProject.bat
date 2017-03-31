@@ -11,12 +11,12 @@ IF NOT "%PRJVARSLOADED%"=="Yes" (
 ECHO ===============================================================================
 ECHO             Import Project Files
 ECHO ===============================================================================
-IF EXIST %PROJECTSTRUCTUREPATH%\System\Schema (
+IF EXIST ..\source\website\Root\System\Schema\ContentTypes\ (
 	ECHO Contents import with CTD install
-	%PROJECTTOOLSPATH%\Import.exe -SCHEMA %PROJECTSTRUCTUREPATH%\System\Schema -SOURCE %PROJECTSTRUCTUREPATH% -TARGET /Root -ASM %ASSEMBLYPATH% -TRANSFORM ExcludeFields.xslt
+	%PROJECTTOOLSPATH%\Import.exe -SCHEMA %PROJECTSTRUCTUREPATH%\System\Schema -SOURCE %PROJECTSTRUCTUREPATH% -TARGET /Root -ASM %ASSEMBLYPATH% 
 ) ELSE (
 	ECHO import only Contents
-	%PROJECTTOOLSPATH%\Import.exe -SOURCE %PROJECTSTRUCTUREPATH% -TARGET /Root -ASM %ASSEMBLYPATH% -TRANSFORM ExcludeFields.xslt
+	%PROJECTTOOLSPATH%\Import.exe -SOURCE %PROJECTSTRUCTUREPATH% -TARGET /Root -ASM %ASSEMBLYPATH% 
 )
 
 IF NOT "%FULLINSTALL%"=="Yes" (

@@ -25,6 +25,18 @@
     <add name="SnCrMsSql" connectionString="Persist Security Info=False;Initial Catalog={$ctg};Data Source={$srv};Integrated Security=true" providerName="System.Data.SqlClient"/>
   </xsl:template>
 
+  <!-- <xsl:template match="sensenet[not(urlList)]">
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
+      <xsl:apply-templates select="node()"/>
+      <xsl:call-template name="urlList"/>
+    </xsl:copy>
+  </xsl:template> -->
+
+  <!--<xsl:template match="text()[contains(., 'urlList')]">
+    <xsl:call-template name="urlList"/>
+  </xsl:template>-->
+
   <xsl:template name="urlList" xml:space="preserve">
     <urlList>
       <sites>

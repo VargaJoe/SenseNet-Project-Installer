@@ -1,0 +1,9 @@
++InTree:(
+'/Root/Sites/rorweb'
+'/Root/Skins/rorweb'
+'/Root/Global/pagetemplates/rorweb*'
+'/Root/IMS'
+)
+-Type:MasterPage
++ModificationDate:>@@Yesterday@@
+.AUTOFILTERS:OFF

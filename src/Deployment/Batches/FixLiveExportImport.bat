@@ -1,4 +1,4 @@
-ECHO OFF
+@ECHO OFF
 
 IF NOT "%PRJVARSLOADED%"=="Yes" GOTO :LOAD
 IF NOT "%FULLINSTALL%"=="Yes" GOTO :LOAD
@@ -12,23 +12,14 @@ call ProjectVariables.bat
 :SKIP
 
 ECHO ===============================================================================
-ECHO             				Check If Host Record Is Prepared
+ECHO             					Copy Necessary Files 
 ECHO ===============================================================================
 
-@ECHO OFF
-
-SET HOSTSPATH=%WINDIR%\System32\drivers\etc\hosts
-SET NEWLINE=^& echo.
-
-FIND /C /I "%HOSTNAME%" %HOSTSPATH%
-IF %ERRORLEVEL% NEQ 0 (
-	rem we should check somehow if insert new line is necessary 
-	ECHO %NEWLINE%>>%HOSTSPATH% 
-	ECHO 127.0.0.1 	%HOSTNAME%>>%HOSTSPATH%
-) ELSE (
-	ECHO %HOSTNAME% host ALREADY EXISTS 
-)
-
-ipconfig /flushdns
-
-ECHO Done.
+attrib -r %ASSEMBLYPATH%\Import.exe 
+attrib -r %ASSEMBLYPATH%\Export.exe 
+attrib -r %ASSEMBLYPATH%\Indexpopulator.exe 
+attrib -r %ASSEMBLYPATH%\LiveExportImport.dll 
+xcopy %SNTOOLSPATH%\Import.exe %ASSEMBLYPATH% /Y
+xcopy %SNTOOLSPATH%\Export.exe %ASSEMBLYPATH% /Y
+xcopy %SNTOOLSPATH%\Indexpopulator.exe %ASSEMBLYPATH% /Y
+xcopy %CUCTOMFERENCESPATH%\LiveExportImport.dll %ASSEMBLYPATH% /Y
