@@ -27,7 +27,7 @@ Prerequisits are mostly come from the scripts that are made for managing Sense/N
 ## Powershell script modules:
 
 - `StartWebsiteAppPool`: starts the site by the given parameter. 
-```
+```powershell
 StartWebsiteAppPool.ps1 [SiteName]
 ```
 - `StopWebsiteAppPool`: stops the site by the given parameter.
@@ -35,15 +35,15 @@ StartWebsiteAppPool.ps1 [SiteName]
 StopWebsiteAppPool.ps1 [SiteName]
 ```
 - BuildSnSolution: builds the solution by the given parameter.
-```
+```powershell
 BuildSnSolution.ps1` -slnPath [Solution file path. It is .sln file]
 ```
 - `Create-IISSite`: creates the application pool and the site. In the first parameter you need to set the application pool (same site name) and in the second parameter you need to set the site’s physical path on the hard drive.
-```
+```powershell
 Create-IISSite.ps1 [SiteName] [site’s physicalPath]
 ```
 - `GetLatestSolution`: gets the latest version from the repository.
-```
+```powershell
 GetLatestSolution.ps1 -tfexepath [tf.exe physical path] –location [project source folder path]
 ```
 - `Import-Module`: imports the project files to the repository.
@@ -60,12 +60,12 @@ GetLatestSolution.ps1 -tfexepath [tf.exe physical path] –location [project sou
 unzip.ps1 -filename [zip file path] -destname [destination path]
 ```
 - `START`: You can run it in different modes: 
--- fullinstall: runs sensenet install process.
+** fullinstall: runs sensenet install process.
 
 ## Local install 
 
 If everything've set right, you can call the scripts simply with the following parameter:
-```
+```powershell
 START.ps1 fullinstall
 ```
 
