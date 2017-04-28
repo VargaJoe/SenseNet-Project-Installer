@@ -23,6 +23,9 @@ Prerequisits are mostly come from the scripts that are made for managing Sense/N
 3. IIS
 3. PowerShell (or obsolate batch scripts uses command line)
 4. Environment settings
+	- SenseNet package install needs the package file into Releases folder.
+	- Download and install the 7-Zip application from http://www.7-zip.org/.
+	- Enable the powershell script running permission: PS C:\PowerShell-PowerUp> Set-ExecutionPolicy unrestricted
 
 ## Powershell script modules:
 
