@@ -1,0 +1,35 @@
+{
+  "DataBase": {
+    "DataSource": "MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": "Project"
+  },
+  "IIS": {
+    "WebAppName": "Project",
+    "AppPoolName": "Project",
+	"Hosts": [ "project", "testproject" ],
+    "DotNetVersion": "v4.0"
+  },
+  "Platform": {
+    "PackageFolderPath": "",
+    "PackageName": "",
+    "SourceFolderPath": "",
+    "SolutionFilePath": ""
+  }, 
+  "Project": {
+    "SourceFolderPath": "..\\..\\",
+    "WebFolderPath": "..\\..\\Source\\WebSite",
+	"WebConfigFilePath": "..\\..\\Source\\WebSite\\web.config",
+	"SnAdminFilePath": "..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": "..\\..\\Source\\WebSite\\Tools",
+	"DeployFolderPath": "..\\..\\Source\\WebSite\\deploy",
+    "SolutionFilePath": "..\\..\\Source\\Project.sln"
+  },
+  "Tools": {
+    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe",
+    "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
+    "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
+    "NuGetFolderPath": "..\\Tools\\nuget",
+    "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
+  }
+
+}

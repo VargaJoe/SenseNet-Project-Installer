@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>Site</ContentType>
+  <ContentName>project</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[project]]></DisplayName>
+    <UrlList>
+      <Url authType='Forms'>project</Url>
+    </UrlList>
+    <LoginPage>
+      <Path>/Root/Sites/project/login</Path>
+    </LoginPage>
+    <DenyCrossSiteAccess>false</DenyCrossSiteAccess>
+	<AllowedChildTypes>Folder, Workspace, Profiles, Image, DocumentLibrary, ImageLibrary, MemoList, TaskList, CustomList, SmartFolder, SystemFolder, Page</AllowedChildTypes>
+  </Fields>
+  <Permissions>
+    <Clear />
+    <Identity path="/Root/IMS/BuiltIn/Portal/Visitor">
+      <See>Allowed</See>
+    </Identity>
+    <Identity path="/Root/IMS/BuiltIn/Portal/Everyone">
+      <See>Allowed</See>
+      <Open>Allowed</Open>
+    </Identity>
+  </Permissions>
+</ContentMetaData>
+
+ 

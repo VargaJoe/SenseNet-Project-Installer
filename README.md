@@ -1,5 +1,7 @@
 # SenseNet Project Installer
 
+> Outdated, update needed, if you're looking for the older version of the script, it's in the 'installer-6.5' branch.
+
 ## How it works
 
 This is basically a package of various scripts used by my team creating and managing custom project installations. There are some batch scripts as previously used solution, but lately we replaced them with powershell scripts.

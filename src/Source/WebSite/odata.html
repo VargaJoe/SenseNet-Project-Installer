@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+	    BODY {font-family: Arial, Helvetica, sans-serif;}
+		.div { margin: 0px 4px 4px 0px; padding: 2px; }
+		#resourceDiv { width: 100%; }
+		#resourceTextBox { width: 80%; font-size:larger; }
+		#requestBodyTextArea { width: 100%; }
+		.strong { font-weight: bold; }
+		.clear { clear: both; }
+
+		#methodDiv { border: 1px solid lightgray;}
+		#optionsDiv { border: 1px solid lightgray; float:left; }
+		#actionsDiv { border: 1px solid lightgray; float:left; }
+		#operationsSelect { width: 240px; }
+		
+		.optionsLabel { vertical-align: top; }
+		TABLE TR TD { padding: 0; margin: 0; border:0px solid red; }
+		INPUT { padding: 1; margin: 0; border:1px solid gray; }
+		.integerTextBox { width: 48px; }
+		.stringTextBox { width: 240px; }
+
+        #goButton { font-size: large; font-weight:bold; padding: 4px 20px 4px 20px; }
+
+		#resultTextArea { width: 100%;  height: 380px; }
+	</style>
+	<script src="http://code.jquery.com/jquery-1.7.1.js"></script>
+	<script type="text/javascript">
+		function go(){
+			var q = "";
+			var totalcount = $("#inlinecountCheckBox").attr('checked');
+
+			q = addParam(q, "$orderby",     "",     $("#orderbyTextBox").attr("value"));
+			q = addParam(q, "$top",         "",     $("#topTextBox").attr("value"));
+			q = addParam(q, "$skip",        "",     $("#skipTextBox").attr("value"));
+			q = addParam(q, "$filter",      "",     $("#filterTextBox").attr("value"));
+			q = addParam(q, "$expand",      "",     $("#expandTextBox").attr("value"));
+			q = addParam(q, "$select",      "",     $("#selectTextBox").attr("value"));
+			q = addParam(q, "query",       "",     $("#queryTextBox").attr("value"));
+			q = addParam(q, "$inlinecount", "",     $("#inlinecountCheckBox").attr('checked') == "checked" ? "allpages" : "");
+			q = addParam(q, "metadata",     "full", $('input[name=metadata]:checked', '#form').val() );
+
+			var action = $("#operationsSelect").find(':selected').val();
+			var url = "/OData.svc/" + $("#resourceTextBox").attr("value") + (action ? "/" + action : "") + (q ? "?" + q : "");
+			var verb = $('input[name=verb]:checked', '#form').val();
+			//var link = verb == "GET" ? "<a href='"+url+(q?"&":"?")+"$format=table' target='_blank'>view as table</a>" : "";
+
+			$("#url").html(url);
+			if (verb == "GET") {
+			    $("#viewastableLink").show();
+			    $("#viewastableLink").attr("href", url + (q ? "&" : "?") + "$format=table");
+			} else {
+			    $("#viewastableLink").hide();
+			    $("#viewastableLink").attr("href", "#");
+			}
+
+			var body = $("#requestBodyTextArea").val();
+			$.ajax({ url: url, type: verb, data: body, cache: false,
+				success: function (data) { $("#resultTextArea").val(JSON.stringify(data, null, 4)); },
+				error: function (jqXHR, textStatus, errorThrown) { $("#resultTextArea").val("ERROR:" + JSON.stringify(jqXHR, null, 4)); }
+			});
+		}
+		function addParam(base, name, defaultValue, value){
+			if(!value || value.length == 0 || value == defaultValue)
+				return base;
+			if(base.length > 0)
+				base += "&";
+			return base + name + "=" + value;
+        }
+        function toggleUrlEnd() {
+            var val = $("#resourceTextBox").attr("value");
+
+            var p = val.indexOf("')");
+            var newval;
+            if (p >= 0 && p == val.length - 2) {
+                newval = val.substr(0, p).replace("('", "/");
+            }
+            else {
+                var segs = val.split("/");
+                if (segs.length == 0)
+                    return;
+                if (segs[segs.length - 1].length == 0)
+                    segs.pop();
+                if (segs.length == 0)
+                    return;
+                var last = "('" + segs.pop() + "')";
+                if (segs.length > 0)
+                    segs.push(segs.pop() + last);
+                else
+                    segs.push(last);
+                newval = segs.join("/");
+            }
+            $("#resourceTextBox").attr("value", newval);
+        }
+
+        var operations;
+        var parameters;
+        var defaultOptionHtml = '<option value="" title="no operation">----</option>';
+        function loadOperations() {
+            var verb = $('input[name=verb]:checked', '#form').val();
+            var url = "/OData.svc/" + $("#resourceTextBox").attr("value");
+            var body = $("#requestBodyTextArea").val();
+
+            $.getJSON(url, function (data) {
+                var meta = data.d.__metadata;
+                operations = verb == "GET" ? meta.functions : meta.actions.concat(meta.functions);
+                var names = [];
+                var options = defaultOptionHtml;
+                for (var i = 0; i < operations.length; i++) {
+                    var op = operations[i];
+                    options += '<option value="' + op.name + '" title="' + op.title + '">' + op.name + '</option>';
+                }
+                $("#operationsSelect").html(options);
+                $("#parametersCell").html('');
+            });
+            // [{ "title": "Add Aspects", "name": "AddAspects", "forbidden": false, "target": "/OData.svc/workspaces('Document')/AddAspects",
+            //    "parameters": [ { "name": "aspects", "type": "string[]", "required": true } ] } ]
+        }
+        function resetOperations() {
+            $("#operationsSelect").html(defaultOptionHtml);
+            $("#parametersCell").html('');
+            $("#requestBodyTextArea").val('');
+        }
+        function selectOperation() {
+            var name = $("#operationsSelect").find(':selected').val();
+            if (name.length == 0) {
+                $("#parametersCell").html('');
+                $("#requestBodyTextArea").val('');
+                return;
+            }
+            var operation = getObjectByName(operations, name);
+            //alert(JSON.stringify(operation, null, 4));
+            var parametersHtml = "<table>";
+            parameters = {};
+            for (var i = 0; i < operation.parameters.length; i++) {
+                var op = operation.parameters[i];
+                parametersHtml += createActionParameterRow(op.name, op.type, op.required);
+                parameters[op.name] = null;
+            }
+            parametersHtml += "</table>";
+            $("#parametersCell").html(parametersHtml);
+            $("#requestBodyTextArea").val(JSON.stringify(parameters, null, 4));
+        }
+        function createActionParameterRow(name, type, required) {
+            return '<tr><td>' + name + (required ? '*' : '') + '</td><td><input type="text" name="'+name+'" class="stringTextBox" onchange="parameterChanged(this);" /></td><td>' + type + '</td></tr>';
+        }
+        function parameterChanged(control) {
+            var op = $("#operationsSelect").find(':selected').val();
+            var name = $(control).attr("name");
+            var value = $(control).val();
+            var parameter = getParameterByName(op, name);
+            if (parameter.type == "string[]") {
+                var words = value.split(',');
+                for (var i = 0; i < words.length; i++)
+                    words[i] = words[i].trim();
+                parameters[name] = words;
+            }
+            else {
+                parameters[name] = value;
+            }
+            $("#requestBodyTextArea").val(JSON.stringify(parameters, null, 4));
+        }
+
+        //---------------------------------------
+
+        function getParameterByName(opName, prmName) {
+            var operation = $.grep(operations, function (op) { return op.name == opName })[0];
+            return $.grep(operation.parameters, function (op) { return op.name == prmName })[0];
+        }
+        function getObjectByName(obj, name) {
+            return $.grep(obj, function (o) { return o.name == name })[0];
+        }
+	</script>
+</head>
+<body>
+<form id="form">
+	<div id="resourceDiv" class="div">
+        <span class="strong">/OData.svc/</span>
+        <input type="text" id="resourceTextBox" value="workspaces('Document')" onchange="resetOperations();"/>
+	    <input type="button" id="toggleButton" value="toggle" onclick="toggleUrlEnd();" />
+    </div>
+	<div id="methodDiv" class="div">
+		<span class="strong">HTTP Method:</span>
+		<input type="radio" name="verb" value="GET" checked="true" />GET&nbsp;&nbsp;
+		<input type="radio" name="verb" value="POST" />POST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="radio" name="verb" value="PUT" />PUT&nbsp;&nbsp;
+		<input type="radio" name="verb" value="MERGE" />MERGE&nbsp;&nbsp;
+		<input type="radio" name="verb" value="PATCH" />PATCH&nbsp;&nbsp;
+		<input type="radio" name="verb" value="DELETE" />DELETE&nbsp;&nbsp;
+	</div>
+    <div class="clear">
+	    <div id="optionsDiv" class="div">
+		    <table>
+			    <tr><td class="optionsLabel strong">Options</td><td>
+				    <table>
+					    <tr><td>$orderby:</td><td><input type="text" id="orderbyTextBox" class="stringTextBox" /></td></tr>
+					    <tr><td>$top:    </td><td><input type="text" id="topTextBox" class="integerTextBox" /></td></tr>
+					    <tr><td>$skip:   </td><td><input type="text" id="skipTextBox" class="integerTextBox" /></td></tr>
+					    <tr><td>$filter: </td><td><input type="text" id="filterTextBox" class="stringTextBox" /></td></tr>
+					    <tr><td>$expand: </td><td><input type="text" id="expandTextBox" class="stringTextBox" /></td></tr>
+					    <tr><td>$select: </td><td><input type="text" id="selectTextBox" class="stringTextBox" /></td></tr>
+					    <tr><td>query:   </td><td><input type="text" id="queryTextBox" class="stringTextBox" /></td></tr>
+					    <tr><td>total count: </td><td><input type="checkbox" id="inlinecountCheckBox" /></td></tr>
+					    <tr><td>metadata: </td><td>
+							    Full:<input type="radio" name="metadata" value="full" checked="true" />
+							    Minimal:<input type="radio" name="metadata" value="minimal" />
+							    No:<input type="radio" name="metadata" value="no" />
+						    </td></tr>
+				    </table>
+			    </td></tr>
+		    </table>
+	    </div>
+	    <div id="actionsDiv" class="div">
+		    <table>
+			    <tr><td class="optionsLabel strong">Operations:</td><td>
+                    <select id="operationsSelect" onchange="selectOperation();">
+                        <option value="" title="no operation">----</option>
+                    </select>
+                    <input type="button" id="loadOperationsButton" value="load" onclick="loadOperations();" />
+                </td></tr>
+			    <tr><td class="optionsLabel strong">Parameters:</td><td id="parametersCell">
+			    </td></tr>
+		    </table>
+	    </div>
+	    <div class="clear">
+	    </div>
+    </div>
+	<div class="div"><span class="strong">Request stream:</span><br/><textarea rows="7" id="requestBodyTextArea"></textarea></div>
+	<div><input type="button" id="goButton" value="Go" onclick="go();" /></div>
+	<div class="div">URL: <span id="url" class="div">???</span> <a id="viewastableLink" href="#" target="_blank">view as table</a> </div>
+	<div class="div"><span class="strong">Result:</span><br/><textarea rows="8" id="resultTextArea"></textarea></div>
+</form>
+</body>
+</html>

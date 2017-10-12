@@ -1,0 +1,31 @@
+<Package type='Tool' >
+	<Id>Custom Project install</Id>
+	<Description>Install your project's custom contents and make changes on product settings</Description>
+	<ReleaseDate>2017-06-23</ReleaseDate>
+	<Version>1.0.0</Version>
+	<Steps>
+		<Phase>
+			<StartRepository startLuceneManager="false" startWorkflowEngine="false" />
+
+			<!-- Import project Contents -->
+			<!-- <Import target="/Root" resetSecurity="false" LogLevel="Verbose" source="import"  /> -->
+			
+			<!-- Explore's right side throw errors without this -->
+			<EditPermissions path="/Root/(apps)/GenericContent/ContentStoreGetTreeNodeAllChildren" identity="/Root/IMS/BuiltIn/Portal/ContentExplorers" allow="RunApplication"/>
+			<EditPermissions path="/Root/(apps)/GenericContent/Delete" identity="/Root/IMS/BuiltIn/Portal/ContentExplorers" allow="Open" localonly="true"/>
+			<EditPermissions path="/Root/System/SystemPlugins/ListView/ExploreView.ascx" identity="/Root/IMS/BuiltIn/Portal/ContentExplorer" allow="See"/>
+
+			<!-- Can not delete Contents without this -->
+			<EditPermissions path="/Root/Trash" identity="/Root/IMS/BuiltIn/Portal/IdentifiedUsers" allow="Save,AddNew,Delete,RunApplication"/>
+
+			<!-- Can not copy Contents without this -->
+			<EditPermissions path="/Root/(apps)/GenericContent/CopyTo" identity="/Root/IMS/BuiltIn/Portal/Everyone" allow="RunApplication"/>
+
+			<!-- Other -->
+			<EditPermissions path="/Root/System/Schema/ContentTypes" identity="/Root/IMS/BuiltIn/Portal/IdentifiedUsers" allow="Open"/>
+			<EditPermissions path="/Root/(apps)/GenericContent/DialogUploadGetUserUploads" identity="/Root/IMS/BuiltIn/Portal/IdentifiedUsers" allow="RunApplication"/>
+
+			<Import target="/Root" resetSecurity="false" LogLevel="Verbose" source="Root" sourceIsRelativeTo="TargetDirectory" />
+		</Phase>
+	</Steps>
+</Package>
