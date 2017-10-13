@@ -20,12 +20,17 @@ $ErrorActionPreference = "Stop"
 . ".\Init-Functions.ps1"
 . ".\Default-Modules.ps1"
 
-$DefaultSettingsPath = Set-SettingsPath -SettingName "default"
-Write-Host default setting path: $DefaultSettingsPath
-$DefaultSettings = Load-Settings -SettingsPath $DefaultSettingsPath
 
-$ProjectSettingsPath = Set-SettingsPath $Settings
-Write-Host project setting path: $ProjectSettingsPath 
-$ProjectSettings = Load-Settings -SettingsPath $ProjectSettingsPath
+if (Is-Administrator) {
+	$DefaultSettingsPath = Set-SettingsPath -SettingName "default"
+	Write-Host default setting path: $DefaultSettingsPath
+	$DefaultSettings = Load-Settings -SettingsPath $DefaultSettingsPath
 
-Run-Modules "$Mode"
+	$ProjectSettingsPath = Set-SettingsPath $Settings
+	Write-Host project setting path: $ProjectSettingsPath 
+	$ProjectSettings = Load-Settings -SettingsPath $ProjectSettingsPath
+
+	Run-Modules "$Mode"
+} else {
+	Write-Host You have to run this script in administrator mode!
+}

@@ -63,7 +63,18 @@ Function Run-Modules {
 		Write-Host Running Module Name: $Mode
 		Invoke-Expression Module-"$Mode" 
 	}
-	
+}
+
+Function Is-Administrator {
+	$Result = $False
+	If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
+		[Security.Principal.WindowsBuiltInRole] "Administrator"))
+	{
+		$Result = $False
+	} else {
+		$Result = $True
+	}
+	return $Result
 }
 
 Function Go-Verbose {
