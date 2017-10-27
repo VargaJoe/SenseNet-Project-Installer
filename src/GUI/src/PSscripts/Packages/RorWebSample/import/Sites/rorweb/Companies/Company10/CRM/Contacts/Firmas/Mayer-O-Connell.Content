@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Mayer-O-Connell</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Mayer-O'Connell]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Leverandør</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0937_Evje og Hornnes</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[647071859]]></OrgNumber>
+    <Email><![CDATA[nblabie6p@vk.com]]></Email>
+    <Telephone><![CDATA[33-(258)511-5911]]></Telephone>
+    <Company_Addresse><![CDATA[9 Schurz Point]]></Company_Addresse>
+    <Company_Sted><![CDATA[Paris 15]]></Company_Sted>
+    <Company_Postnumber><![CDATA[3525]]></Company_Postnumber>
+    <Postal_Address><![CDATA[9 Schurz Point]]></Postal_Address>
+    <Postal_Sted><![CDATA[Paris 15]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[3525]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Mayer-O-Connell.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:40.52</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:40.52</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

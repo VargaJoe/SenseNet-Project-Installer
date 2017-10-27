@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMContact</ContentType>
+  <ContentName>Dorene Fetter</ContentName>
+  <Fields>
+    <Firstname><![CDATA[Dorene]]></Firstname>
+    <Lastname><![CDATA[Fetter]]></Lastname>
+    <CRMRolle>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Roles/Lærling</Path>
+    </CRMRolle>
+    <IsTiltakshaver>true</IsTiltakshaver>
+    <Firmas>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Firmas/Sparebanken Vest</Path>
+    </Firmas>
+    <Email><![CDATA[dfetterb6@bigcartel.com]]></Email>
+    <Mobile><![CDATA[55-(277)540-4804]]></Mobile>
+    <Postal_City><![CDATA[Cícero Dantas]]></Postal_City>
+    <Postal_ZIP><![CDATA[2431]]></Postal_ZIP>
+    <Site_Address><![CDATA[9428 Lakeland Crossing]]></Site_Address>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Dorene Fetter.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <DisplayName><![CDATA[Dorene Fetter]]></DisplayName>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T14:41:17.59</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T14:41:17.59</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

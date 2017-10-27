@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMContact</ContentType>
+  <ContentName>Giraldo Pydcock</ContentName>
+  <Fields>
+    <Firstname><![CDATA[Giraldo]]></Firstname>
+    <Lastname><![CDATA[Pydcock]]></Lastname>
+    <CRMRolle>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Roles/Kontorsjef</Path>
+    </CRMRolle>
+    <IsTiltakshaver>false</IsTiltakshaver>
+    <Firmas>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Firmas/Transparent Turtle rørledning</Path>
+    </Firmas>
+    <Email><![CDATA[gpydcockbb@shinystat.com]]></Email>
+    <Mobile><![CDATA[373-(457)541-0876]]></Mobile>
+    <Postal_City><![CDATA[Criuleni]]></Postal_City>
+    <Postal_ZIP><![CDATA[8732]]></Postal_ZIP>
+    <Site_Address><![CDATA[2061 Grayhawk Avenue]]></Site_Address>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Giraldo Pydcock.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <DisplayName><![CDATA[Giraldo Pydcock]]></DisplayName>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:14.27</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:14.27</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

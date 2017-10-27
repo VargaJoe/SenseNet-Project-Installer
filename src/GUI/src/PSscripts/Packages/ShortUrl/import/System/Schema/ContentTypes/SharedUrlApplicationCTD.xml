@@ -1,0 +1,49 @@
+﻿<ContentType name="SharedUrlApplication" parentType="SystemFolder" handler="SharedUrl.SharedUrlApplication" xmlns="http://schemas.sensenet.com/SenseNet/ContentRepository/ContentTypeDefinition">
+  <DisplayName>SharedUrlApplication</DisplayName>
+  <Description></Description>
+  <Icon>Application</Icon>
+  <AllowedChildTypes>
+    SharedUrl
+  </AllowedChildTypes>
+  <Fields>
+    <Field name="DisplayName" type="ShortText">
+      <DisplayName>DisplayName</DisplayName>
+      <Description></Description>
+      <Configuration>
+        <VisibleBrowse>Hide</VisibleBrowse>
+          <VisibleEdit>Hide</VisibleEdit>
+          <VisibleNew>Hide</VisibleNew>
+      </Configuration>
+    </Field>
+    <Field name="Elevate" type="Boolean">
+      <Configuration>
+        <VisibleBrowse>Show</VisibleBrowse>
+        <VisibleEdit>Show</VisibleEdit>
+        <VisibleNew>Show</VisibleNew>
+      </Configuration>
+    </Field>
+    <Field name="SharedUrlMode" type="Choice">
+      <DisplayName>SharedUrlMode</DisplayName>
+      <Description></Description>
+      <Configuration>
+        <AllowMultiple>false</AllowMultiple>
+        <AllowExtraValue>false</AllowExtraValue>
+        <Options>
+          <Option selected="true" value="contentpath">Content Path</Option>
+          <Option value="session">Session</Option>
+          <Option value="hybrid">Hybrid</Option>
+        </Options>
+        <ReadOnly>false</ReadOnly>
+        <Compulsory>false</Compulsory>
+        <DefaultValue></DefaultValue>
+        <VisibleBrowse>Show</VisibleBrowse>
+        <VisibleEdit>Show</VisibleEdit>
+        <VisibleNew>Show</VisibleNew>
+      </Configuration>
+    </Field>      
+    <Field name="SessionKey" type="ShortText">
+      <DisplayName>SessionKey</DisplayName>
+      <Description></Description>
+    </Field>    
+  </Fields>
+</ContentType>

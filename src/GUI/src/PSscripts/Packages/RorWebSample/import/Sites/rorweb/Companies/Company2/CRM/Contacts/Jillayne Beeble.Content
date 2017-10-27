@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMContact</ContentType>
+  <ContentName>Jillayne Beeble</ContentName>
+  <Fields>
+    <Firstname><![CDATA[Jillayne]]></Firstname>
+    <Lastname><![CDATA[Beeble]]></Lastname>
+    <CRMRolle>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Roles/Lærling</Path>
+    </CRMRolle>
+    <IsTiltakshaver>true</IsTiltakshaver>
+    <Firmas>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Firmas/Brown Tiger rørledning</Path>
+    </Firmas>
+    <Email><![CDATA[jbeeble3r@blogger.com]]></Email>
+    <Mobile><![CDATA[224-(657)651-4356]]></Mobile>
+    <Postal_City><![CDATA[Dalaba]]></Postal_City>
+    <Postal_ZIP><![CDATA[9134]]></Postal_ZIP>
+    <Site_Address><![CDATA[53700 Pankratz Hill]]></Site_Address>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Jillayne Beeble.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <DisplayName><![CDATA[Jillayne Beeble]]></DisplayName>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:14.71</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:14.71</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

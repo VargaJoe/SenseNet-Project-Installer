@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>User</ContentType>
+  <ContentName>cmpadmin1</ContentName>
+  <Fields>
+    <LoginName><![CDATA[cmpadmin1]]></LoginName>
+    <DisplayName><![CDATA[cmpadmin1]]></DisplayName>
+    <Enabled>true</Enabled>
+    <Email><![CDATA[cmpadm1@gmail.com]]></Email>
+    <FullName><![CDATA[cmpadmin1]]></FullName>
+    <ImageRef />
+    <ImageData attachment="cmpadmin1.ImageData" />
+    <Password>
+      <Hash>$2a$10$JF9cddqgRTDFRYXdicPEiOXXR078ria6m5.iDllM7EBWaRp1/NyfG</Hash>
+    </Password>
+    <TrashDisabled>false</TrashDisabled>
+    <Language>en</Language>
+    <Owner>
+      <Path>/Root/IMS/Rorweb/Clients/cmpadmin1</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <CreatedBy>
+      <Path>/Root/IMS/Rorweb/Clients/cmpadmin1</Path>
+    </CreatedBy>
+    <CreationDate>2017-03-24T08:30:47.85</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-03-24T10:31:05.85</ModificationDate>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

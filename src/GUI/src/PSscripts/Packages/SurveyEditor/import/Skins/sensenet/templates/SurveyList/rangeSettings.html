@@ -1,0 +1,7 @@
+﻿<label>#= MinValue.title#</label>
+<input id="MinValue" min="#= MinValue.defaultValue#" type="#= MinValue.type#" value="#= MinValue.defaultValue#" />
+<label>#= MaxValue.title#</label>
+<input id="MaxValue" min="#= (MinValue.defaultValue + 1)#" type="#= MaxValue.type#" value="#= MaxValue.defaultValue#" />
+<label>#= Step.title#</label>
+<input min="1" id="Step" type="#= Step.type#" value="#= Step.defaultValue#" />
+<span class="error hidden"></span>

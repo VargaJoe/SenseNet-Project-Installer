@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>Settings</ContentType>
+  <ContentName>SharedUrl.settings</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[ShortUrl.settings]]></DisplayName>
+    <Index>0</Index>
+    <GlobalOnly>false</GlobalOnly>
+    <Binary attachment="SharedUrl.settings" />
+    <Hidden>false</Hidden>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

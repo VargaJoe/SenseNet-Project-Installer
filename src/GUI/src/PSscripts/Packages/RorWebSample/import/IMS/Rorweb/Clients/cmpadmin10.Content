@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>User</ContentType>
+  <ContentName>cmpadmin10</ContentName>
+  <Fields>
+    <LoginName><![CDATA[cmpadmin10]]></LoginName>
+    <DisplayName><![CDATA[cmpadmin10]]></DisplayName>
+    <JobTitle><![CDATA[]]></JobTitle>
+    <Enabled>true</Enabled>
+    <Email><![CDATA[cmpadmin10@gmail.com]]></Email>
+    <FullName><![CDATA[cmpadmin10]]></FullName>
+    <ImageRef />
+    <ImageData attachment="cmpadmin10.ImageData" />
+    <Password>
+      <Hash>$2a$10$u/8Ti/ur7DiUavxmgWZw3e6hLs/wESo4ki1kVbBFvu.55WZBd3XPS</Hash>
+    </Password>
+    <SyncGuid><![CDATA[]]></SyncGuid>
+    <LastSync>0001-01-01T00:00:00</LastSync>
+    <Manager />
+    <Department><![CDATA[]]></Department>
+    <Languages><![CDATA[]]></Languages>
+    <Phone><![CDATA[]]></Phone>
+    <TrashDisabled>false</TrashDisabled>
+    <Gender>...</Gender>
+    <MaritalStatus>...</MaritalStatus>
+    <BirthDate>0001-01-01T00:00:00</BirthDate>
+    <Education><![CDATA[]]></Education>
+    <TwitterAccount><![CDATA[]]></TwitterAccount>
+    <FacebookURL><![CDATA[]]></FacebookURL>
+    <LinkedInURL><![CDATA[]]></LinkedInURL>
+    <Language>en</Language>
+    <FollowedWorkspaces />
+    <Owner>
+      <Path>/Root/IMS/Rorweb/Clients/cmpadmin10</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/Rorweb/Clients/cmpadmin10</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T10:53:55.84</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:39:11.21</ModificationDate>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

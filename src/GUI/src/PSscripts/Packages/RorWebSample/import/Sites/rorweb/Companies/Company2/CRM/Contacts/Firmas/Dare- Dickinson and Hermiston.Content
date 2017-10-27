@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Dare- Dickinson and Hermiston</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Dare, Dickinson and Hermiston]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Søknadskommune</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1263_Lindås</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[133747932]]></OrgNumber>
+    <Email><![CDATA[dmcareavey52@delicious.com]]></Email>
+    <Telephone><![CDATA[54-(990)433-2301]]></Telephone>
+    <Company_Addresse><![CDATA[618 Loomis Park]]></Company_Addresse>
+    <Company_Sted><![CDATA[La Cumbre]]></Company_Sted>
+    <Company_Postnumber><![CDATA[3690]]></Company_Postnumber>
+    <Postal_Address><![CDATA[618 Loomis Park]]></Postal_Address>
+    <Postal_Sted><![CDATA[La Cumbre]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[3690]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Dare- Dickinson and Hermiston.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:32.62</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:32.62</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

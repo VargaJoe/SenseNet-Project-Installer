@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMContact</ContentType>
+  <ContentName>Elbert Wey</ContentName>
+  <Fields>
+    <Firstname><![CDATA[Elbert]]></Firstname>
+    <Lastname><![CDATA[Wey]]></Lastname>
+    <CRMRolle>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Roles/Fagansvarlig</Path>
+    </CRMRolle>
+    <IsTiltakshaver>false</IsTiltakshaver>
+    <Firmas>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Firmas/The Blue Fork rørledning Company</Path>
+    </Firmas>
+    <Email><![CDATA[ewey8w@princeton.edu]]></Email>
+    <Mobile><![CDATA[63-(973)680-6339]]></Mobile>
+    <Postal_City><![CDATA[Palguyod]]></Postal_City>
+    <Postal_ZIP><![CDATA[10385]]></Postal_ZIP>
+    <Site_Address><![CDATA[761 Marcy Avenue]]></Site_Address>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Elbert Wey.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <DisplayName><![CDATA[Elbert Wey]]></DisplayName>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:15.46</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:15.46</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

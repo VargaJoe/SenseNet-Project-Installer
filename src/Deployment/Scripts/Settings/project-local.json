@@ -25,11 +25,10 @@
     "SolutionFilePath": "..\\..\\Source\\Project.sln"
   },
   "Tools": {
-    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe",
+    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\tf.exe",
     "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
     "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
     "NuGetFolderPath": "..\\Tools\\nuget",
     "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
   }
-
 }

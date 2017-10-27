@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Purdy-Morar</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Purdy-Morar]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Søknadskommune</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0137_Våler</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[789349862]]></OrgNumber>
+    <Email><![CDATA[ftuttonde@dagondesign.com]]></Email>
+    <Telephone><![CDATA[234-(198)451-3639]]></Telephone>
+    <Company_Addresse><![CDATA[40298 American Ash Lane]]></Company_Addresse>
+    <Company_Sted><![CDATA[Ajasse Ipo]]></Company_Sted>
+    <Company_Postnumber><![CDATA[3343]]></Company_Postnumber>
+    <Postal_Address><![CDATA[40298 American Ash Lane]]></Postal_Address>
+    <Postal_Sted><![CDATA[Ajasse Ipo]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[3343]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Purdy-Morar.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:36.09</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:36.09</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

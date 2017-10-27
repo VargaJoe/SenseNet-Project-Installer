@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Roberts Inc</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Roberts Inc]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Søknadskommune</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1018_Søgne</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[308927919]]></OrgNumber>
+    <Email><![CDATA[dbjerkan93@nature.com]]></Email>
+    <Telephone><![CDATA[86-(133)610-3306]]></Telephone>
+    <Company_Addresse><![CDATA[9412 Summit Crossing]]></Company_Addresse>
+    <Company_Sted><![CDATA[Shifan]]></Company_Sted>
+    <Company_Postnumber><![CDATA[1123]]></Company_Postnumber>
+    <Postal_Address><![CDATA[9412 Summit Crossing]]></Postal_Address>
+    <Postal_Sted><![CDATA[Shifan]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[1123]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Roberts Inc.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:35.17</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:35.17</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

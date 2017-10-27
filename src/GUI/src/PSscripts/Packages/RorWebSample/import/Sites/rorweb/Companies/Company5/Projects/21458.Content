@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebProject</ContentType>
+  <ContentName>21458</ContentName>
+  <Fields>
+    <ProjectNumber><![CDATA[984654]]></ProjectNumber>
+    <ProjectDate>2017-09-10T22:00:00</ProjectDate>
+    <GardsNumber><![CDATA[5634]]></GardsNumber>
+    <BruksNumber><![CDATA[563]]></BruksNumber>
+    <FesteNumber><![CDATA[34]]></FesteNumber>
+    <SeksjonsNumber><![CDATA[657]]></SeksjonsNumber>
+    <BygningsNumber><![CDATA[53]]></BygningsNumber>
+    <BoligNumber><![CDATA[7]]></BoligNumber>
+    <CaseNumber><![CDATA[89563]]></CaseNumber>
+    <CaseNumber_Year><![CDATA[3456]]></CaseNumber_Year>
+    <Address_Eiendom><![CDATA[3 Melrose Point]]></Address_Eiendom>
+    <PostalCode><![CDATA[3579]]></PostalCode>
+    <City><![CDATA[Socos]]></City>
+    <Assignement><![CDATA[]]></Assignement>
+    <BuildingType>new</BuildingType>
+    <IsArchive>false</IsArchive>
+    <ProjectCustomer>
+      <Path>/Root/Sites/rorweb/Companies/Company5/CRM/Contacts/Firmas/Hayes-Schiller</Path>
+    </ProjectCustomer>
+    <ResponsibleCompany>
+      <Path>/Root/Sites/rorweb/Companies/Company5/CRM/Contacts/Firmas/Kertzmann-Simonis</Path>
+    </ResponsibleCompany>
+    <ApproverMunicipality>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1120_Klepp</Path>
+    </ApproverMunicipality>
+    <Kommune><![CDATA[1120]]></Kommune>
+    <PlantID><![CDATA[]]></PlantID>
+    <LastBoligmappaUpload>0001-01-01T00:00:00</LastBoligmappaUpload>
+    <HaveBoligmappaUpload>false</HaveBoligmappaUpload>
+    <DisplayName><![CDATA[21458]]></DisplayName>
+    <Owner>
+      <Path>/Root/IMS/Rorweb/Clients/cmpadmin5</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/Rorweb/Clients/cmpadmin5</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T14:39:13.57</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/Rorweb/Clients/cmpadmin5</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:51:46.37</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

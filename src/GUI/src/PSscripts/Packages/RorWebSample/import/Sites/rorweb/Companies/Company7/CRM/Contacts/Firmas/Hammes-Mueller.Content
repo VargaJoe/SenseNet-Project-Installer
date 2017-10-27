@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Hammes-Mueller</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Hammes-Mueller]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Ansvarlig foretak</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0622_Krødsherad</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[464165943]]></OrgNumber>
+    <Email><![CDATA[ralexis4v@goodreads.com]]></Email>
+    <Telephone><![CDATA[670-(589)670-8505]]></Telephone>
+    <Company_Addresse><![CDATA[06816 Hanover Crossing]]></Company_Addresse>
+    <Company_Sted><![CDATA[Aileu]]></Company_Sted>
+    <Company_Postnumber><![CDATA[2511]]></Company_Postnumber>
+    <Postal_Address><![CDATA[06816 Hanover Crossing]]></Postal_Address>
+    <Postal_Sted><![CDATA[Aileu]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[2511]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Hammes-Mueller.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:34.63</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:34.63</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

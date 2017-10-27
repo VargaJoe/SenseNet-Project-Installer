@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMContact</ContentType>
+  <ContentName>Michaella Spavins</ContentName>
+  <Fields>
+    <Firstname><![CDATA[Michaella]]></Firstname>
+    <Lastname><![CDATA[Spavins]]></Lastname>
+    <CRMRolle>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Roles/Rorlegger</Path>
+    </CRMRolle>
+    <IsTiltakshaver>true</IsTiltakshaver>
+    <Firmas>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Firmas/CA Technologies</Path>
+    </Firmas>
+    <Email><![CDATA[mspavinsqc@miibeian.gov.cn]]></Email>
+    <Mobile><![CDATA[86-(434)349-4806]]></Mobile>
+    <Postal_City><![CDATA[Nanhuang]]></Postal_City>
+    <Postal_ZIP><![CDATA[4933]]></Postal_ZIP>
+    <Site_Address><![CDATA[37 8th Plaza]]></Site_Address>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Michaella Spavins.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <DisplayName><![CDATA[Michaella Spavins]]></DisplayName>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T14:41:19.54</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T14:41:19.54</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

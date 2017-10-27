@@ -1,0 +1,5 @@
+﻿<ContentType name="SurveyListItem" parentType="ListItem" handler="SenseNet.ContentRepository.GenericContent" xmlns="http://schemas.sensenet.com/SenseNet/ContentRepository/ContentTypeDefinition">
+  <DisplayName>$Ctd-SurveyListItem,DisplayName</DisplayName>
+  <Description>$Ctd-SurveyListItem,Description</Description>
+  <Icon>FormItem</Icon>
+</ContentType>

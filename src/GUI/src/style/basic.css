@@ -1,0 +1,63 @@
+body{
+    background-image: url("../img/background_v21.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    /* background: -moz-linear-gradient(45deg, rgba(56,255,202,1) 0%, rgba(0,128,128,1) 100%);
+    background: -webkit-gradient(linear, left bottom, right top, color-stop(0%, rgba(56,255,202,1)), color-stop(100%, rgba(0,128,128,1))); 
+    background: -webkit-linear-gradient(45deg, rgba(56,255,202,1) 0%, rgba(0,128,128,1) 100%); 
+    background: -o-linear-gradient(45deg, rgba(56,255,202,1) 0%, rgba(0,128,128,1) 100%); 
+    background: -ms-linear-gradient(45deg, rgba(56,255,202,1) 0%, rgba(0,128,128,1) 100%); 
+    background: linear-gradient(45deg, rgba(56,255,202,1) 0%, rgba(0,128,128,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#008080', endColorstr='#38FFCA',GradientType=1 );
+    height: 100%;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;  */
+}
+
+h1{
+    color: white;
+}
+
+.hidden{
+    display: none;
+}
+
+.fullwidth {
+    width: 100%;
+}
+
+div.mainmenu div{
+    border-right: 1px solid rgba(0, 0, 0, 0.19);
+    background-color: rgba(1,1,1,0.3);
+    cursor: pointer;
+}
+
+.tabitem{
+    color:white;
+}
+
+.margintop30{
+    margin-top: 30px;
+}
+
+/* Overwrite bootstrap  */
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover{
+    background-color: #21cbab;
+}
+
+.nav>li>a:focus, .nav>li>a:hover{
+    background-color: #27d8b3;
+}
+
+.nav-tabs>li>a{
+    border-radius: 0;
+    color: #2b6056;
+}
+
+.list-group-item:first-child{
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}

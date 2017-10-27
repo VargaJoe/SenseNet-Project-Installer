@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Goldner Inc</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Goldner Inc]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Tiltakshaver</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0612_Hole</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[520250108]]></OrgNumber>
+    <Email><![CDATA[mleeseir@about.me]]></Email>
+    <Telephone><![CDATA[63-(771)774-8181]]></Telephone>
+    <Company_Addresse><![CDATA[6368 Warner Way]]></Company_Addresse>
+    <Company_Sted><![CDATA[Mauhao]]></Company_Sted>
+    <Company_Postnumber><![CDATA[10132]]></Company_Postnumber>
+    <Postal_Address><![CDATA[6368 Warner Way]]></Postal_Address>
+    <Postal_Sted><![CDATA[Mauhao]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[10132]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Goldner Inc.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:41</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:41</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentType name="SurveyList" parentType="ItemList" handler="SenseNet.Portal.Portlets.ContentHandlers.SurveyList" xmlns="http://schemas.sensenet.com/SenseNet/ContentRepository/ContentTypeDefinition">
+  <DisplayName>$Ctd-SurveyList,DisplayName</DisplayName>
+  <Description>$Ctd-SurveyList,Description</Description>
+  <Icon>ContentList</Icon>
+  <AllowIncrementalNaming>true</AllowIncrementalNaming>
+  <AllowedChildTypes>SurveyListItem,Folder</AllowedChildTypes>
+  <Fields>
+    <Field name="DisplayName" type="ShortText">
+      <Configuration>
+        <VisibleBrowse>Show</VisibleBrowse>
+        <VisibleEdit>Show</VisibleEdit>
+        <VisibleNew>Show</VisibleNew>
+      </Configuration>
+    </Field>
+    <Field name="Description" type="LongText">
+      <Configuration>
+        <VisibleBrowse>Show</VisibleBrowse>
+        <VisibleEdit>Show</VisibleEdit>
+        <VisibleNew>Show</VisibleNew>
+      </Configuration>
+    </Field>
+    <Field name="RawJson" type="LongText">
+      <Configuration>
+        <VisibleBrowse>Hide</VisibleBrowse>
+        <VisibleEdit>Hide</VisibleEdit>
+        <VisibleNew>Hide</VisibleNew>
+      </Configuration>
+    </Field>
+    <Field name="IntroText" type="LongText">
+      <Configuration>
+        <VisibleBrowse>Show</VisibleBrowse>
+        <VisibleEdit>Show</VisibleEdit>
+        <VisibleNew>Show</VisibleNew>
+        <TextType>RichText</TextType>
+      </Configuration>
+    </Field>
+    <Field name="OutroText" type="LongText">
+      <Configuration>
+        <VisibleBrowse>Show</VisibleBrowse>
+        <VisibleEdit>Show</VisibleEdit>
+        <VisibleNew>Show</VisibleNew>
+        <TextType>RichText</TextType>
+      </Configuration>
+    </Field>
+    <Field name="OutroRedirectLink" type="Reference">
+    </Field>
+    <Field name="LandingPage" type="Reference">
+      <Configuration>
+        <AllowMultiple>False</AllowMultiple>
+        <SelectionRoot>/Root/Sites/Default_Site</SelectionRoot>
+      </Configuration>
+    </Field>
+    <Field name="OnlySingleResponse" type="Boolean">
+    </Field>
+    <Field name="EnableNotificationMail" type="Boolean">
+    </Field>
+    <Field name="EmailList" type="LongText">
+      <Indexing>
+        <Analyzer>Lucene.Net.Analysis.Standard.StandardAnalyzer</Analyzer>
+      </Indexing>
+    </Field>
+    <Field name="EmailField" type="ShortText">
+    </Field>
+    <Field name="EmailFrom" type="ShortText">
+    </Field>
+    <Field name="MailSubject" type="ShortText">
+    </Field>
+    <Field name="AdminEmailTemplate" type="LongText">
+      <Indexing>
+        <Analyzer>Lucene.Net.Analysis.Standard.StandardAnalyzer</Analyzer>
+      </Indexing>
+      <Configuration>
+        <ControlHint>sn:RichText</ControlHint>
+        <TextType>RichText</TextType>
+      </Configuration>
+    </Field>
+    <Field name="SubmitterEmailTemplate" type="LongText">
+      <Indexing>
+        <Analyzer>Lucene.Net.Analysis.Standard.StandardAnalyzer</Analyzer>
+      </Indexing>
+      <Configuration>
+        <ControlHint>sn:RichText</ControlHint>
+        <TextType>RichText</TextType>
+      </Configuration>
+    </Field>
+  </Fields>
+</ContentType>

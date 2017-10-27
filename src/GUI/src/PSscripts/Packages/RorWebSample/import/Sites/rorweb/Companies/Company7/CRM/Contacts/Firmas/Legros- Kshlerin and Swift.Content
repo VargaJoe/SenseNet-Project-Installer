@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Legros- Kshlerin and Swift</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Legros, Kshlerin and Swift]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Kommune</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1871_Andøy</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[108322719]]></OrgNumber>
+    <Email><![CDATA[dprandink2@com.com]]></Email>
+    <Telephone><![CDATA[359-(395)514-5551]]></Telephone>
+    <Company_Addresse><![CDATA[5 Waywood Point]]></Company_Addresse>
+    <Company_Sted><![CDATA[Kresna]]></Company_Sted>
+    <Company_Postnumber><![CDATA[4140]]></Company_Postnumber>
+    <Postal_Address><![CDATA[5 Waywood Point]]></Postal_Address>
+    <Postal_Sted><![CDATA[Kresna]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[4140]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Legros- Kshlerin and Swift.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:35.02</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:35.02</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

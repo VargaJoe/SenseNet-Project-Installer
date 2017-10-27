@@ -1,0 +1,19 @@
+<Package type='Tool' >
+  <Id>SenseNet.SurveyEditor</Id>
+  <Description>sensenet Survey Editor</Description>
+  <ReleaseDate>2017-06-20</ReleaseDate>
+  <Version>1.0.0</Version>
+  <Steps>
+    <Phase>
+		<Copy targetDirectory='.' source='bin' />
+    </Phase>
+    <Phase>
+      <StartRepository startLuceneManager="false" startWorkflowEngine="false" />
+      <Import target="/Root" resetSecurity="false" LogLevel="Verbose" source="import" />
+    </Phase>
+    <Phase>
+      <StartRepository startLuceneManager="false" startWorkflowEngine="false" />
+      <PopulateIndex />
+    </Phase>
+  </Steps>
+</Package>

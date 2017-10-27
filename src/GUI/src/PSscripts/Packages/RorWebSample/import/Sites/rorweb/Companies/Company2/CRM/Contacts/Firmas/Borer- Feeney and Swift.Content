@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Borer- Feeney and Swift</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Borer, Feeney and Swift]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Leverandør</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1926_Dyrøy</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[173089840]]></OrgNumber>
+    <Email><![CDATA[bgoodycv@skype.com]]></Email>
+    <Telephone><![CDATA[46-(701)521-3715]]></Telephone>
+    <Company_Addresse><![CDATA[48158 Hoepker Terrace]]></Company_Addresse>
+    <Company_Sted><![CDATA[Halmstad]]></Company_Sted>
+    <Company_Postnumber><![CDATA[10635]]></Company_Postnumber>
+    <Postal_Address><![CDATA[48158 Hoepker Terrace]]></Postal_Address>
+    <Postal_Sted><![CDATA[Halmstad]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[10635]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Borer- Feeney and Swift.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:31.78</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:31.78</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

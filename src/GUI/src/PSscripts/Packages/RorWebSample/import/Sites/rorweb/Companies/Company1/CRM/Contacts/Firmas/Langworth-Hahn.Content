@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Langworth-Hahn</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Langworth-Hahn]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Søknadskommune</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0233_Nittedal</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[288633284]]></OrgNumber>
+    <Email><![CDATA[npapworthlm@engadget.com]]></Email>
+    <Telephone><![CDATA[47-(273)492-7313]]></Telephone>
+    <Company_Addresse><![CDATA[48497 Elka Parkway]]></Company_Addresse>
+    <Company_Sted><![CDATA[Kristiansund N]]></Company_Sted>
+    <Company_Postnumber><![CDATA[5076]]></Company_Postnumber>
+    <Postal_Address><![CDATA[48497 Elka Parkway]]></Postal_Address>
+    <Postal_Sted><![CDATA[Kristiansund N]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[5076]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Langworth-Hahn.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:34.09</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:34.09</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

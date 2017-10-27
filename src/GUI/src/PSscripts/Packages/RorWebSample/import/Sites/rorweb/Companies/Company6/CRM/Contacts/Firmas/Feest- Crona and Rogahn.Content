@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Feest- Crona and Rogahn</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Feest, Crona and Rogahn]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Tiltakshaver</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0544_Øystre Slidre</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[414508043]]></OrgNumber>
+    <Email><![CDATA[oanyene38@joomla.org]]></Email>
+    <Telephone><![CDATA[967-(691)114-9232]]></Telephone>
+    <Company_Addresse><![CDATA[9158 Jenna Hill]]></Company_Addresse>
+    <Company_Sted><![CDATA[Aş Şalw]]></Company_Sted>
+    <Company_Postnumber><![CDATA[6653]]></Company_Postnumber>
+    <Postal_Address><![CDATA[9158 Jenna Hill]]></Postal_Address>
+    <Postal_Sted><![CDATA[Aş Şalw]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[6653]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Feest- Crona and Rogahn.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:34.49</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:34.49</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

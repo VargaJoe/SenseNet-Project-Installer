@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebProject</ContentType>
+  <ContentName>Starwall</ContentName>
+  <Fields>
+    <ProjectNumber><![CDATA[2349845]]></ProjectNumber>
+    <ProjectDate>2017-09-11T22:00:00</ProjectDate>
+    <GardsNumber><![CDATA[834]]></GardsNumber>
+    <BruksNumber><![CDATA[757]]></BruksNumber>
+    <FesteNumber><![CDATA[453]]></FesteNumber>
+    <SeksjonsNumber><![CDATA[78489]]></SeksjonsNumber>
+    <BygningsNumber><![CDATA[3]]></BygningsNumber>
+    <BoligNumber><![CDATA[456]]></BoligNumber>
+    <CaseNumber><![CDATA[457957]]></CaseNumber>
+    <CaseNumber_Year><![CDATA[5634]]></CaseNumber_Year>
+    <Address_Eiendom><![CDATA[622 Delladonna Terrace]]></Address_Eiendom>
+    <PostalCode><![CDATA[6784]]></PostalCode>
+    <City><![CDATA[Famões]]></City>
+    <Assignement><![CDATA[]]></Assignement>
+    <BuildingType>new</BuildingType>
+    <IsArchive>false</IsArchive>
+    <ProjectCustomer>
+      <Path>/Root/Sites/rorweb/Companies/Company3/CRM/Contacts/Percy Blindmann</Path>
+    </ProjectCustomer>
+    <ResponsibleCompany>
+      <Path>/Root/Sites/rorweb/Companies/Company3/CRM/Contacts/Firmas/Beahan LLC</Path>
+    </ResponsibleCompany>
+    <ApproverMunicipality>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1026_Åseral</Path>
+    </ApproverMunicipality>
+    <Kommune><![CDATA[1026]]></Kommune>
+    <PlantID><![CDATA[]]></PlantID>
+    <LastBoligmappaUpload>0001-01-01T00:00:00</LastBoligmappaUpload>
+    <HaveBoligmappaUpload>false</HaveBoligmappaUpload>
+    <DisplayName><![CDATA[Starwall]]></DisplayName>
+    <Owner>
+      <Path>/Root/IMS/Rorweb/Clients/cmpadmin3</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/Rorweb/Clients/cmpadmin3</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:49:10.3</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/Rorweb/Clients/cmpadmin3</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:49:10.3</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

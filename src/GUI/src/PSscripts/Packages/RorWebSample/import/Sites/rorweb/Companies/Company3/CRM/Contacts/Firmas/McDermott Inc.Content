@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>McDermott Inc</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[McDermott Inc]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Søknadskommune</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1535_Vestnes</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[383402416]]></OrgNumber>
+    <Email><![CDATA[hclimardo@ifeng.com]]></Email>
+    <Telephone><![CDATA[86-(666)325-8379]]></Telephone>
+    <Company_Addresse><![CDATA[920 Alpine Point]]></Company_Addresse>
+    <Company_Sted><![CDATA[Fuzhai]]></Company_Sted>
+    <Company_Postnumber><![CDATA[1906]]></Company_Postnumber>
+    <Postal_Address><![CDATA[920 Alpine Point]]></Postal_Address>
+    <Postal_Sted><![CDATA[Fuzhai]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[1906]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="McDermott Inc.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:39.2</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:39.2</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

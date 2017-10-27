@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Bechtelar Inc</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Bechtelar Inc]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Ansvarlig foretak</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1504_Ålesund</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[117120432]]></OrgNumber>
+    <Email><![CDATA[rsmoth5x@wikimedia.org]]></Email>
+    <Telephone><![CDATA[46-(133)796-0681]]></Telephone>
+    <Company_Addresse><![CDATA[563 Judy Park]]></Company_Addresse>
+    <Company_Sted><![CDATA[Hultsfred]]></Company_Sted>
+    <Company_Postnumber><![CDATA[10973]]></Company_Postnumber>
+    <Postal_Address><![CDATA[563 Judy Park]]></Postal_Address>
+    <Postal_Sted><![CDATA[Hultsfred]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[10973]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Bechtelar Inc.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:31.31</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:31.31</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

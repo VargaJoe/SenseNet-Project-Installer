@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Thiel- Stroman and Armstrong</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Thiel, Stroman and Armstrong]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Leverandør</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0723_Tjøme</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[807695728]]></OrgNumber>
+    <Email><![CDATA[kquenbyqh@sitemeter.com]]></Email>
+    <Telephone><![CDATA[63-(703)501-6558]]></Telephone>
+    <Company_Addresse><![CDATA[4 Leroy Way]]></Company_Addresse>
+    <Company_Sted><![CDATA[Lagasit]]></Company_Sted>
+    <Company_Postnumber><![CDATA[10219]]></Company_Postnumber>
+    <Postal_Address><![CDATA[4 Leroy Way]]></Postal_Address>
+    <Postal_Sted><![CDATA[Lagasit]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[10219]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Thiel- Stroman and Armstrong.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:28.65</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:28.65</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

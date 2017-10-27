@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Buckridge-Collins</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Buckridge-Collins]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Ansvarlig søker</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1871_Andøy</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[454940082]]></OrgNumber>
+    <Email><![CDATA[gmunford5n@upenn.edu]]></Email>
+    <Telephone><![CDATA[212-(469)282-9988]]></Telephone>
+    <Company_Addresse><![CDATA[7066 Bultman Road]]></Company_Addresse>
+    <Company_Sted><![CDATA[Tiout]]></Company_Sted>
+    <Company_Postnumber><![CDATA[9064]]></Company_Postnumber>
+    <Postal_Address><![CDATA[7066 Bultman Road]]></Postal_Address>
+    <Postal_Sted><![CDATA[Tiout]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[9064]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Buckridge-Collins.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:31.67</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:31.67</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

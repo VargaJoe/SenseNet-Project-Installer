@@ -1,0 +1,11 @@
+﻿{
+  //TODO: extender on/off
+  "ContextTypeBlackList": [ "SharedUrlApplication", "SharedUrlcontentLink", "SharedUrlResolver" ],
+  "ParentMode": "workspace", //parent, ancestor, site, workspace, custom
+  "AncestorType": "", //"RorWebCompanyWorkspace"
+  "CustomParentPath": "",
+  "CookieName": "SenseNetContentShare",
+  "CookieExpirationInMinutes": 5,
+  "ExtendedMemberships": [ "/Root/IMS/Rorweb/Rornorge/WebUser", "@@WorkspacePath@@/Groups/CompanyMembers" ] //@@ParentPath@@, @@WorkspacePath@@
+  //Shares folder name, lehetne ures is
+}

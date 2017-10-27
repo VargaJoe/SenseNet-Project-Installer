@@ -1,0 +1,66 @@
+{
+  "name": "electronapp",
+  "productName": "SNinstall",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:rem": "rimraf dist/* && electron-packager . Installer --platform=win32 --arch=x64 --out=dist",
+    "build": "electron-packager . Installer2 --platform=win32 --arch=x64 --out=dist"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "./node_modules/bootstrap/dist/js/bootstrap.js": {
+      "depends": [
+        "jquery:jQuery"
+      ]
+    }
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "angular": "^1.6.6",
+    "babel-core": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "electron-packager": "^9.1.0",
+    "electron-prebuilt": "^1.4.13",
+    "rimraf": "^2.6.2"
+  },
+  "dependencies": {
+    "animate.css": "^3.5.2",
+    "bootstrap": "^3.3.7",
+    "browserify-shim": "^3.8.14",
+    "electron-json-storage": "^3.1.1",
+    "electron-storage": "^1.0.7",
+    "font-awesome": "^4.7.0",
+    "fs": "0.0.1-security",
+    "jquery": "^3.2.1",
+    "jspm": "^0.16.53",
+    "load-json-file": "^3.0.0",
+    "lodash": "^4.17.4",
+    "nestable": "^0.2.0",
+    "node-powershell": "^3.1.1",
+    "noty": "^3.1.3",
+    "sortablejs": "^1.6.1",
+    "tether": "^1.4.0",
+    "underscore": "^1.8.3"
+  },
+  "jspm": {
+    "dependencies": {
+      "aurelia-bootstrapper": "npm:aurelia-bootstrapper@^2.1.1",
+      "aurelia-framework": "npm:aurelia-framework@^1.1.5",
+      "bootstrap": "github:twbs/bootstrap@^3.3.7"
+    },
+    "devDependencies": {
+      "babel": "npm:babel-core@^5.8.24",
+      "babel-runtime": "npm:babel-runtime@^5.8.24",
+      "core-js": "npm:core-js@^1.1.4"
+    }
+  }
+}

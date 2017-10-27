@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Kreiger Group</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Kreiger Group]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Leverandør</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1524_Norddal</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[102943125]]></OrgNumber>
+    <Email><![CDATA[awallaceo6@ucoz.ru]]></Email>
+    <Telephone><![CDATA[86-(117)389-5514]]></Telephone>
+    <Company_Addresse><![CDATA[98 Lyons Crossing]]></Company_Addresse>
+    <Company_Sted><![CDATA[Yangxipu]]></Company_Sted>
+    <Company_Postnumber><![CDATA[9192]]></Company_Postnumber>
+    <Postal_Address><![CDATA[98 Lyons Crossing]]></Postal_Address>
+    <Postal_Sted><![CDATA[Yangxipu]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[9192]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Kreiger Group.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:33.69</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:33.69</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

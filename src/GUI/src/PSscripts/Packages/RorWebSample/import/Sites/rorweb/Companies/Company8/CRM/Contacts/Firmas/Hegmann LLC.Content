@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Hegmann LLC</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Hegmann LLC]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Ansvarlig søker</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1228_Odda</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[504631048]]></OrgNumber>
+    <Email><![CDATA[egowdiecg@plala.or.jp]]></Email>
+    <Telephone><![CDATA[48-(206)798-3313]]></Telephone>
+    <Company_Addresse><![CDATA[1 Onsgard Street]]></Company_Addresse>
+    <Company_Sted><![CDATA[Podgórzyn]]></Company_Sted>
+    <Company_Postnumber><![CDATA[2775]]></Company_Postnumber>
+    <Postal_Address><![CDATA[1 Onsgard Street]]></Postal_Address>
+    <Postal_Sted><![CDATA[Podgórzyn]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[2775]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Hegmann LLC.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:35.58</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:35.58</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

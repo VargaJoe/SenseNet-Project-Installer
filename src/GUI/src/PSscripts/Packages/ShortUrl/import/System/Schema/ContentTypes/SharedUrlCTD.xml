@@ -1,0 +1,17 @@
+﻿<ContentType name="SharedUrl" parentType="Folder" handler="SharedUrl.SharedUrlHandler"  xmlns="http://schemas.sensenet.com/SenseNet/ContentRepository/ContentTypeDefinition">
+  <DisplayName>SharedUrl</DisplayName>
+  <Description></Description>
+  <Icon>Link</Icon>
+  <Fields>
+    <Field name="ContentRef" type="Reference">
+      <DisplayName>ContentRef</DisplayName>
+      <Description></Description>
+    </Field>
+    <Field name="SharedUrl" type="ShortText">
+      <DisplayName>Short Url</DisplayName>
+      <Description></Description>
+    </Field>
+    <Field name="AllChild" type="Boolean">
+    </Field>
+  </Fields>
+</ContentType>

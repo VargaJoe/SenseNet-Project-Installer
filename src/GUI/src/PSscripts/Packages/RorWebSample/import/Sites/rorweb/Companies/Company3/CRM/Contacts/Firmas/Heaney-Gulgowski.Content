@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Heaney-Gulgowski</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Heaney-Gulgowski]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Ansvarlig søker</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0821_Bø</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[402393728]]></OrgNumber>
+    <Email><![CDATA[jfyrth8i@mail.ru]]></Email>
+    <Telephone><![CDATA[63-(223)414-0236]]></Telephone>
+    <Company_Addresse><![CDATA[92 Crowley Terrace]]></Company_Addresse>
+    <Company_Sted><![CDATA[Guimbal]]></Company_Sted>
+    <Company_Postnumber><![CDATA[9517]]></Company_Postnumber>
+    <Postal_Address><![CDATA[92 Crowley Terrace]]></Postal_Address>
+    <Postal_Sted><![CDATA[Guimbal]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[9517]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Heaney-Gulgowski.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:38.76</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:38.76</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

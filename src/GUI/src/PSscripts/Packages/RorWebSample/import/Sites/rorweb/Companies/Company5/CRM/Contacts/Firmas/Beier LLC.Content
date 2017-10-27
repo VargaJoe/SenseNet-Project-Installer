@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Beier LLC</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Beier LLC]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Søknadskommune</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0628_Hurum</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[308379135]]></OrgNumber>
+    <Email><![CDATA[chayternx@e-recht24.de]]></Email>
+    <Telephone><![CDATA[260-(217)669-5778]]></Telephone>
+    <Company_Addresse><![CDATA[8531 Tomscot Plaza]]></Company_Addresse>
+    <Company_Sted><![CDATA[Mongu]]></Company_Sted>
+    <Company_Postnumber><![CDATA[8714]]></Company_Postnumber>
+    <Postal_Address><![CDATA[8531 Tomscot Plaza]]></Postal_Address>
+    <Postal_Sted><![CDATA[Mongu]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[8714]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Beier LLC.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:33.54</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:33.54</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

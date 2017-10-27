@@ -1,0 +1,927 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Resources>
+  <ResourceClass name="Ctd-SurveyList">
+    <Languages>
+      <Language cultureName="en">
+        <data name="DisplayName" xml:space="preserve">
+          <value>Survey List</value>
+        </data>
+        <data name="Description" xml:space="preserve">
+          <value>Create yout own survey!</value>
+        </data>
+      </Language>
+      <Language cultureName="hu">
+        <data name="DisplayName" xml:space="preserve">
+          <value>Kérdőív lista</value>
+        </data>
+        <data name="Description" xml:space="preserve">
+          <value>Hozza létre saját kérdőívét!!</value>
+        </data>
+      </Language>
+    </Languages>
+  </ResourceClass>
+  <ResourceClass name="Ctd-SurveyListItem">
+    <Languages>
+      <Language cultureName="en">
+        <data name="DisplayName" xml:space="preserve">
+          <value>Survey List Item</value>
+        </data>
+        <data name="Description" xml:space="preserve">
+          <value>Survey List Item created by Form</value>
+        </data>
+      </Language>
+      <Language cultureName="hu">
+        <data name="DisplayName" xml:space="preserve">
+          <value>Kérdőív</value>
+        </data>
+        <data name="Description" xml:space="preserve">
+          <value>Űrlapal létrehozott kérdőív</value>
+        </data>
+      </Language>
+    </Languages>
+  </ResourceClass>
+  <ResourceClass name="SurveyList">
+    <Languages>
+      <Language cultureName="en">
+        <data name="DisplayName-DisplayName" xml:space="preserve">
+          <value>Survey title</value>
+        </data>
+        <data name="Description-DisplayName" xml:space="preserve">
+          <value>Survey description</value>
+        </data>
+        <data name="Intro-DisplayName" xml:space="preserve">
+          <value>Survey intro text</value>
+        </data>
+        <data name="Outro-DisplayName" xml:space="preserve">
+          <value>Survey outro text</value>
+        </data>
+        <data name="Untitled-Survey" xml:space="preserve">
+          <value>Untitled survey</value>
+        </data>
+        <data name="Section" xml:space="preserve">
+          <value>Section</value>
+        </data>
+        <data name="AfterThisSection" xml:space="preserve">
+          <value>After this section go to: </value>
+        </data>
+        <data name="IntroductionText" xml:space="preserve">
+          <value>Introduction text</value>
+        </data>
+        <data name="EndText" xml:space="preserve">
+          <value>Submit</value>
+        </data>
+        <data name="SurveySettingsTitle" xml:space="preserve">
+          <value>Survey Settings</value>
+        </data>
+        <data name="Progressbar-DisplayName" xml:space="preserve">
+          <value>ProgressBar</value>
+        </data>
+        <data name="Intro-Title" xml:space="preserve">
+          <value>Welcome message</value>
+        </data>
+        <data name="Outro-Title" xml:space="preserve">
+          <value>Good bye message</value>
+        </data>
+        <data name="Title-DisplayName" xml:space="preserve">
+          <value>Section title</value>
+        </data>
+        <data name="SectionDescription-DisplayName" xml:space="preserve">
+          <value>Section description</value>
+        </data>
+        <data name="Copy" xml:space="preserve">
+          <value>copy</value>
+        </data>
+        <data name="RequiredField" xml:space="preserve">
+          <value>Required field</value>
+        </data>
+        <data name="AddNewSection" xml:space="preserve">
+          <value>New section</value>
+        </data>
+        <data name="AddNewElement" xml:space="preserve">
+          <value>Add new element</value>
+        </data>
+        <data name="CopySection" xml:space="preserve">
+          <value>Copy section</value>
+        </data>
+        <data name="DeleteSection" xml:space="preserve">
+          <value>Delete section</value>
+        </data>
+        <data name="DeleteQuestion" xml:space="preserve">
+          <value>Delete question</value>
+        </data>
+        <data name="PreviousSection" xml:space="preserve">
+          <value>Back to previous section</value>
+        </data>
+        <data name="NextSection" xml:space="preserve">
+          <value>Go to following section</value>
+        </data>
+        <data name="Submit" xml:space="preserve">
+          <value>Submit</value>
+        </data>
+        <data name="AddNewQuestion" xml:space="preserve">
+          <value>New question</value>
+        </data>
+        <data name="ShortQuestion-DisplayName" xml:space="preserve">
+          <value>Short answer</value>
+        </data>
+        <data name="LongQuestion-DisplayName" xml:space="preserve">
+          <value>Paragraph</value>
+        </data>
+        <data name="ParagraphQuestion-DisplayName" xml:space="preserve">
+          <value>Paragraph</value>
+        </data>
+        <data name="SwitchQuestion-DisplayName" xml:space="preserve">
+          <value>Switch</value>
+        </data>
+        <data name="RadioQuestion-DisplayName" xml:space="preserve">
+          <value>Radiobutton</value>
+        </data>
+        <data name="OptionalTextQuestion-DisplayName" xml:space="preserve">
+          <value>Optional text</value>
+        </data>
+        <data name="CheckboxQuestion-DisplayName" xml:space="preserve">
+          <value>Checkbox</value>
+        </data>
+        <data name="DropdownQuestion-DisplayName" xml:space="preserve">
+          <value>Dropdown</value>
+        </data>
+        <data name="RangeQuestion-DisplayName" xml:space="preserve">
+          <value>Slider</value>
+        </data>
+        <data name="DateQuestion-DisplayName" xml:space="preserve">
+          <value>Date and time</value>
+        </data>
+        <data name="GridQuestion-DisplayName" xml:space="preserve">
+          <value>Grid</value>
+        </data>
+        <data name="CaptchaQuestion-DisplayName" xml:space="preserve">
+          <value>Captcha</value>
+        </data>
+        <data name="SavedSurveys" xml:space="preserve">
+          <value>Saved surveys</value>
+        </data>
+        <data name="Text" xml:space="preserve">
+          <value>Text</value>
+        </data>
+        <data name="Number" xml:space="preserve">
+          <value>Number</value>
+        </data>
+        <data name="RegExp" xml:space="preserve">
+          <value>Regular Expression</value>
+        </data>
+        <data name="SectionHint-PlaceHolder" xml:space="preserve">
+          <value>Section hint</value>
+        </data>
+        <data name="Hint-PlaceHolder" xml:space="preserve">
+          <value>Hint</value>
+        </data>
+        <data name="ErrorMessage-PlaceHolder" xml:space="preserve">
+          <value>Error message</value>
+        </data>
+        <data name="AddNewSurvey" xml:space="preserve">
+          <value>Add new survey</value>
+        </data>
+        <data name="UntitledQuestion" xml:space="preserve">
+          <value>Untitled question</value>
+        </data>
+        <data name="UntitledSection" xml:space="preserve">
+          <value>Untitled section</value>
+        </data>
+        <data name="Hint-Menu" xml:space="preserve">
+          <value>Hint</value>
+        </data>
+        <data name="Validation-Menu" xml:space="preserve">
+          <value>Validation</value>
+        </data>
+        <data name="PlaceHolder-Menu" xml:space="preserve">
+          <value>Placeholder</value>
+        </data>
+        <data name="PlaceHolder-PlaceHolder" xml:space="preserve">
+          <value>Placeholder</value>
+        </data>
+        <data name="EmptyQuestionTextBox" xml:space="preserve">
+          <value>Short answer text</value>
+        </data>
+        <data name="Required" xml:space="preserve">
+          <value>Required question</value>
+        </data>
+        <data name="OptionalTextRequired" xml:space="preserve">
+          <value>Required question and text option when selected</value>
+        </data>
+        <data name="Email" xml:space="preserve">
+          <value>Email</value>
+        </data>
+        <data name="Url" xml:space="preserve">
+          <value>Url</value>
+        </data>
+        <data name="GreaterThan" xml:space="preserve">
+          <value>Greater than</value>
+        </data>
+        <data name="LessThan" xml:space="preserve">
+          <value>Less than</value>
+        </data>
+        <data name="WholeNumber" xml:space="preserve">
+          <value>Whole number</value>
+        </data>
+        <data name="Matches" xml:space="preserve">
+          <value>Matches</value>
+        </data>
+        <data name="DoesntMatch" xml:space="preserve">
+          <value>Doesn't match</value>
+        </data>
+        <data name="Pattern" xml:space="preserve">
+          <value>Pattern</value>
+        </data>
+        <data name="MinLength" xml:space="preserve">
+          <value>Minimum length</value>
+        </data>
+        <data name="MaxLength" xml:space="preserve">
+          <value>Maximum length</value>
+        </data>
+        <data name="errorMessageNoQuestion" xml:space="preserve">
+          <value>Survey cannot be saved without question</value>
+        </data>
+        <data name="errorMessageNoSection" xml:space="preserve">
+          <value>Survey cannot be saved without section</value>
+        </data>
+        <data name="Between" xml:space="preserve">
+          <value>Between</value>
+        </data>
+        <data name="MinValue" xml:space="preserve">
+          <value>Minimum value</value>
+        </data>
+        <data name="MaxValue" xml:space="preserve">
+          <value>Maximum value</value>
+        </data>
+        <data name="DateOnly" xml:space="preserve">
+          <value>Date only</value>
+        </data>
+        <data name="TimeOnly" xml:space="preserve">
+          <value>Time only</value>
+        </data>
+        <data name="DateAndTime" xml:space="preserve">
+          <value>Date and time</value>
+        </data>
+        <data name="MinDate" xml:space="preserve">
+          <value>Minimum date</value>
+        </data>
+        <data name="MaxDate" xml:space="preserve">
+          <value>Maximum date</value>
+        </data>
+        <data name="MinTime" xml:space="preserve">
+          <value>Minimum time</value>
+        </data>
+        <data name="MaxTime" xml:space="preserve">
+          <value>Maximum time</value>
+        </data>
+        <data name="BetweenDate" xml:space="preserve">
+          <value>Between two dates</value>
+        </data>
+        <data name="BetweenTime" xml:space="preserve">
+          <value>Between</value>
+        </data>
+        <data name="MaxDateAndTime" xml:space="preserve">
+          <value>Maximum date and time</value>
+        </data>
+        <data name="MinDateAndTime" xml:space="preserve">
+          <value>Minimum date and time</value>
+        </data>
+        <data name="MaxDateTime" xml:space="preserve">
+          <value>Maximum date and time</value>
+        </data>
+        <data name="MinDateTime" xml:space="preserve">
+          <value>Minimum date and time</value>
+        </data>
+        <data name="BetweenDateAndTime" xml:space="preserve">
+          <value>Between</value>
+        </data>
+        <data name="BetweenAnd" xml:space="preserve">
+          <value>Between including</value>
+        </data>
+        <data name="Step" xml:space="preserve">
+          <value>Step</value>
+        </data>
+        <data name="MinIsGreaterThanMaxErrorMessage" xml:space="preserve">
+          <value>Minimum value must be less than maximum value!</value>
+        </data>
+        <data name="StepIsNotCorrectErrorMessage" xml:space="preserve">
+          <value>Step value is not valid!</value>
+        </data>
+        <data name="SiteKey" xml:space="preserve">
+          <value>SiteKey</value>
+        </data>
+        <data name="Theme" xml:space="preserve">
+          <value>Theme</value>
+        </data>
+        <data name="CallBack" xml:space="preserve">
+          <value>CallBack</value>
+        </data>
+        <data name="OtherValue" xml:space="preserve">
+          <value>Other value</value>
+        </data>
+        <data name="Other" xml:space="preserve">
+          <value>Other</value>
+        </data>
+        <data name="Option" xml:space="preserve">
+          <value>Option</value>
+        </data>
+        <data name="AddOption" xml:space="preserve">
+          <value>Add option</value>
+        </data>
+        <data name="AddOtherOption" xml:space="preserve">
+          <value>Add Other option</value>
+        </data>
+        <data name="GoToQuestion-Menu" xml:space="preserve">
+          <value>Go to section based on answer</value>
+        </data>
+        <data name="MaxChoice" xml:space="preserve">
+          <value>Maximum number of options that can be chosen</value>
+        </data>
+        <data name="UntitledRow" xml:space="preserve">
+          <value>Untitled row</value>
+        </data>
+        <data name="UntitledColumn" xml:space="preserve">
+          <value>Untitled column</value>
+        </data>
+        <data name="AddRow" xml:space="preserve">
+          <value>Add row</value>
+        </data>
+        <data name="AddColumn" xml:space="preserve">
+          <value>Add column</value>
+        </data>
+        <data name="YesValue" xml:space="preserve">
+          <value>Yes</value>
+        </data>
+        <data name="NoValue" xml:space="preserve">
+          <value>No</value>
+        </data>
+        <data name="OptionalTextInfo" xml:space="preserve">
+          <value>(when selected, text option is required)</value>
+        </data>
+        <data name="UploadQuestion-DisplayName" xml:space="preserve">
+          <value>Fileupload</value>
+        </data>
+        <data name="AllowMultiple" xml:space="preserve">
+          <value>Allow multiple files to upload</value>
+        </data>
+        <data name="MultipleFileUploadIsNotAllowed" xml:space="preserve">
+          <value>Uploading multiple files is not allowed here!</value>
+        </data>
+        <data name="ErrorMessage-NoFile" xml:space="preserve">
+          <value>No files!</value>
+        </data>
+        <data name="ErrorMessage-GridRequired" xml:space="preserve">
+          <value>Please fill at least one input per row!</value>
+        </data>
+        <data name="AreYouSure" xml:space="preserve">
+          <value>Are you sure you want to delete</value>
+        </data>
+        <data name="AndAllQuestion" xml:space="preserve">
+          <value>and all of its questions</value>
+        </data>
+        <data name="SettingsButtonText" xml:space="preserve">
+          <value>Settings</value>
+        </data>
+        <data name="GeneralSettings" xml:space="preserve">
+          <value>General settings</value>
+        </data>
+        <data name="NotificationSettings" xml:space="preserve">
+          <value>Notification settings</value>
+        </data>
+        <data name="ValidFrom" xml:space="preserve">
+          <value>Valid from</value>
+        </data>
+        <data name="ValidTill" xml:space="preserve">
+          <value>Valid till</value>
+        </data>
+        <data name="EnableLifespan" xml:space="preserve">
+          <value>Enable lifespan</value>
+        </data>
+        <data name="EnableNotificationMail" xml:space="preserve">
+          <value>Enable notification email</value>
+        </data>
+        <data name="EmailList" xml:space="preserve">
+          <value>Email list</value>
+        </data>
+        <data name="EmailField" xml:space="preserve">
+          <value>Email field</value>
+        </data>
+        <data name="EmailFrom" xml:space="preserve">
+          <value>Email from</value>
+        </data>
+        <data name="MailSubject" xml:space="preserve">
+          <value>Email subject</value>
+        </data>
+        <data name="AdminEmailTemplate" xml:space="preserve">
+          <value>Admin email template</value>
+        </data>
+        <data name="SubmitterEmailTemplate" xml:space="preserve">
+          <value>Submitter email template</value>
+        </data>
+        <data name="Save" xml:space="preserve">
+          <value>Save</value>
+        </data>
+        <data name="Cancel" xml:space="preserve">
+          <value>Cancel</value>
+        </data>
+        <data name="ValidFrom-Description" xml:space="preserve">
+          <value>This content will appear on the date you set if lifespan handling is enabled for this content.</value>
+        </data>
+        <data name="ValidTill-Description" xml:space="preserve">
+          <value>This content will disappear on the date you set if lifespan handling is enabled for this content.</value>
+        </data>
+        <data name="EnableLifespan-Description" xml:space="preserve">
+          <value>Specify whether you want to define starting and end date for the validity of this content.</value>
+        </data>
+        <data name="EnableNotificationMail-Description" xml:space="preserve">
+          <value>Specify whether you want to send a notification email after submit.</value>
+        </data>
+        <data name="EmailList-Description" xml:space="preserve">
+          <value>The list of email addresses to where a notification message containing submitted values are sent after submitting the form. The addresses should be separated by ";", "," or new line.</value>
+        </data>
+        <data name="EmailField-Description" xml:space="preserve">
+          <value>The field specified among Survey fields containing the submitter's email address.</value>
+        </data>
+        <data name="EmailFrom-Description" xml:space="preserve">
+          <value>This address is displayed in the "From" field of the notification email. Default is "mailerservice@example.com".</value>
+        </data>
+        <data name="MailSubject-Description" xml:space="preserve">
+          <value>This will be the subject of the submitter mail.</value>
+        </data>
+        <data name="AdminEmailTemplate-Description" xml:space="preserve">
+          <value>The template of the email message sent to the administrators. By default the template of notification email sent to the submitter is the same as the one sent to the recipients given in the email list above. Form content can be inserted with the "{0}" string.</value>
+        </data>
+        <data name="SubmitterEmailTemplate-Description" xml:space="preserve">
+          <value>The template of the email message sent to the submitter. By default the template of notification email sent to the submitter is the same as the one sent to the recipients given in the email list above. Form content can be inserted with the "{0}" string.</value>
+        </data>
+        <data name="error" xml:space="preserve">
+          <value>error: </value>
+        </data>
+        <data name="QuestionIsNotValid" xml:space="preserve">
+          <value>The following question is not valid and cannot be saved so it is removed from the survey: </value>
+        </data>
+        <data name="Browse" xml:space="preserve">
+          <value>Browse</value>
+        </data>
+        <data name="OutroLink-DisplayName" xml:space="preserve">
+          <value>Landing page</value>
+        </data>
+        <data name="OutroLink-Description" xml:space="preserve">
+          <value>The user will be navigated to this content after filling the form</value>
+        </data>
+        <data name="AfterSubmit-DisplayName" xml:space="preserve">
+          <value>After submit function</value>
+        </data>
+        <data name="AfterSubmit-Description" xml:space="preserve">
+          <value>The user will be navigated to this content after filling the form</value>
+        </data>
+        <data name="OnlySingleResponse-DisplayName" xml:space="preserve">
+          <value>One response only</value>
+        </data>
+        <data name="OnlySingleResponse-Description" xml:space="preserve">
+          <value>One response only</value>
+        </data>
+      </Language>
+      <Language cultureName="hu">
+        <data name="DisplayName-DisplayName" xml:space="preserve">
+          <value>Kérdőív címe</value>
+        </data>
+        <data name="Description-DisplayName" xml:space="preserve">
+          <value>Kérdőív leírása</value>
+        </data>
+        <data name="Intro-DisplayName" xml:space="preserve">
+          <value>Kérdőív nyitó szövege</value>
+        </data>
+        <data name="Outro-DisplayName" xml:space="preserve">
+          <value>Kérdőív záró szövege</value>
+        </data>
+        <data name="Untitled-Survey" xml:space="preserve">
+          <value>Névtelen kérdőív</value>
+        </data>
+        <data name="Section" xml:space="preserve">
+          <value>Szekció</value>
+        </data>
+        <data name="AfterThisSection" xml:space="preserve">
+          <value>A szekció utána navigáljon ide: </value>
+        </data>
+        <data name="IntroductionText" xml:space="preserve">
+          <value>Üdvözlő szöveg</value>
+        </data>
+        <data name="EndText" xml:space="preserve">
+          <value>Mentés</value>
+        </data>
+        <data name="SurveySettingsTitle" xml:space="preserve">
+          <value>Kérdőív beállítások</value>
+        </data>
+        <data name="Progressbar-DisplayName" xml:space="preserve">
+          <value>Folyamatjelző</value>
+        </data>
+        <data name="Intro-Title" xml:space="preserve">
+          <value>Bevezető</value>
+        </data>
+        <data name="Outro-Title" xml:space="preserve">
+          <value>Vége</value>
+        </data>
+        <data name="Title-DisplayName" xml:space="preserve">
+          <value>Szekció cím</value>
+        </data>
+        <data name="SectionDescription-DisplayName" xml:space="preserve">
+          <value>Szekció leírás</value>
+        </data>
+        <data name="Copy" xml:space="preserve">
+          <value>másolat</value>
+        </data>
+        <data name="RequiredField" xml:space="preserve">
+          <value>Kötelező mező</value>
+        </data>
+        <data name="AddNewSection" xml:space="preserve">
+          <value>Új szekció</value>
+        </data>
+        <data name="AddNewElement" xml:space="preserve">
+          <value>Új elem hozzáadása</value>
+        </data>
+        <data name="CopySection" xml:space="preserve">
+          <value>Szekció másolása</value>
+        </data>
+        <data name="DeleteSection" xml:space="preserve">
+          <value>Szekció törlése</value>
+        </data>
+        <data name="DeleteQuestion" xml:space="preserve">
+          <value>Kérdés törlése</value>
+        </data>
+        <data name="PreviousSection" xml:space="preserve">
+          <value>Vissza az előző szekcióhoz</value>
+        </data>
+        <data name="NextSection" xml:space="preserve">
+          <value>Tovább a következő szekcióhoz</value>
+        </data>
+        <data name="Submit" xml:space="preserve">
+          <value>Elküld</value>
+        </data>
+        <data name="AddNewQuestion" xml:space="preserve">
+          <value>Új kérdés</value>
+        </data>
+        <data name="ShortQuestion-DisplayName" xml:space="preserve">
+          <value>Rövid válasz</value>
+        </data>
+        <data name="ParagraphQuestion-DisplayName" xml:space="preserve">
+          <value>Hosszú válasz</value>
+        </data>
+        <data name="SwitchQuestion-DisplayName" xml:space="preserve">
+          <value>Kapcsoló</value>
+        </data>
+        <data name="RadioQuestion-DisplayName" xml:space="preserve">
+          <value>Rádiógomb választó</value>
+        </data>
+        <data name="OptionalTextQuestion-DisplayName" xml:space="preserve">
+          <value>Választható szöveg</value>
+        </data>
+        <data name="CheckboxQuestion-DisplayName" xml:space="preserve">
+          <value>Jelölőnégyzet</value>
+        </data>
+        <data name="DropdownQuestion-DisplayName" xml:space="preserve">
+          <value>Legördülő válasz</value>
+        </data>
+        <data name="RangeQuestion-DisplayName" xml:space="preserve">
+          <value>Csúszka</value>
+        </data>
+        <data name="DateQuestion-DisplayName" xml:space="preserve">
+          <value>Dátum és idő</value>
+        </data>
+        <data name="GridQuestion-DisplayName" xml:space="preserve">
+          <value>Táblázat</value>
+        </data>
+        <data name="CaptchaQuestion-DisplayName" xml:space="preserve">
+          <value>Captcha</value>
+        </data>
+        <data name="SavedSurveys" xml:space="preserve">
+          <value>Mentett kérdőívek</value>
+        </data>
+        <data name="Text" xml:space="preserve">
+          <value>Szöveges</value>
+        </data>
+        <data name="Number" xml:space="preserve">
+          <value>Szám</value>
+        </data>
+        <data name="RegExp" xml:space="preserve">
+          <value>Reguláris kifejezés</value>
+        </data>
+        <data name="SectionHint-PlaceHolder" xml:space="preserve">
+          <value>Szekció magyarázat</value>
+        </data>
+        <data name="Hint-PlaceHolder" xml:space="preserve">
+          <value>Magyarázat</value>
+        </data>
+        <data name="ErrorMessage-PlaceHolder" xml:space="preserve">
+          <value>Hibaüzenet</value>
+        </data>
+        <data name="AddNewSurvey" xml:space="preserve">
+          <value>Új kérdőív létrehozása</value>
+        </data>
+        <data name="UntitledQuestion" xml:space="preserve">
+          <value>Névtelen kérdés</value>
+        </data>
+        <data name="UntitledSection" xml:space="preserve">
+          <value>Névtelen szekció</value>
+        </data>
+        <data name="Hint-Menu" xml:space="preserve">
+          <value>Magyarázat</value>
+        </data>
+        <data name="Validation-Menu" xml:space="preserve">
+          <value>Validáció</value>
+        </data>
+        <data name="PlaceHolder-Menu" xml:space="preserve">
+          <value>Helykitöltő</value>
+        </data>
+        <data name="PlaceHolder-PlaceHolder" xml:space="preserve">
+          <value>Helykitöltő</value>
+        </data>
+        <data name="EmptyQuestionTextBox" xml:space="preserve">
+          <value>Rövid szöveges válasz</value>
+        </data>
+        <data name="Required" xml:space="preserve">
+          <value>Kötelező kérdés</value>
+        </data>
+        <data name="OptionalTextRequired" xml:space="preserve">
+          <value>Kötelező kérdés és kiválasztás esetén kötelező szöveges válasz</value>
+        </data>
+        <data name="Email" xml:space="preserve">
+          <value>Email</value>
+        </data>
+        <data name="Url" xml:space="preserve">
+          <value>Url</value>
+        </data>
+        <data name="GreaterThan" xml:space="preserve">
+          <value>Nagyobb mint</value>
+        </data>
+        <data name="LessThan" xml:space="preserve">
+          <value>Kisebb mint</value>
+        </data>
+        <data name="WholeNumber" xml:space="preserve">
+          <value>Egész szám</value>
+        </data>
+        <data name="Matches" xml:space="preserve">
+          <value>Megfelel</value>
+        </data>
+        <data name="DoesntMatch" xml:space="preserve">
+          <value>Nem felel meg</value>
+        </data>
+        <data name="Pattern" xml:space="preserve">
+          <value>Mintázat</value>
+        </data>
+        <data name="MinLength" xml:space="preserve">
+          <value>Minimum hosszúság</value>
+        </data>
+        <data name="MaxLength" xml:space="preserve">
+          <value>Maximum hosszúság</value>
+        </data>
+        <data name="LongQuestion-DisplayName" xml:space="preserve">
+          <value>Hosszú válasz</value>
+        </data>
+        <data name="errorMessageNoQuestion" xml:space="preserve">
+          <value>Kérdés hozzáadása nélkül nem lehet elmenteni</value>
+        </data>
+        <data name="errorMessageNoSection" xml:space="preserve">
+          <value>Szekció hozzáadása nélkül nem lehet elmenteni</value>
+        </data>
+        <data name="Between" xml:space="preserve">
+          <value>Között</value>
+        </data>
+        <data name="MinValue" xml:space="preserve">
+          <value>Minimum érték</value>
+        </data>
+        <data name="MaxValue" xml:space="preserve">
+          <value>Maximum érték</value>
+        </data>
+        <data name="DateOnly" xml:space="preserve">
+          <value>Csak dátum</value>
+        </data>
+        <data name="TimeOnly" xml:space="preserve">
+          <value>Csak idő</value>
+        </data>
+        <data name="DateAndTime" xml:space="preserve">
+          <value>Dátum és idő</value>
+        </data>
+        <data name="MinDate" xml:space="preserve">
+          <value>Minimum dátum</value>
+        </data>
+        <data name="MaxDate" xml:space="preserve">
+          <value>Maximum dátum</value>
+        </data>
+        <data name="MinTime" xml:space="preserve">
+          <value>Minimum óra</value>
+        </data>
+        <data name="MaxTime" xml:space="preserve">
+          <value>Maximum óra</value>
+        </data>
+        <data name="BetweenDate" xml:space="preserve">
+          <value>Dátumok között</value>
+        </data>
+        <data name="BetweenTime" xml:space="preserve">
+          <value>Időpontok között</value>
+        </data>
+        <data name="MaxDateAndTime" xml:space="preserve">
+          <value>Maximum dátum és idő</value>
+        </data>
+        <data name="MinDateAndTime" xml:space="preserve">
+          <value>Minimum dátum és idő</value>
+        </data>
+        <data name="MaxDateTime" xml:space="preserve">
+          <value>Maximum dátum és idő</value>
+        </data>
+        <data name="MinDateTime" xml:space="preserve">
+          <value>Minimum dátum és idő</value>
+        </data>
+        <data name="BetweenDateAndTime" xml:space="preserve">
+          <value>Között</value>
+        </data>
+        <data name="BetweenAnd" xml:space="preserve">
+          <value>Között szélsőértékekkel</value>
+        </data>
+        <data name="Step" xml:space="preserve">
+          <value>Lépés</value>
+        </data>
+        <data name="MinIsGreaterThanMaxErrorMessage" xml:space="preserve">
+          <value>A minimum értéknek kisebbnek kell lennie, mint a maximum érték!</value>
+        </data>
+        <data name="StepIsNotCorrectErrorMessage" xml:space="preserve">
+          <value>A lépés értéke nem megfelelő!</value>
+        </data>
+        <data name="SiteKey" xml:space="preserve">
+          <value>SiteKey</value>
+        </data>
+        <data name="Theme" xml:space="preserve">
+          <value>Theme</value>
+        </data>
+        <data name="CallBack" xml:space="preserve">
+          <value>CallBack</value>
+        </data>
+        <data name="OtherValue" xml:space="preserve">
+          <value>Egyéb válasz</value>
+        </data>
+        <data name="Other" xml:space="preserve">
+          <value>Egyéb</value>
+        </data>
+        <data name="Option" xml:space="preserve">
+          <value>Válaszlehetőség</value>
+        </data>
+        <data name="AddOption" xml:space="preserve">
+          <value>Válaszlehetőség hozzáadása</value>
+        </data>
+        <data name="AddOtherOption" xml:space="preserve">
+          <value>Egyéb válaszlehetőség hozzáadása</value>
+        </data>
+        <data name="GoToQuestion-Menu" xml:space="preserve">
+          <value>Válasz alapján ugrás szekcióhoz</value>
+        </data>
+        <data name="MaxChoice" xml:space="preserve">
+          <value>Kijelölhető válaszok maximális száma</value>
+        </data>
+        <data name="UntitledRow" xml:space="preserve">
+          <value>Névtelen sor</value>
+        </data>
+        <data name="UntitledColumn" xml:space="preserve">
+          <value>Névtelen oszlop</value>
+        </data>
+        <data name="AddRow" xml:space="preserve">
+          <value>Sor hozzáadása</value>
+        </data>
+        <data name="AddColumn" xml:space="preserve">
+          <value>Oszlop hozzáadása</value>
+        </data>
+        <data name="YesValue" xml:space="preserve">
+          <value>Igen</value>
+        </data>
+        <data name="NoValue" xml:space="preserve">
+          <value>Nem</value>
+        </data>
+        <data name="UploadQuestion-DisplayName" xml:space="preserve">
+          <value>Fájlfeltöltés</value>
+        </data>
+        <data name="AllowMultiple" xml:space="preserve">
+          <value>Több fájl feltöltésének engedélyezése</value>
+        </data>
+        <data name="OptionalTextInfo" xml:space="preserve">
+          <value>(kiválasztáskor szöveges opció megadása szükséges)</value>
+        </data>
+        <data name="MultipleFileUploadIsNotAllowed" xml:space="preserve">
+          <value>Csak egy fájlt lehet feltölteni!</value>
+        </data>
+        <data name="ErrorMessage-NoFile" xml:space="preserve">
+          <value>Kötelező fájlt feltölteni!</value>
+        </data>
+        <data name="ErrorMessage-GridRequired" xml:space="preserve">
+          <value>Soronként legalább egy mezőt töltsön ki!</value>
+        </data>
+        <data name="AreYouSure" xml:space="preserve">
+          <value>Biztos benne, hogy törölné a következőt</value>
+        </data>
+        <data name="AndAllQuestion" xml:space="preserve">
+          <value>és az összes kérdését</value>
+        </data>
+        <data name="SettingsButtonText" xml:space="preserve">
+          <value>Beállítások</value>
+        </data>
+        <data name="GeneralSettings" xml:space="preserve">
+          <value>Általános beállítások</value>
+        </data>
+        <data name="NotificationSettings" xml:space="preserve">
+          <value>Értesítés beállítások</value>
+        </data>
+        <data name="ValidFrom" xml:space="preserve">
+          <value>Érvényesség kezdete</value>
+        </data>
+        <data name="ValidTill" xml:space="preserve">
+          <value>Érvényesség vége</value>
+        </data>
+        <data name="EnableLifespan" xml:space="preserve">
+          <value>Időtartam figyelés</value>
+        </data>
+        <data name="EnableNotificationMail" xml:space="preserve">
+          <value>Értesítés küldés engedélyezése</value>
+        </data>
+        <data name="EmailList" xml:space="preserve">
+          <value>E-mailcím lista</value>
+        </data>
+        <data name="EmailField" xml:space="preserve">
+          <value>E-mail mező</value>
+        </data>
+        <data name="EmailFrom" xml:space="preserve">
+          <value>E-mail feladója</value>
+        </data>
+        <data name="MailSubject" xml:space="preserve">
+          <value>E-mail tárgya</value>
+        </data>
+        <data name="AdminEmailTemplate" xml:space="preserve">
+          <value>Admin e-mail sablon</value>
+        </data>
+        <data name="SubmitterEmailTemplate" xml:space="preserve">
+          <value>Kitöltő e-mail sablon</value>
+        </data>
+        <data name="Save" xml:space="preserve">
+          <value>Mentés</value>
+        </data>
+        <data name="Cancel" xml:space="preserve">
+          <value>Mégsem</value>
+        </data>
+        <data name="ValidFrom-Description" xml:space="preserve">
+          <value>Az időtartam figyelés bekapcsolása esetében a beállított érvényességi idő után jelenik meg a tartalom.</value>
+        </data>
+        <data name="ValidTill-Description" xml:space="preserve">
+          <value>Az időtartam figyelés bekapcsolása esetében a beállított érvényességi idő előtt jelenik meg a tartalom.</value>
+        </data>
+        <data name="EnableLifespan-Description" xml:space="preserve">
+          <value>Ha be van kapcsolva, akkor csak az időben aktuális elemek jelennek meg.</value>
+        </data>
+        <data name="EnableNotificationMail-Description" xml:space="preserve">
+          <value>Email értesítések kiküldése kitöltésről.</value>
+        </data>
+        <data name="EmailList-Description" xml:space="preserve">
+          <value>Értesítő emailek címlistája, a címeket ";", "," karakterekkel kell elválasztani, vagy új sorba kell felvenni.</value>
+        </data>
+        <data name="EmailField-Description" xml:space="preserve">
+          <value>Az itt megadott mezőben szereplő érték lesz a kitöltő emailcíme</value>
+        </data>
+        <data name="EmailFrom-Description" xml:space="preserve">
+          <value>Az email feladójaként az itt megadott cím szerepel majd, alapértelmezettként az "mailerservice@example.com" szrepel.</value>
+        </data>
+        <data name="MailSubject-Description" xml:space="preserve">
+          <value>Az itt megadott szöveg szerepel majd az értesítő email tárgyában</value>
+        </data>
+        <data name="AdminEmailTemplate-Description" xml:space="preserve">
+          <value>Az adminisztrátoroknak kiküldött email sablonja adható meg itt. Alapértelmezettként a kitöltőnek küldött üzenet sablonja megegyezik a normál értesítés sablonjával. Mezőérték "{0}" szintaxissal adható meg.</value>
+        </data>
+        <data name="SubmitterEmailTemplate-Description" xml:space="preserve">
+          <value>Kitöltőnek küldött email sablon adható meg itt. Alapértelmezettként a sablon megegyezik az adminisztrátoroknak küldött üzenet sablonjával. Mezőérték "{0}" szintaxissal adható meg.</value>
+        </data>
+        <data name="error" xml:space="preserve">
+          <value>hiba: </value>
+        </data>
+        <data name="QuestionIsNotValid" xml:space="preserve">
+          <value>A következő kérdés nem érvényes, ezért törlésre kerül: </value>
+        </data>
+        <data name="Browse" xml:space="preserve">
+          <value>Tallózás</value>
+        </data>
+        <data name="OutroLink-DisplayName" xml:space="preserve">
+          <value>Fogadó oldal</value>
+        </data>
+        <data name="OutroLink-Description" xml:space="preserve">
+          <value>Kitöltés után a felhasználó ide érkezzen</value>
+        </data>
+        <data name="AfterSubmit-DisplayName" xml:space="preserve">
+          <value>Jóváhagyás után futtatandó függvény</value>
+        </data>
+        <data name="AfterSubmit-Description" xml:space="preserve">
+          <value>Jóváhagyás után a felhasználó ide érkezzen</value>
+        </data>
+        <data name="OnlySingleResponse-DisplayName" xml:space="preserve">
+          <value>Csak egy kitöltés</value>
+        </data>
+        <data name="OnlySingleResponse-Description" xml:space="preserve">
+          <value>Csak egy kitöltés</value>
+        </data>
+      </Language>
+    </Languages>
+  </ResourceClass>
+</Resources>

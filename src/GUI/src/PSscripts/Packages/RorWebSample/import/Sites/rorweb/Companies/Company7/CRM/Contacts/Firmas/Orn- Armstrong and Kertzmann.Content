@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Orn- Armstrong and Kertzmann</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Orn, Armstrong and Kertzmann]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Leverandør</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0627_Røyken</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[850140337]]></OrgNumber>
+    <Email><![CDATA[hduncanh7@mozilla.org]]></Email>
+    <Telephone><![CDATA[61-(790)589-4797]]></Telephone>
+    <Company_Addresse><![CDATA[545 Red Cloud Court]]></Company_Addresse>
+    <Company_Sted><![CDATA[Adelaide Mail Centre]]></Company_Sted>
+    <Company_Postnumber><![CDATA[7688]]></Company_Postnumber>
+    <Postal_Address><![CDATA[545 Red Cloud Court]]></Postal_Address>
+    <Postal_Sted><![CDATA[Adelaide Mail Centre]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[7688]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Orn- Armstrong and Kertzmann.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:34.98</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:34.98</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

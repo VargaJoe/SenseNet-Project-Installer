@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Prosacco-Kilback</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Prosacco-Kilback]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Tiltakshaver</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/0122_Trøgstad</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[917515457]]></OrgNumber>
+    <Email><![CDATA[eswannack3x@nymag.com]]></Email>
+    <Telephone><![CDATA[27-(912)950-8850]]></Telephone>
+    <Company_Addresse><![CDATA[2 Aberg Parkway]]></Company_Addresse>
+    <Company_Sted><![CDATA[Mthatha]]></Company_Sted>
+    <Company_Postnumber><![CDATA[9317]]></Company_Postnumber>
+    <Postal_Address><![CDATA[2 Aberg Parkway]]></Postal_Address>
+    <Postal_Sted><![CDATA[Mthatha]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[9317]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Prosacco-Kilback.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-11T15:12:36.99</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-11T15:12:36.99</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>

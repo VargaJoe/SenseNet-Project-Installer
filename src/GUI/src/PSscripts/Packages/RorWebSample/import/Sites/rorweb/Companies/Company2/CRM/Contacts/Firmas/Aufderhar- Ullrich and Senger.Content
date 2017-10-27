@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>RorWebCRMCompany</ContentType>
+  <ContentName>Aufderhar- Ullrich and Senger</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[Aufderhar, Ullrich and Senger]]></DisplayName>
+    <CRMCategory>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Categories/Ansvarlig foretak</Path>
+    </CRMCategory>
+    <Kommunes>
+      <Path>/Root/Sites/rorweb/Companies/Rornorge/CRM/Contacts/Kommunes/1612_Hemne</Path>
+    </Kommunes>
+    <OrgNumber><![CDATA[405666963]]></OrgNumber>
+    <Email><![CDATA[hcleall88@nytimes.com]]></Email>
+    <Telephone><![CDATA[33-(510)592-9145]]></Telephone>
+    <Company_Addresse><![CDATA[42 1st Hill]]></Company_Addresse>
+    <Company_Sted><![CDATA[Rennes]]></Company_Sted>
+    <Company_Postnumber><![CDATA[3715]]></Company_Postnumber>
+    <Postal_Address><![CDATA[42 1st Hill]]></Postal_Address>
+    <Postal_Sted><![CDATA[Rennes]]></Postal_Sted>
+    <Postal_Postnumber><![CDATA[3715]]></Postal_Postnumber>
+    <IsArchive>false</IsArchive>
+    <SignatureImage_Data attachment="Aufderhar- Ullrich and Senger.SignatureImage_Data" />
+    <SignatureImage_Ref />
+    <Owner>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </Owner>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <EnableLifespan>false</EnableLifespan>
+    <ValidFrom>0001-01-01T00:00:00</ValidFrom>
+    <ValidTill>0001-01-01T00:00:00</ValidTill>
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </CreatedBy>
+    <CreationDate>2017-09-12T08:38:31.01</CreationDate>
+    <ModifiedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/Admin</Path>
+    </ModifiedBy>
+    <ModificationDate>2017-09-12T08:38:31.02</ModificationDate>
+    <TrashDisabled>false</TrashDisabled>
+    <IsTaggable>false</IsTaggable>
+    <IsRateable>false</IsRateable>
+    <RateAvg>0.0000</RateAvg>
+    <RateCount>0</RateCount>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>
