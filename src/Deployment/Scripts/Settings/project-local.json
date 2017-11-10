@@ -9,6 +9,12 @@
 	"Hosts": [ "project", "testproject" ],
     "DotNetVersion": "v4.0"
   },
+   "Modes": {
+	"custom" : [ "stop" ]
+  },
+  "Packages": {
+    "PackagesPath": "..\\Packages"
+  }, 
   "Platform": {
     "PackageFolderPath": "",
     "PackageName": "",
@@ -31,5 +37,4 @@
     "NuGetFolderPath": "..\\Tools\\nuget",
     "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
   }
-
 }

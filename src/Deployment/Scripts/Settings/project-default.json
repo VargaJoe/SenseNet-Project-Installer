@@ -1,6 +1,7 @@
 {
   "Modes": {
     "fullinstall": ["stop", "getlatest", "restorepckgs", "prbuild", "sninstall", "removedemo",  "prinstall", "createsite", "sethost", "start"],
+	"sninstall": ["stop", "getlatest", "restorepckgs", "prbuild", "sninstall", "createsite", "sethost", "start"],
 	"deploy" : [ "initwebfolder", "deploywebfolder", "sninstall","createsite", "sethost", "start"]
   },
   "Tools": {
@@ -10,5 +11,6 @@
     "NuGetFolderPath": "..\\Tools\\nuget",
     "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
   }
+
 
 }

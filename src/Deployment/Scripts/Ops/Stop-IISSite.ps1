@@ -49,7 +49,7 @@ Function fnStopWebsite([string]$WebsiteName)
 	}
 	catch
 	{
-		$ErrorMessage = $_.Exception.Message
+		$ErrorMessage = $MaximumErrorCount
 		$functionname = $MyInvocation.MyCommand.Name
 		Write-Host "[Error][$modulename : $functionname] => "$ErrorMessage
 		exit 6
@@ -101,7 +101,7 @@ do
 while (!$Websitesuccess -and $currentRetry -le $timeout)
 if($currentRetry -gt $timeout)
 {
-	Write-Host "The '$WebsiteName' website can't be stopped"
+	Write-Error "The '$WebsiteName' website can't be stopped"
 	exit 8
 }
 

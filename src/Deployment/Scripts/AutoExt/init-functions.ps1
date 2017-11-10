@@ -43,25 +43,46 @@ Function Run-Modules {
 	$ProcessSteps = $defaultsettings.modes."$Mode".Length
 	$Step = 0
 	if (!($defaultsettings.modes."$Mode" -eq $Null)) {
-		Write-Host Running Mode Name: $Mode
 		foreach ($ModuleName in $defaultsettings.modes."$Mode") {
+			$Result = 0
 			$Step += 1
 			$Synopsis = Get-Help Module-"$ModuleName" |  foreach { $_.Synopsis  }
-			Write-Host Mode: $Mode
-			Write-Host Module: $ModuleName
-			Write-Host Synopsis: $Synopsis
-			Write-Host Progress: (($Step/($ProcessSteps))*100)
-			write-progress -id 1 -activity "$Mode" -status "$Synopsis" -percentComplete (($Step/($ProcessSteps))*100);
-			# Run-Module $Modul
-			Invoke-Expression Module-"$ModuleName" 
-		}	
-		Write-Host
-		Write-Host --------------------------------------------------
-		Write-Host -------------------- FINISH ----------------------
-		Write-Host --------------------------------------------------
+			$Progress=(($Step/($ProcessSteps))*100)
+			
+			Write-Log "================================================" -foregroundcolor "green"
+			Write-Log "============= $Mode/$ModuleName =============" -foregroundcolor "green"
+			Write-Log "================================================" -foregroundcolor "green"
+			Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"			
+			Write-Log "Progress: $Progress/100" -foregroundcolor "green"
+			
+			# write-progress -id 1 -activity "$Mode" -status "$Synopsis" -percentComplete (($Step/($ProcessSteps))*100);
+			
+			try {
+				Invoke-Expression "Module-$ModuleName" 
+			}
+			catch {
+				$Result = 1
+				Write-Log "Error: $_.Message" -foregroundcolor "red"
+				$error.clear()
+			}
+			Write-Log "Exit code: $Result" -foregroundcolor "green"
+			Write-Log 
+		}
+		Write-Log 
+		Write-Log "--------------------------------------------------"
+		Write-Log "-------------------- FINISH ----------------------"
+		Write-Log "--------------------------------------------------"
 	} else {
-		Write-Host Running Module Name: $Mode
-		Invoke-Expression Module-"$Mode" 
+		Write-Log "Running Module Name: $Mode"
+		try {
+			Invoke-Expression "Module-$Mode" 
+		}
+		catch {
+			$Result = 1
+			$error.clear()
+		}
+		Write-Log "Exit code: $Result" -foregroundcolor "green"
+		Write-Log 
 	}
 }
 
@@ -77,10 +98,40 @@ Function Is-Administrator {
 	return $Result
 }
 
-Function Go-Verbose {
-     [CmdletBinding()]Param()
-     Write-Verbose "Alright, you prefer talkative functions. First of all, I appreciate your wish to learn more about the common parameter -Verbose. Secondly, blah blah.."
-     Write-Host "This is self-explanatory, anyway."
+Function Write-Log {
+     Param(
+		[Parameter(Mandatory=$False)]
+        [String]$Message,
+		[Parameter(Mandatory=$False)]
+        [String]$Mode=$OutputMode,
+		[Parameter(Mandatory=$False)]
+        [String]$ForegroundColor=(get-host).ui.rawui.ForegroundColor	
+		)
+		
+	if ($ShowOutput -eq $True){
+		switch ($Mode) 
+		{ 
+			"Output" {
+				Write-Output $Message
+			}
+			"Verbose" {
+				Write-Verbose $Message
+			}
+			default {
+				Write-Host $Message -ForegroundColor $ForegroundColor
+			}
+		}
+	}
+}
+
+Function List-Packages {
+	[System.Collections.ArrayList]$Result = @()
+	$PackagesPath = Get-FullPath $ProjectSettings.Packages.PackagesPath	
+	$Packages = Get-ChildItem "$PackagesPath"
+	foreach ($pckg in $Packages) {
+		$Result.Add($pckg)
+	}	
+	return $Result
 }
 
 function Set-ConnectionString {
@@ -91,7 +142,7 @@ function Set-ConnectionString {
             [String]$ConnectionString
          )
 	
-	Write-Host Config path: $ConfigPath
+	Write-Log "Config path: $ConfigPath"
 	Set-ItemProperty $ConfigPath -name IsReadOnly -value $false
 	$doc = [xml](get-content $ConfigPath)
 	$root = $doc.get_DocumentElement();
@@ -109,7 +160,7 @@ function Set-AppSetting {
             [String]$Value
          )
 	
-	Write-Host Config path: $ConfigPath
+	Write-Log "Config path: $ConfigPath"
 	Set-ItemProperty $ConfigPath -name IsReadOnly -value $false
 	$doc = [xml](get-content $ConfigPath)
 	#$root = $doc.get_DocumentElement();
@@ -140,7 +191,7 @@ function Set-PathTooLongHandling {
 
 	#  <AppContextSwitchOverrides value="Switch.System.IO.UseLegacyPathHandling=false;Switch.System.IO.BlockLongPaths=false" />		 
 	
-	Write-Host Config path: $ConfigPath
+	Write-Log "Config path: $ConfigPath"
 	Set-ItemProperty $ConfigPath -name IsReadOnly -value $false
 	$doc = [xml](get-content $ConfigPath)
 	if (!($doc.configuration.runtime.AppContextSwitchOverrides)){
@@ -168,7 +219,7 @@ function Set-PathTooLongHandling {
       # # </sites>
     # # </urlList>
 		 
-	# Write-Host Config path: $ConfigPath
+	# Write-Log Config path: $ConfigPath
 	# $doc = [xml](get-content $ConfigPath)
 	# if (!($doc.configuration.sensenet.urlList)){
 		# $override = $doc.CreateElement("urlList")
@@ -178,6 +229,13 @@ function Set-PathTooLongHandling {
 	# }
 	# $doc.Save($ConfigPath)
 # }
+
+# Functions uncertain if needed
+Function Go-Verbose {
+     [CmdletBinding()]Param()
+     Write-Log -Message "Alright, you prefer talkative functions. First of all, I appreciate your wish to learn more about the common parameter -Verbose. Secondly, blah blah.." -Mode Verbose 
+     Write-Log "This is self-explanatory, anyway."
+}
 
 Function Register-PSRepositoryFix {
     [CmdletBinding()]
@@ -197,11 +255,11 @@ Function Register-PSRepositoryFix {
     $ErrorActionPreference = 'Stop'
 
     Try {
-        Write-Verbose 'Trying to register via ​Register-PSRepository'
+        Write-Log -Message 'Trying to register via ​Register-PSRepository' -Mode Verbose 
         ​Register-PSRepository -Name $Name -SourceLocation $SourceLocation -InstallationPolicy $InstallationPolicy
-        Write-Verbose 'Registered via Register-PSRepository'
+        Write-Log -Message 'Registered via Register-PSRepository' -Mode Verbose 
     } Catch {
-        Write-Verbose 'Register-PSRepository failed, registering via workaround'
+        Write-Log -Message 'Register-PSRepository failed, registering via workaround' -Mode Verbose 
 
         # Adding PSRepository directly to file
         Register-PSRepository -name $Name -SourceLocation $env:TEMP -InstallationPolicy $InstallationPolicy
@@ -215,7 +273,7 @@ Function Register-PSRepositoryFix {
 
         # Reloading PSRepository list
         Set-PSRepository -Name PSGallery -InstallationPolicy Untrusted
-        Write-Verbose 'Registered via workaround'
+        Write-Log -Message 'Registered via workaround' -Mode Verbose 
     }
 }
 
@@ -237,8 +295,8 @@ function New-Directory([string]$dir) {
 # This function will return two values: the kind of MSBuild chosen and the MSBuild directory.
 function Get-MSBuildKindAndDir([switch]$xcopy = $false) {
     if ($xcopy) { 
-        Write-Output "xcopy"
-        Write-Output (Get-MSBuildDirXCopy)
+        Write-Log "xcopy"
+        Write-Log "(Get-MSBuildDirXCopy)"
         return
     }
     # MSBuild from an active VS command prompt.  
@@ -248,8 +306,8 @@ function Get-MSBuildKindAndDir([switch]$xcopy = $false) {
         $command = (Get-Command msbuild -ErrorAction SilentlyContinue)
         if ($command -ne $null) {
             $p = Split-Path -parent $command.Path
-            Write-Output "vscmd"
-            Write-Output $p
+            Write-Log "vscmd"
+            Write-Log "$p"
             return
         }
     }
@@ -257,15 +315,15 @@ function Get-MSBuildKindAndDir([switch]$xcopy = $false) {
     try {
         $p = Get-VisualStudioDir
         $p = Join-Path $p "MSBuild\15.0\Bin"
-        Write-Output "vsinstall"
-        Write-Output $p
+        Write-Log "vsinstall"
+        Write-Log "$p"
         return
     }
     catch { 
         # Failures are expected here when no VS installation is present on the machine.
     }
-    Write-Output "xcopy"
-    Write-Output (Get-MSBuildDirXCopy)
+    Write-Log "xcopy"
+    Write-Log "(Get-MSBuildDirXCopy)"
     return
 }
 
