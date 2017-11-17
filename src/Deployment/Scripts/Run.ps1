@@ -15,6 +15,7 @@ Param(
 )
 
 $ErrorActionPreference = "Stop"
+$Result = 0
 
 # ================================================
 # ============== GLOBAL VARIABLES ================
@@ -61,3 +62,5 @@ foreach ($file in $AutoLoadExtensionFiles) {
 } else {
 	Write-Verbose you have to run this script in administrator mode!
 }
+
+exit $Result

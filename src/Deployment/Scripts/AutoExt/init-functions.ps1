@@ -45,7 +45,7 @@ Function Run-Modules {
 	$Step = 0
 	if (!($defaultsettings.modes."$Mode" -eq $Null)) {
 		foreach ($ModuleName in $defaultsettings.modes."$Mode") {
-			$Result = 6
+			$script:Result = 0
 			$Step += 1
 			$Synopsis = Get-Help Module-"$ModuleName" |  foreach { $_.Synopsis  }
 			$Progress=(($Step/($ProcessSteps))*100)
@@ -62,7 +62,7 @@ Function Run-Modules {
 				Invoke-Expression "Module-$ModuleName" 
 			}
 			catch {
-				$Result = 1
+				$script:Result = 1
 				Write-Log "Error: $_.Message" -foregroundcolor "red"
 				$error.clear()
 			}
@@ -86,7 +86,7 @@ Function Run-Modules {
 			Invoke-Expression "Module-$Mode" 
 		}
 		catch {
-			$Result = 1
+			$script:Result = 1
 			Write-Log "Error: $_.Message" -foregroundcolor "red"
 			$error.clear()
 		}
