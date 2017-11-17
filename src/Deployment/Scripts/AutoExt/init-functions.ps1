@@ -40,11 +40,12 @@ Function Run-Modules {
 		[Parameter(Mandatory=$True)]
         [String]$Mode
 		)
+	$Output = if ($show) {'Out-Default'} else {'Out-Null'}
 	$ProcessSteps = $defaultsettings.modes."$Mode".Length
 	$Step = 0
 	if (!($defaultsettings.modes."$Mode" -eq $Null)) {
 		foreach ($ModuleName in $defaultsettings.modes."$Mode") {
-			$Result = 0
+			$Result = 6
 			$Step += 1
 			$Synopsis = Get-Help Module-"$ModuleName" |  foreach { $_.Synopsis  }
 			$Progress=(($Step/($ProcessSteps))*100)
@@ -66,6 +67,7 @@ Function Run-Modules {
 				$error.clear()
 			}
 			Write-Log "Exit code: $Result" -foregroundcolor "green"
+			Write-Verbose "Exit code: $Result" 
 			Write-Log 
 		}
 		Write-Log 
@@ -73,15 +75,23 @@ Function Run-Modules {
 		Write-Log "-------------------- FINISH ----------------------"
 		Write-Log "--------------------------------------------------"
 	} else {
-		Write-Log "Running Module Name: $Mode"
+		$Synopsis = Get-Help Module-"$Mode" |  foreach { $_.Synopsis  }
+		Write-Log "================================================" -foregroundcolor "green"
+		Write-Log "============= $Mode/$Mode =============" -foregroundcolor "green"
+		Write-Log "================================================" -foregroundcolor "green"
+		Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"			
+		Write-Log "Progress: 100/100" -foregroundcolor "green"
+		
 		try {
 			Invoke-Expression "Module-$Mode" 
 		}
 		catch {
 			$Result = 1
+			Write-Log "Error: $_.Message" -foregroundcolor "red"
 			$error.clear()
 		}
 		Write-Log "Exit code: $Result" -foregroundcolor "green"
+		Write-Verbose "Exit code: $Result" 
 		Write-Log 
 	}
 }

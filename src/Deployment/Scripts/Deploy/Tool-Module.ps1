@@ -7,6 +7,7 @@ Param(
 )
 
 $ProjectSnAdminFilePath = Get-FullPath $ProjectSettings.Project.SnAdminFilePath
+$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 
-Write-Host $ProjectSnAdminFilePath $ToolName $ToolParameters
-& $ProjectSnAdminFilePath $ToolName $ToolParameters
+Write-Verbose "$ProjectSnAdminFilePath $ToolName $ToolParameters"
+& $ProjectSnAdminFilePath $ToolName $ToolParameters | & $Output

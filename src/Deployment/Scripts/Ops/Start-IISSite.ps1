@@ -20,15 +20,12 @@ $waitsecond = 3 # seconds
 $timeout = 4 # max waiting while not starting: $timeout*$waitsecond
 # ====================================
 
-Write-Host ================================================ -foregroundcolor "green"
-Write-Host START WEBSITE AND APPLICATION POOL ">>" $WebsiteName -foregroundcolor "green"
-Write-Host ================================================ -foregroundcolor "green"
-Write-Host Computer: $Computer 
+Write-Verbose "================================================" 
+Write-Verbose "START WEBSITE AND APPLICATION POOL >> $WebsiteName"
+Write-Verbose "================================================" 
+Write-Verbose "Computer: $Computer"
 
-#Set-ExecutionPolicy Unrestricted  
-# Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass 
-import-module WebAdministration
-# $modulename = $MyInvocation.MyCommand.Name
+import-module WebAdministration -Verbose:$false
 
 # IIS website start function
 Function fnStartWebsite([string]$WebsiteName)
@@ -51,7 +48,7 @@ Function fnStartWebsite([string]$WebsiteName)
 	catch{
 		$ErrorMessage = $_.Exception.Message
 		$functionname = $MyInvocation.MyCommand.Name
-		Write-Host "[Error][$modulename : $functionname] => "$ErrorMessage
+		Write-Verbose "[Error][$modulename : $functionname] => "$ErrorMessage
 		exit 2
 	}
 }
@@ -77,7 +74,7 @@ Function fnStartApplicationPool([string]$AppPoolName)
 	catch{
 		$ErrorMessage = $_.Exception.Message
 		$functionname = $MyInvocation.MyCommand.Name
-		Write-Host "[Error][$modulename : $functionname] => "$ErrorMessage
+		Write-Verbose "[Error][$modulename : $functionname] => "$ErrorMessage
 		exit 3
 	}
 }
@@ -90,7 +87,7 @@ $currentRetry = 0
 do
 {
 	if ($statusSite.State -eq "Started"){
-		Write-Host "The '$WebsiteName' website is running..."
+		Write-Verbose "The '$WebsiteName' website is running..."
 		$Websitesuccess = $true;
 	}
 	else{
@@ -102,7 +99,7 @@ while (!$Websitesuccess -and $currentRetry -le $timeout)
 
 if($currentRetry -gt $timeout)
 {
-	Write-Host "The '$WebsiteName' website can't be started"
+	Write-Verbose "The '$WebsiteName' website can't be started"
 	exit 5
 }
 
@@ -114,7 +111,7 @@ $currentRetry = 0
 do
 {
 	if ($statusPool.Value -eq "Started"){
-		Write-Host "The '$AppPoolName' application pool is running..."
+		Write-Verbose "The '$AppPoolName' application pool is running..."
 		$Poolsuccess = $true;
 	}
 	else{
@@ -126,7 +123,7 @@ while (!$Poolsuccess -and $currentRetry -le $timeout)
 
 if($currentRetry -gt $timeout)
 {
-	Write-Host "The '$AppPoolName' application pool can't start"
+	Write-Verbose "The '$AppPoolName' application pool can't start"
 	exit 4
 }
 

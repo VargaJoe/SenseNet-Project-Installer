@@ -4,12 +4,12 @@ Param(
 [string[]]$SiteHosts 
 )
 
-Write-Host ================================================ -foregroundcolor "green"
-Write-Host SET HOST FILE -foregroundcolor "green"
-Write-Host ================================================ -foregroundcolor "green"
+Write-Verbose "================================================"
+Write-Verbose "SET HOST FILE"
+Write-Verbose "================================================"
 # CALL: .\SetHostFile.ps1 -hostname "sensenet"
 
-Write-Host Hosts $SiteHosts 
+Write-Verbose "Hosts $SiteHosts" 
 	
 function New-ObjectHostFileEntry{
     param(
@@ -65,10 +65,10 @@ function Add-Host{
 	
     if($IP -match [regex]"(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9])[.]){3}(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9]))"){
  
-        Write-Host "Add Host in host file: "$(if($IP){$IP + " "}else{})$(if($DNS){$DNS})
+        Write-Verbose "Add Host in host file: $(if($IP){$IP + " "}else{})$(if($DNS){$DNS})"
 		
         Add-Content -Path $HostFile -Value ("`r`n"+$IP + "       " + $DNS) -Encoding "Ascii"
-		Write-Host "$HostFile has been modified successfully!" -foregroundcolor "green"
+		Write-Verbose "$HostFile has been modified successfully!" 
     }
 }
 
@@ -104,7 +104,7 @@ function Remove-HostFileEntry{
  
             if($HostIP -eq $IP -or $HostDNS -eq $DNS){
  
-                Write-Host "Remove host file entry: "$(if($IP){$IP + " "}else{})$(if($DNS){$DNS})
+                Write-Verbose "Remove host file entry: $(if($IP){$IP + " "}else{})$(if($DNS){$DNS})"
                 $Modification = $true
             }else{
                 $HostFileContentNew += $Line
@@ -125,13 +125,13 @@ try{
 	foreach ($hostUrl in $SiteHosts) {		
 		$HostnameToLower = $hostUrl.ToLower()
 		$IsExists = Is-Exists -FindHostname $HostnameToLower
-		Write-Host "Check for $HostnameToLower"
+		Write-Verbose "Check for $HostnameToLower"
 		if (!$IsExists)
 		{
 			Add-Host -IP "127.0.0.1" -DNS $HostnameToLower
 		}
 		else{
-			Write-Host "$HostnameToLower is already exist in hosts file!" -foregroundcolor "Yellow"
+			Write-Verbose "$HostnameToLower is already exist in hosts file!" 
 		}
 	}
 	exit 0
@@ -139,12 +139,12 @@ try{
 Catch
 {
 	$ErrorMessage = $_.Exception.Message
-	# Write-Host "[Error][Add-HostFileEntry()] => "$ErrorMessage
-	Write-Host $ErrorMessage
+	# Write-Verbose "[Error][Add-HostFileEntry()] => "$ErrorMessage
+	Write-Verbose "$ErrorMessage"
 	exit 1
 }
 	
 if($LastExitCode -gt 0){
-	Write-Host "Something wrong during modify host file! ExitCode:($LastExitCode)"
+	Write-Verbose "Something wrong during modify host file! ExitCode:($LastExitCode)"
 	exit 1
 }

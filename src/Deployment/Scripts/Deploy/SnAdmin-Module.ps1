@@ -21,15 +21,15 @@ $Initfunctions = [IO.Path]::Combine($ScriptBaseFolderPath, "init-functions.ps1")
 #$NuGetFilePath = [IO.Path]::Combine($NuGetFolderPath, "NuGet.exe")
 #}
 
-Write-Host Helper functions initialization from $Initfunctions 
+Write-Verbose "Helper functions initialization from $Initfunctions"
 . $Initfunctions
 
 $WebFolderPath = [IO.Path]::GetFullPath($WebFolderPath)
-Write-host WebFolder combine: $WebFolderPath
+Write-Verbose "WebFolder combine: $WebFolderPath"
 
 $AdminExeFilePath = [IO.Path]::Combine($WebFolderPath, 'Admin\bin\snadmin.exe')
 
 $PackageFullPath  = [IO.Path]::GetFullPath($PackagePath)
 
-Write-Host $AdminExeFilePath "$PackageFullPath"
+Write-Verbose "$AdminExeFilePath $PackageFullPath"
 & $AdminExeFilePath "$PackageFullPath"

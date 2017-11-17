@@ -49,15 +49,15 @@ foreach ($file in $AutoLoadExtensionFiles) {
 	$ProjectSettings = load-settings -settingspath $projectsettingspath
 
 	# $mergedsettings = Join-Object -Left $projectsettings -Right $defaultsettings -LeftJoinProperty * -RightJoinProperty * -Type AllInBoth | ConvertTo-Json -depth 100  | Out-File "test.json"
-	# Write-Host 3 $mergedsettings
+	# Write-Verbose 3 $mergedsettings
 	
 	# Start-Transcript -path output.txt 
-	Run-Modules "$Mode" 
+	Run-Modules "$Mode"  
 	# Stop-Transcript
 	
 	# Package list	
 	 # $pckgs = List-Packages
-	 # Write-Host $pckgs
+	 # Write-Verbose $pckgs
 } else {
-	write-host you have to run this script in administrator mode!
+	Write-Verbose you have to run this script in administrator mode!
 }
