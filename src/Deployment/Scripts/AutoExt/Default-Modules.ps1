@@ -415,12 +415,13 @@ Function Module-SetRepoUrl {
 	try {
 		# Site name, url and authentication type must be get from settings json, probably with iteration
 		$ProjectSiteHosts = $ProjectSettings.IIS.Hosts
-		$ProjectSiteName = $ProjectSettings.IIS.WebAppName
+		# $ProjectSiteName = $ProjectSettings.IIS.WebAppName
+		$ProjectSiteName = "project"
 		$AuthenticationType="Forms"
 		
 		foreach ($hostUrl in $ProjectSiteHosts) {		
 			$HostnameToLower = $hostUrl.ToLower()
-			Write-Verbose "Set host $HostnameToLower on $ProjectSiteName with $AuthenticationType authentication type"
+			Write-Verbose "Set $HostnameToLower on $ProjectSiteName with $AuthenticationType authentication type"
 			& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -ToolName "seturl" -ToolParameters "site:$ProjectSiteName","url:$HostnameToLower","authenticationType:$AuthenticationType"
 		}
 		$script:Result = $LASTEXITCODE
