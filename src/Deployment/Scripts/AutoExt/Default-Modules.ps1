@@ -410,14 +410,19 @@ Function Module-SetRepoUrl {
 	.SYNOPSIS
 	Set sensenet site repository url
 	.DESCRIPTION
-	
+	-SiteHosts $ProjectSiteHosts
 	#>
 	try {
 		# Site name, url and authentication type must be get from settings json, probably with iteration
-		$SiteName="Defaul_Site"
-		$Url="project"
+		$ProjectSiteHosts = $ProjectSettings.IIS.Hosts
+		$ProjectSiteName = $ProjectSettings.IIS.WebAppName
 		$AuthenticationType="Forms"
-		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -ToolName "seturl" -ToolParameters "site:$SiteName","url:$Url","authenticationType:$AuthenticationType"
+		
+		foreach ($hostUrl in $ProjectSiteHosts) {		
+			$HostnameToLower = $hostUrl.ToLower()
+			Write-Verbose "Set host $HostnameToLower on $ProjectSiteName with $AuthenticationType authentication type"
+			& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -ToolName "seturl" -ToolParameters "site:$ProjectSiteName","url:$HostnameToLower","authenticationType:$AuthenticationType"
+		}
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
