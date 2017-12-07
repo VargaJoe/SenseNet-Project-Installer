@@ -1,16 +1,13 @@
 {
   "DataBase": {
     "DataSource": "MySenseNetContentRepositoryDatasource",
-    "InitialCatalog": "parizsi"
+    "InitialCatalog": "project"
   },
   "IIS": {
-    "WebAppName": "parizsi",
-    "AppPoolName": "parizsi",
-	"Hosts": [ "parizsi" ],
+    "WebAppName": "project",
+    "AppPoolName": "project",
+	"Hosts": [ "project", "testurl2" ],
     "DotNetVersion": "v4.0"
-  },
-   "Modes": {
-	"custom" : [ "parizsi", "parizsi2" ]
   },
   "Packages": {
     "PackagesPath": "..\\Packages"
