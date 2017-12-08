@@ -97,8 +97,10 @@ Function Module-RestorePckgs {
 	try {
 		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 		Write-Verbose "RESTORE PACKAGES REFERENCED BY SOLUTION" 
+		$NuGetSourcePath = $ProjectSettings.Tools.NuGetSourceUrl
 		$NuGetFilePath = Get-FullPath $ProjectSettings.Tools.NuGetFilePath
-		Write-Verbose "$NuGetFilePath"
+		Write-Verbose "Check if $NuGetFilePath exists..."
+		& $ScriptBaseFolderPath\Dev\Download-File.ps1 -Url $NuGetSourcePath -Output $NuGetFilePath
 		$ProjectSolutionFilePath = Get-FullPath $ProjectSettings.Project.SolutionFilePath
 		Write-Verbose "$NuGetFilePath restore $ProjectSolutionFilePath" 
 		& "$NuGetFilePath" restore "$ProjectSolutionFilePath" | & $Output

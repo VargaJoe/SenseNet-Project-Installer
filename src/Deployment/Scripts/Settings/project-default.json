@@ -10,6 +10,7 @@
     "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
     "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
     "NuGetFolderPath": "..\\Tools\\nuget",
+	"NuGetSourceUrl": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
     "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
   }
 
