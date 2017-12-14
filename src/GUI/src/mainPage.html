@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,68 +11,139 @@
     <link rel="stylesheet" href="../node_modules/noty/lib/noty.css">
     <link rel="stylesheet" href="../node_modules/animate.css/animate.min.css">
     <link rel="stylesheet" href="style/sortablestyle.css">
-    <link rel="stylesheet" href="style/basic.css">
+    
+    <link rel="stylesheet" href="style/bootstrap-toggle.min.css">
     <link rel="stylesheet" href="style/ladda-themeless.min.css">
+    <link rel="stylesheet" href="style/basic.css">
 </head>
-<body>
-    <ul class="nav nav-tabs mainmenu">
-        <li class="active"><a data-toggle="tab" href="#install">Install process</a></li>
-        <li><a data-toggle="tab" href="#settings">Settings</a></li>
-    </ul>
-              
-    <div class="container">
-            <div class="tab-content">
-                    <div id="install" class="tab-pane fade in active">
-                            <div class="row marginBottom10">
-                                    <div class="col-xs-12 text-center">
-                                        <h1>Install Sensenet</h1>
-                                    </div>
-                                </div>
-                                <div class="row marginBottom10">
-                                    <div class="col-xs-12" id="output">
-                        
-                                    </div>
-                                </div>
-                                <div class="row" id="processOrder">
-                                    <div class="col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
-                                            <ul class="list-group animated fadeIn" id="items"></ul>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-xs-6 text-right">
-                                        <button class="btn btn-default" id="savesequence" onclick="SaveProcessSeq()">Save the list</button>
-                                    </div>
-                                    <div class="col-xs-6">
-                                        <button type="button" class="btn btn-danger ladda-button" 
-                                        id="runfullprocessbtn" data-processname="fullinstall" data-style="expand-left">
-                                                <span class="ladda-label">Run process</span>
-                                        </button>
-                                    </div>
-                                </div>
-                    </div>
-                    <div id="settings" class="tab-pane fade">
-                            <div class="container margintop30">
-                                <div class="row" id="jsonsettings">
 
-                                </div>
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                       <button class="btn btn-default" id="savesettings" onclick="">Save</button>
-                                    </div>
-                                </div>
-                            </div> 
+<body>
+    <ul class="nav nav-tabs mainmenu navbar-fixed-top">
+        <li class="active">
+            <a data-toggle="tab" href="#install">Install process</a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#settingsdefault">Default settings</a>
+        </li>
+        <li>
+            <a data-toggle="tab" href="#settingslocal">Local settings</a>
+        </li>
+    </ul>
+
+    <div class="container maincontainer">
+        <div class="tab-content">
+            <div id="install" class="tab-pane fade in active">
+                <div class="row marginBottom10">
+                    <div class="col-xs-12 text-center">
+                        <h1>Install Sensenet</h1>
                     </div>
-                 </div>
+                </div>
+                <div class="row marginBottom10">
+                    <div class="col-xs-12" id="output">
+
+                    </div>
+                </div>
+                <div class="row" id="processOrder">
+                    <div class="col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-6 col-lg-offset-3">
+                        <ul class="list-group animated fadeIn" id="items"></ul>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-6 text-right">
+                        <button class="btn btn-default" id="savesequence" onclick="SaveProcessSeq()">Save the list</button>
+                    </div>
+                    <div class="col-xs-6">
+                        <button type="button" class="btn btn-danger ladda-button" id="runfullprocessbtn" data-processname="fullinstall" data-style="expand-left">
+                            <span class="ladda-label">
+                                <i class="fa fa-play" aria-hidden="true"></i> Run process</span>
+                        </button>
+                        <button class="btn btn-info stopBtn hidden" onclick="StopFullProcess()">
+                            <i class="fa fa-stop" aria-hidden="true"></i> Stop</button>
+                    </div>
+                </div>
+            </div>
+            <div id="settingsdefault" class="tab-pane fade">
+                <div class="container">
+                    <div class="row marginBottom10">
+                        <div class="col-xs-12 text-center">
+                            <h1>Default Settings</h1>
+                            <h3 class="settingsPath"></h3>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div id="jsonsettingsdefault">
+
+                        </div>
+                        <!-- <div class="col-xs-12 col-md-6 col-md-offset-3"><h3>Tools</h3><hr></div>
+                                    <div class="col-xs-12" id="jsonsettingsdefault"></div> -->
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <button class="btn btn-danger ladda-button" id="savesettingsdefault" data-style="expand-left" onclick="SaveSettingsJSON('settingsdefault')">
+                                <span class="ladda-label">Save</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="settingslocal" class="tab-pane fade">
+                <div class="container">
+                    <div class="row marginBottom10">
+                        <div class="col-xs-12 text-center">
+                            <h1>Local Settings</h1>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div id="jsonsettingslocal">
+
+                        </div>
+                        <!-- <div class="col-xs-12 col-md-6 col-md-offset-3"><h3>Tools</h3><hr></div>
+                                <div class="col-xs-12" id="jsonsettingslocal"></div> -->
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <button class="btn btn-danger ladda-button" id="savesettingslocal" data-style="expand-left" onclick="SaveSettingsJSON('settingslocal')">
+                                <span class="ladda-label">Save</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="InfoModal" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content SN-ModalContent">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">End of installation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p id="modalmsg">The process has been successful.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default noBorderRadius" onclick="ResetStatus()">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
-    <script>global.Tether = require('popper')</script>
     <script>window.jQuery = window.$ = require('jquery')</script>
     <script>require('bootstrap')</script>
     <script src="js/spin.min.js"></script>
+    <script src="js/bootstrap-toggle.min.js"></script>
     <script src="js/ladda.min.js"></script>
     <!-- <script>require('babel-core/register')</script>
     <script>require('babel-polyfill')</script> -->
     <script>require('./mainPage.js')</script>
-    
+
 </body>
+
 </html>

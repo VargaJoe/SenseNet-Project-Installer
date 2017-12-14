@@ -12,11 +12,12 @@ Param(
 [string]$DotNetVersion = "v4.0"
 )
 
-Write-Host ================================================ -foregroundcolor "green"
-Write-Host CREATE IIS SITE -foregroundcolor "green"
-Write-Host ================================================ -foregroundcolor "green"
+Write-Verbose "================================================" 
+Write-Verbose "CREATE IIS SITE"
+Write-Verbose "================================================"
 
-Import-Module WebAdministration
+Import-Module WebAdministration  -Verbose:$false
+
 $iisAppPoolName = $PoolName.ToLower()
 $iisAppName = $SiteName.ToLower()
 
@@ -29,11 +30,11 @@ try
 	#check if the app pool doesn't exists
 	if (!(Test-Path $iisAppPoolName -pathType container))
 	{
-		Write-Host Create the $iisAppPoolName application pool
+		Write-Verbose "Create the $iisAppPoolName application pool"
 		$appPool = New-Item $iisAppPoolName
 		$appPool | Set-ItemProperty -Name "managedRuntimeVersion" -Value $DotNetVersion
 	} else {
-		Write-Host $iisAppPoolName application pool already exists
+		Write-Verbose "$iisAppPoolName application pool already exists"
 	}
 
 	#navigate to the sites root
@@ -42,9 +43,9 @@ try
 	#check if the site exists
 	if (!(Test-Path $iisAppName -pathType container)){
 		
-		Write-Host Create the $iisAppName site
-		Write-Host Site webfolder: $DirectoryPath
-		Write-Host Site host: $iisAppName":80"
+		Write-Verbose "Create the $iisAppName site"
+		Write-Verbose "Site webfolder: $DirectoryPath"
+		Write-Verbose "Site host: $iisAppName:80"
 		$iisApp = New-Item $iisAppName -bindings @{protocol="http";bindingInformation="*:80:" + $iisAppName} -physicalPath $DirectoryPath
 		$iisApp | Set-ItemProperty -Name "applicationPool" -Value $iisAppPoolName
 		
@@ -52,27 +53,28 @@ try
 			$HostnameToLower = $hostUrl.ToLower()
 			if ($null -ne (get-webbinding | where-object {$_.bindinginformation -eq "*:80:$HostnameToLower"}))
 			{
-				Write-Host $HostnameToLower":80 is already a binding"
+				Write-Verbose "$HostnameToLower:80 is already a binding"
 			}
 			else
 			{
 				New-WebBinding -Name $iisAppName -Port 80 -Protocol http -HostHeader $HostnameToLower 
-				Write-Host $HostnameToLower":80 is now a binding"
+				Write-Verbose "$HostnameToLower:80 is now a binding"
 			}
 			
 			# if ($null -ne (get-webbinding | where-object {$_.bindinginformation -eq "*:443:$HostnameToLower"}))
 			# {
-				# Write-Host $HostnameToLower":443 is already a binding"
+				# Write-Verbose "$HostnameToLower:443 is already a binding"
 			# }
 			# else
 			# {
 				# New-WebBinding -Name $iisAppName -Port 443 -Protocol http -HostHeader $HostnameToLower 
-				# Write-Host $HostnameToLower":443 is now a binding"
+				# Write-Verbose "$HostnameToLower:443 is now a binding"
 			# }			
-		}	
+		}
+		exit 0	
 	} else {
-		Write-Host $iisAppName site already exists	
-		return
+		Write-Verbose "$iisAppName site already exists"
+		exit 0
 	}
 }
 finally

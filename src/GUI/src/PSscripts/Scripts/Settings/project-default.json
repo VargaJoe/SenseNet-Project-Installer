@@ -1,1 +1,18 @@
-{"Modes":{"afullinstall":["snservices","stop","snwebpages","prbuild","sninstall","removedemo"],"deploy":["start","initwebfolder","deploywebfolder","sninstall","createsite","sethost"],"fullinstall":["start","getlatest","prbuild","sninstall","removedemo","restorepckgs","updateproduct","survey","shorturl","prinstall","prsample","createsite","sethost","stop"],"test":["stop","snservices","snwebpages"]},"Tools":{"ConfigTransformationTool":"..\\Tools\\CTT\\ctt.exe","NuGetFilePath":"..\\Tools\\nuget\\nuget.exe","NuGetFolderPath":"..\\Tools\\nuget","UnZipperFilePath":"..\\Tools\\7zip\\7za.exe","VisualStudio":"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe"}}
+{
+  "Modes": {
+    "firstinstall": ["restorepckgs", "prbuild", "sninstall", "removedemo",  "prinstall", "setrepourl", "createsite", "sethost", "start"],
+    "fullinstall": ["stop", "getlatest", "restorepckgs", "prbuild", "sninstall", "removedemo",  "prinstall", "setrepourl", "createsite", "sethost", "start"],
+    "demoinstall": ["restorepckgs", "prbuild", "sninstall", "createsite", "sethost", "start"],
+    "deploy" : [ "initwebfolder", "deploywebfolder", "sninstall","createsite", "sethost", "start"]
+  },
+  "Tools": {
+    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe",
+    "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
+    "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
+    "NuGetFolderPath": "..\\Tools\\nuget",
+	"NuGetSourceUrl": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
+    "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
+  }
+
+
+}

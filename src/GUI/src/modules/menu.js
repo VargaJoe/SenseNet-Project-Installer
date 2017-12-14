@@ -1,8 +1,10 @@
 const electron = require('electron');
 const loadJsonFile = require('load-json-file');
 const {app} = electron;
-let settingsFilePath = __dirname+'/PSscripts/Scripts/Settings/project-default.json';
-const settings = require('./settings/settings');
+const settingsLoader = require('./settingLoader');
+
+let appSettings = settingsLoader("GUISettings.json");
+let settingsFilePath = __dirname+appSettings.defaultInstallJSON;
 
 function loadModes(settingsFilePath){
     console.log("settingsFilePath load start.");
@@ -19,14 +21,14 @@ function menuTemplate(mainWindow,settingsFilePath) {
     return new Promise((resolve, reject) => {
         loadJsonFile(settingsFilePath).then(json => {
             let modesMenu = [];
-            console.log("SETT",settings.properties.defaultProcessName);
+            console.log("SETT",appSettings.defaultProcessName);
             for(var attributename in json.Modes){
                 let menuObj = {};
                 let tempArray = json.Modes[attributename];
                 menuObj.label = attributename;
                 menuObj.type = 'radio';
                 menuObj.checked = false;
-                if(attributename === settings.properties.defaultProcessName){
+                if(attributename === appSettings.defaultProcessName){
                     menuObj.checked = true;
                 }
                 menuObj.click = ()=>{

@@ -1,0 +1,26 @@
+{
+  "DataBase": {
+    "DataSource": "MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": "Project"
+  },
+  "IIS": {
+    "WebAppName": "Project",
+    "AppPoolName": "Project",
+	"Hosts": [ "localhost" ],
+    "DotNetVersion": "v4.0"
+  },
+  "Platform": {
+    "PackageFolderPath": "..\\WebFolder",
+    "PackageName": "..\\WebFolder\\SN7Beta4",
+    "SourceFolderPath": "..\\..",
+    "SolutionFilePath": "Source\\SenseNet\\SenseNet.sln"
+  },
+  "Tools": {
+    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe",
+    "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
+    "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
+    "NuGetFolderPath": "..\\Tools\\nuget",
+    "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
+  }
+
+}

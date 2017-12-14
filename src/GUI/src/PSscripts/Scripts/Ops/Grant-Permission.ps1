@@ -36,10 +36,10 @@ if(get-module sqlps){"yes"}else{"no"}
 #Grant Owner role
 #Invoke-Sqlcmd -ServerInstance $DataSource -Database $Catalog -Query $ARS
 
-Write-Host "ServerInstance: $DataSource"
-Write-Host "Database: $Catalog" 
-Write-Host "Rolename: $DBRole"
-Write-Host "Membername: $User"
+Write-Verbose "ServerInstance: $DataSource"
+Write-Verbose "Database: $Catalog" 
+Write-Verbose "Rolename: $DBRole"
+Write-Verbose "Membername: $User"
 Invoke-Sqlcmd -ServerInstance "$DataSource" -Database "$Catalog" -Query "$ARS"
 
 

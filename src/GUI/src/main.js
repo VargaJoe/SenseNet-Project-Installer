@@ -6,8 +6,7 @@ const loadJsonFile = require('load-json-file');
 const fs = require('fs');
 
 // Modules:
-//const psmodule = require('./psmodule');
-const settings = require('./modules/settings/settings');
+const settingsLoader = require('./modules/settingLoader');
 const menu = require('./modules/menu');
 
 
@@ -21,12 +20,14 @@ const Tray = electron.Tray;
 let mainWindow;
 let counter = 5;
 let proc_fullinstall;
-let settingsFilePath = __dirname+settings.properties.defaultInstallJSON;
+let appSettings = settingsLoader("GUISettings.json");
+let settingsFilePath =  __dirname+appSettings.settingsPath+appSettings.defaultInstallJSON;
 let settingsJSON;
 let windowMenu;
 
 app.on('ready', _=> {
     console.log("App is ready.");
+    console.log(appSettings);
 
     mainWindow = new Browser({
         height:900,
@@ -60,12 +61,22 @@ ipc.on('pasrun-end',(event, arg)=>{
     console.log("[pasrun-end]::"+arg);
 })
 
-ipc.on('pasrun-output',(event, arg)=>{
-    console.log("[pasrun-output]::"+arg);
+// If the process successfuly
+ipc.on('pasrun-success',(event, arg)=>{
+    console.log("[pasrun-success]::"+JSON.stringify(arg));
+    event.sender.send('process-success',arg);
 })
 
-ipc.on('pasrun-err',(event, arg)=>{
-    console.log("[pasrun-err]::"+arg);
+// If the process error
+ipc.on('pasrun-error',(event, arg)=>{
+    console.log("[pasrun-err]::"+JSON.stringify(arg));
+    event.sender.send('process-error',arg);
+})
+
+// If the process start..
+ipc.on('pasrun-loadingstart',(event,arg)=>{
+    console.log("[pasrun-loadingstart]::"+JSON.stringify(arg));
+    event.sender.send('process-loadingstart',arg);
 })
 
 ipc.on('process-start',(event, arg)=>{

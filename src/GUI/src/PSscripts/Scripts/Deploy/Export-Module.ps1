@@ -7,23 +7,22 @@ Param(
 )
 
 $ProjectSnAdminFilePath = Get-FullPath $ProjectSettings.Project.SnAdminFilePath
+$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 
-Write-Host $ProjectSnAdminFilePath "$PackagePath"
+Write-Verbose "$ProjectSnAdminFilePath $PackagePath"
 & $ProjectSnAdminFilePath "$PackagePath"
 
 # filter logic must be implemented, for example if not full path then Queries subfolder must be used
 # and have to think about parameter handle through run.ps1 script 
 if($ExportFromFilePath)
 {
-	#& $ExportExeFilePath -TARGET "$TargetPath" -SOURCE /Root -ASM $BinFolderPath -FILTER $ExportFromFilePath
 	$filter = Get-Content $Exportfromfilepath
-	& $ProjectSnAdminFilePath export source:"/Root" target:"$TargetPath" filter:"$filter"
-	Write-Host Export was running: $ProjectSnAdminFilePath export source:"/Root" target:"$TargetPath" filter:"Queries/$filter"
+	& $ProjectSnAdminFilePath export source:"/Root" target:"$TargetPath" filter:"$filter" | & $Output
+	Write-Verbose "Export was running: $ProjectSnAdminFilePath export source:/Root target:$TargetPath filter:Queries/$filter"
 }
 else{
-	#& $ExportExeFilePath -TARGET "$TargetPath" -SOURCE /Root -ASM $BinFolderPath 
-	& $ProjectSnAdminFilePath export source:"/Root" target:"$TargetPath" 
-	Write-Host Export was running: $ProjectSnAdminFilePath export source:"/Root" target:"$TargetPath" 
+	& $ProjectSnAdminFilePath export source:"/Root" target:"$TargetPath" | & $Output
+	Write-Verbose "Export was running: $ProjectSnAdminFilePath export source:/Root target:$TargetPath" 
 }
 
 
