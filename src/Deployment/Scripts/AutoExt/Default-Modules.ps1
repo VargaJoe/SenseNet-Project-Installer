@@ -417,8 +417,7 @@ Function Module-SetRepoUrl {
 	try {
 		# Site name, url and authentication type must be get from settings json, probably with iteration
 		$ProjectSiteHosts = $ProjectSettings.IIS.Hosts
-		# $ProjectSiteName = $ProjectSettings.IIS.WebAppName
-		$ProjectSiteName = "project"
+		$ProjectSiteName = $ProjectSettings.IIS.WebAppName
 		$AuthenticationType="Forms"
 		
 		foreach ($hostUrl in $ProjectSiteHosts) {		
