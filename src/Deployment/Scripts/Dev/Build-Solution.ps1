@@ -21,7 +21,9 @@ $devenvPath = "c:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Co
 #$devenvPath = ((get-itemproperty -literalpath "hklm:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\devenv.exe").'(default)').replace(".exe",".com").Replace("`"","")
 
 Write-Verbose "$devenvPath $slnPath /build Debug"
-& "$devenvPath" "$slnPath" /build Debug | & $Output
+& "$devenvPath" "$slnPath" /build Debug 
+# TECHNICAL DEBT: the following code snippet case some unexpected results so don't use it for now'
+#| & $Output
 
 #Write-Verbose have been run: $MsBuildpath $slnPath /t:Rebuild /p:Configuration=Debug /p:VisualStudioVersion=14.0
 Write-Verbose "have been run: $devenvPath $slnPath /Rebuild Debug"
