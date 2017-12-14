@@ -1,9 +1,9 @@
 {
   "Modes": {
-    "fullinstall": ["stop", "getlatest", "restorepckgs", "prbuild", "sninstall", "removedemo",  "prinstall", "setrepourl", "createsite", "sethost", "start"],
-	"sninstall": ["stop", "getlatest", "restorepckgs", "prbuild", "sninstall", "createsite", "sethost", "start"],
-	"deploy" : [ "initwebfolder", "deploywebfolder", "sninstall","createsite", "sethost", "start"],
-	"test" : [ "stop", "start" ]
+    "firstinstall": ["restorepckgs", "prbuild", "sninstall", "removedemo",  "prinstall", "setrepourl", "createsite", "sethost", "start"],
+	"fullinstall": ["stop", "getlatest", "restorepckgs", "prbuild", "sninstall", "removedemo",  "prinstall", "setrepourl", "createsite", "sethost", "start"],
+	"demoinstall": ["restorepckgs", "prbuild", "sninstall", "createsite", "sethost", "start"],
+	"deploy" : [ "initwebfolder", "deploywebfolder", "sninstall","createsite", "sethost", "start"]
   },
   "Tools": {
     "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe",
