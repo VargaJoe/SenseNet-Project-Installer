@@ -43,33 +43,43 @@ try
 	#check if the site exists
 	if (!(Test-Path $iisAppName -pathType container)){
 		
-		Write-Verbose "Create the $iisAppName site"
-		Write-Verbose "Site webfolder: $DirectoryPath"
-		Write-Verbose "Site host: $iisAppName:80"
-		$iisApp = New-Item $iisAppName -bindings @{protocol="http";bindingInformation="*:80:" + $iisAppName} -physicalPath $DirectoryPath
-		$iisApp | Set-ItemProperty -Name "applicationPool" -Value $iisAppPoolName
-		
-		foreach ($hostUrl in $SiteHosts) {
+		for ($counter=0; $counter -lt $SiteHosts.Length; $counter++) {
+		# foreach ($hostUrl in $SiteHosts) {
+			$hostUrlComponents = $SiteHosts[$counter].Split(":")
+			if ($hostUrlComponents[1] -eq $Null){
+				$hostUrl = $hostUrlComponents[0]
+			} else {
+				$hostUrl = $hostUrlComponents[1]
+			}				
 			$HostnameToLower = $hostUrl.ToLower()
-			if ($null -ne (get-webbinding | where-object {$_.bindinginformation -eq "*:80:$HostnameToLower"}))
-			{
-				Write-Verbose "$HostnameToLower:80 is already a binding"
-			}
-			else
-			{
-				New-WebBinding -Name $iisAppName -Port 80 -Protocol http -HostHeader $HostnameToLower 
-				Write-Verbose "$HostnameToLower:80 is now a binding"
-			}
 			
-			# if ($null -ne (get-webbinding | where-object {$_.bindinginformation -eq "*:443:$HostnameToLower"}))
-			# {
-				# Write-Verbose "$HostnameToLower:443 is already a binding"
-			# }
-			# else
-			# {
-				# New-WebBinding -Name $iisAppName -Port 443 -Protocol http -HostHeader $HostnameToLower 
-				# Write-Verbose "$HostnameToLower:443 is now a binding"
-			# }			
+			if ($counter -eq 0) {
+				Write-Verbose "Create the $iisAppName site"
+				Write-Verbose "Site webfolder: $DirectoryPath"
+				Write-Verbose "Site host: $HostnameToLower on 80"
+				$iisApp = New-Item $iisAppName -bindings @{protocol="http";bindingInformation="*:80:" + $iisAppName} -physicalPath $DirectoryPath
+				$iisApp | Set-ItemProperty -Name "applicationPool" -Value $iisAppPoolName
+			} else {
+				if ($null -ne (get-webbinding | where-object {$_.bindinginformation -eq "*:80:$HostnameToLower"}))
+				{
+					Write-Verbose "$HostnameToLower on 80 is already a binding"
+				}
+				else
+				{
+					New-WebBinding -Name $iisAppName -Port 80 -Protocol http -HostHeader $HostnameToLower 
+					Write-Verbose "$HostnameToLower on 80 is now a binding"
+				}
+				
+				# if ($null -ne (get-webbinding | where-object {$_.bindinginformation -eq "*:443:$HostnameToLower"}))
+				# {
+					# Write-Verbose "$HostnameToLower:443 is already a binding"
+				# }
+				# else
+				# {
+					# New-WebBinding -Name $iisAppName -Port 443 -Protocol http -HostHeader $HostnameToLower 
+					# Write-Verbose "$HostnameToLower:443 is now a binding"
+				# }			
+			}
 		}	
 	} else {
 		Write-Verbose "$iisAppName site already exists"

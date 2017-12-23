@@ -414,13 +414,23 @@ Function Module-SetRepoUrl {
 	.DESCRIPTION
 	-SiteHosts $ProjectSiteHosts
 	#>
+	# Technical Debt: it should be called an independent ps1 file from here, instead a hardcoded business logic
 	try {
 		# Site name, url and authentication type must be get from settings json, probably with iteration
 		$ProjectSiteHosts = $ProjectSettings.IIS.Hosts
-		$ProjectSiteName = $ProjectSettings.IIS.WebAppName
+		# $ProjectSiteName = $ProjectSettings.IIS.WebAppName
 		$AuthenticationType="Forms"
 		
-		foreach ($hostUrl in $ProjectSiteHosts) {		
+		foreach ($hostCombinedUrl in $ProjectSiteHosts) {				
+			$hostUrlComponents = $hostCombinedUrl.Split(":")
+			if ($hostUrlComponents[1] -eq $Null){
+				$ProjectSiteName = "project"
+				$hostUrl = $hostUrlComponents[0]
+			} else {
+				$ProjectSiteName = $hostUrlComponents[0]
+				$hostUrl = $hostUrlComponents[1]
+			}			
+			
 			$HostnameToLower = $hostUrl.ToLower()
 			Write-Verbose "Set $HostnameToLower on $ProjectSiteName with $AuthenticationType authentication type"
 			& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -ToolName "seturl" -ToolParameters "site:$ProjectSiteName","url:$HostnameToLower","authenticationType:$AuthenticationType"

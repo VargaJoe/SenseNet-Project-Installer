@@ -122,7 +122,13 @@ function Remove-HostFileEntry{
 }
 
 try{
-	foreach ($hostUrl in $SiteHosts) {		
+	foreach ($hostCombinedUrl in $SiteHosts) {
+		$hostUrlComponents = $hostCombinedUrl.Split(":")
+		if ($hostUrlComponents[1] -eq $Null){
+			$hostUrl = $hostUrlComponents[0]
+		} else {
+			$hostUrl = $hostUrlComponents[1]
+		}				
 		$HostnameToLower = $hostUrl.ToLower()
 		$IsExists = Is-Exists -FindHostname $HostnameToLower
 		Write-Verbose "Check for $HostnameToLower"
