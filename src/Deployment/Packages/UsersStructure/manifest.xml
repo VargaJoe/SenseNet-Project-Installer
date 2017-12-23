@@ -1,0 +1,27 @@
+﻿<!-- <Package type='Application' level='Tool'> -->
+<Package type='Tool'>
+	<Id>Project</Id>
+	<Description>Add custom users and set membership information</Description>
+	<Version>1.0</Version>
+	<ReleaseDate>2017-12-23</ReleaseDate>
+	<Steps>
+		<Phase>
+			<StartRepository />
+			<Trace>Add custom users and groups if necessary...</Trace>
+			<Import source='import' target='/Root' />
+			
+			<Trace>Set membership information</Trace>
+			<AddReference name="Members" content="/Root/IMS/BuiltIn/Portal/Administrators">
+			   <Value>
+				  <Path>/Root/IMS/BuiltIn/Portal/cadmin</Path>
+			   </Value>
+			</AddReference>
+			<AddReference name="Members" content="/Root/IMS/BuiltIn/Portal/Operators">
+			   <Value>
+				  <Path>/Root/IMS/BuiltIn/Portal/cadmin</Path>
+			   </Value>
+			</AddReference>
+			<SetField name="Enabled" content="/Root/IMS/BuiltIn/Portal/admin">false</SetField>
+		</Phase>
+	</Steps>
+</Package>

@@ -205,8 +205,25 @@ Function Module-RemoveDemo {
 	
 	#>
 	try {
-		$RemoveDemoPackagePath = Get-FullPath "..\Packages\RemoveDemo"
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$RemoveDemoPackagePath"
+		$PackagePath = Get-FullPath "..\Packages\RemoveDemo"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Module-AdminUsers {
+<#
+	.SYNOPSIS
+	Set common administrators and group memberships
+	.DESCRIPTION
+	
+	#>
+	try {
+		$PackagePath = Get-FullPath "..\Packages\UsersStructure"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -214,7 +231,6 @@ Function Module-RemoveDemo {
 	}
 	
 }
-
 
 Function Module-PrInstall {
 <#
@@ -224,8 +240,8 @@ Function Module-PrInstall {
 	
 	#>
 	try {
-		$ProjectDeployFolderPath =  Get-FullPath $ProjectSettings.Project.DeployFolderPath
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$ProjectDeployFolderPath"	
+		$PackagePath =  Get-FullPath $ProjectSettings.Project.DeployFolderPath
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath"	
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
