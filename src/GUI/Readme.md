@@ -3,11 +3,11 @@
 This is a GUI interface for SenseNet-Project-Installer. It build in Electron framework.
 App settings: PSscripts\Scripts\Settings\GUISettings.json
 
-Install:
+## Install:
 npm install
 
-Build:
+## Build:
 npm run build
 
-Run:
+## Run app:
 npm start
