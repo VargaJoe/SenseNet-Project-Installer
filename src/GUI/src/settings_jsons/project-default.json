@@ -1,0 +1,45 @@
+{
+    "Modes": {
+        "deploy": [
+            "initwebfolder",
+            "deploywebfolder",
+            "sninstall",
+            "createsite",
+            "sethost",
+            "start"
+        ],
+        "fullinstall": [
+            "getlatest",
+            "stop",
+            "restorepckgs",
+            "prbuild",
+            "sninstall",
+            "removedemo",
+            "prinstall",
+            "createsite",
+            "sethost",
+            "start"
+        ],
+        "sninstall": [
+            "stop",
+            "restorepckgs",
+            "prbuild",
+            "sninstall",
+            "prinstall",
+            "createsite",
+            "sethost",
+            "start"
+        ],
+        "test": [
+            "stop",
+            "start"
+        ]
+    },
+    "Tools": {
+        "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
+        "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe",
+        "NuGetFolderPath": "..\\Tools\\nuget",
+        "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
+        "VisualStudio": "..\\Tools\\nuget\\nuget.exe"
+    }
+}
