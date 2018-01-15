@@ -2,7 +2,7 @@
 
 This is a GUI interface for SenseNet-Project-Installer. It build in Electron framework.
 
-Application settings: PSscripts\Scripts\Settings\GUISettings.json
+Application settings: src\PSscripts\Scripts\Settings\GUISettings.json
 
 ## Recommend install these global packages:
 - npm install -g babel-core
