@@ -76,6 +76,7 @@ $(document).ready( () => {
 
 // Run only one process
 $(document).on('click','.runbtn',function (e) {
+    editor.setValue("");
     e.preventDefault()
     var $this = $(this);
     var processname = this.dataset.processname;
@@ -150,6 +151,7 @@ $(document).on('click','.runbtn',function (e) {
 
 // Run full mode process (e.g. fullinstall)
 $(document).on('click','#runfullprocessbtn',function (e) {
+    editor.setValue("");
     e.preventDefault();
     DisableRunBtns(true);
     ResetStatus();
@@ -177,7 +179,7 @@ $(document).on('click','#runfullprocessbtn',function (e) {
     runner(__dirname+"/PSscripts/Scripts",scriptsArray,session)
     .then(v => {
         console.log("End full procvess mode");
-        $("#InfoModal").modal();
+        //$("#InfoModal").modal();
         DisableRunBtns(false);
         l.stop();
         $(".resetBtn").show();
