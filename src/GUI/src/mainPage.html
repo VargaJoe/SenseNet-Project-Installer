@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sensenet install</title>
+    <title>Sensenet install for developers</title>
     <link rel="stylesheet" href="../node_modules\bootstrap\dist\css\bootstrap.min.css">
     <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="../node_modules/noty/lib/noty.css">
@@ -28,6 +28,9 @@
         <li>
             <a data-toggle="tab" href="#settingslocal">Local settings</a>
         </li>
+        <li>
+            <a data-toggle="tab" href="#consoleTab">Console</a>
+        </li>
     </ul>
 
     <div class="container maincontainer">
@@ -35,7 +38,7 @@
             <div id="install" class="tab-pane fade in active">
                 <div class="row marginBottom10">
                     <div class="col-xs-12 text-center">
-                        <h1>Install Sensenet</h1>
+                        <h1>Install Sensenet7</h1>
                     </div>
                 </div>
                 <div class="row marginBottom10">
@@ -58,7 +61,8 @@
                             <span class="ladda-label">
                                 <i class="fa fa-play" aria-hidden="true"></i> Run process</span>
                         </button>
-                        <button class="btn btn-info stopBtn hidden" onclick="StopFullProcess()">
+                        <button class="btn btn-warning resetBtn" onclick="ResetStatus()">Reset</button>
+                        <button class="btn btn-info stopBtn" onclick="StopStatus()">
                             <i class="fa fa-stop" aria-hidden="true"></i> Stop</button>
                     </div>
                 </div>
@@ -112,6 +116,24 @@
                     </div>
                 </div>
             </div>
+            <div id="consoleTab" class="tab-pane fade">
+                <div class="container">
+                    <div class="row marginBottom10">
+                        <div class="col-xs-12 text-center">
+                            <h1>Powershell output</h1>
+                        </div>
+                        <div class="col-xs-12 text-center">
+                            <strong>Show output:</strong> <input id="toggle-showoutput" type="checkbox" checked data-toggle="toggle" 
+                            data-size="mini" data-on="On" data-off="Off" data-onstyle="primary" data-offstyle="danger">&nbsp;&nbsp;
+                            <strong>Verbose:</strong> <input id="toggle-verbose" type="checkbox" checked data-toggle="toggle" 
+                            data-size="mini" data-on="On" data-off="Off" data-onstyle="primary" data-offstyle="danger">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="editor">some text</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
@@ -127,7 +149,7 @@
                         <p id="modalmsg">The process has been successful.</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default noBorderRadius" onclick="ResetStatus()">Ok</button>
+                        <button type="button" class="btn btn-default noBorderRadius" data-dismiss="modal">Ok</button>
                     </div>
                 </div>
             </div>
@@ -138,6 +160,7 @@
     <script>window.jQuery = window.$ = require('jquery')</script>
     <script>require('bootstrap')</script>
     <script src="js/spin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.0/ace.js"></script>
     <script src="js/bootstrap-toggle.min.js"></script>
     <script src="js/ladda.min.js"></script>
     <!-- <script>require('babel-core/register')</script>

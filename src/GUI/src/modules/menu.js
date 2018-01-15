@@ -56,12 +56,12 @@ function menuTemplate(mainWindow,settingsFilePath) {
                         label:'Devtools',
                         role:'toggledevtools'
                     },
-                    {
-                        label:'Testmenu',
-                        click:_=>{
-                            mainWindow.webContents.send('testevent',"Event start menuitem")
-                        }
-                    },
+                    // {
+                    //     label:'Testmenu',
+                    //     click:_=>{
+                    //         mainWindow.webContents.send('testevent',"Event start menuitem")
+                    //     }
+                    // },
                     {
                         label: 'Exit',
                         click: _=>{

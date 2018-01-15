@@ -135,3 +135,7 @@ div.toggle{
 .ladda-button[data-style=contract]{
     width: 45px;
 }
+
+#editor{
+    height: 570px;
+}

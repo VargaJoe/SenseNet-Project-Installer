@@ -9,6 +9,8 @@ const fs = require('fs');
 const Noty = require('noty');
 const settingsLoader = require('./modules/settingLoader');
 const runner = require("./modules/runner");
+const shareModule = require("./modules/shareModule");
+const moment = require("moment");
 
 const statusArray = [
     {type:"complete",class:"successProcess"},
@@ -16,6 +18,20 @@ const statusArray = [
     {type:"progress",class:"progressProcess"},
     {type:"end",class:"-----"}
 ];
+// ACE editor:
+let editor = ace.edit("editor");
+editor.setTheme("ace/theme/monokai");
+editor.getSession().setMode("ace/mode/json");
+editor.getSession().setUseWrapMode(true);
+editor.renderer.setShowGutter(false);
+editor.setValue("Install console");
+editor.setReadOnly(true);
+editor.setOptions({
+    maxLines: 50,
+    minLines:40
+});
+editor.setShowPrintMargin(false);
+
 
 let appSettings = settingsLoader("GUISettings.json");
 let defaultSettings = settingsLoader(appSettings.defaultInstallJSON);
@@ -26,13 +42,22 @@ let settingsFilePath =  __dirname+appSettings.settingsPath+appSettings.defaultIn
 let localsettingsFilePath =  __dirname+appSettings.settingsPath+appSettings.localInstallJSON;
 let settingsRealyJSON, defaultSettingsMemo, localSettingsMemo;
 let loadedMode = appSettings.defaultProcessName;
-
 settingsFileIdDependency = {
     "settingslocal":localsettingsFilePath,
     "settingsdefault":settingsFilePath
 };
 
 $(document).ready( () => {
+    if(appSettings.ShowOutput.value.toLowerCase() === "true"){
+        $("#toggle-showoutput").bootstrapToggle('on')
+    }else{
+        $("#toggle-showoutput").bootstrapToggle('off')
+    }
+    if(appSettings.Verbose.value.toLowerCase() === "true"){
+        $("#toggle-verbose").bootstrapToggle('on')
+    }else{
+        $("#toggle-verbose").bootstrapToggle('off')
+    }
     //ipc.send('process-start','test');
     settingsInit(defaultSettings,"jsonsettingsdefault");
     settingsInit(localSettings,"jsonsettingslocal");
@@ -57,26 +82,68 @@ $(document).on('click','.runbtn',function (e) {
     var l = Ladda.create(this);
     l.start();
     //Run(this.dataset.processname,l);
-
-    runner(__dirname+"/PSscripts/Scripts",[this.dataset])
-    .then(v => {
+    let session = editor.session;
+    session.setNewLineMode("unix");
+    session.insert({
+        row: session.getLength(),
+        column: 0
+     }, "\n" + `[${moment().format("HH:mm:ss")}] Start ${processname}...`)
+    runner(__dirname+"/PSscripts/Scripts",[this.dataset],session)
+    .then(output => {
         console.log("End process");
-        new Noty({
-            type:'success',
-            text: `${processname} succesfuly!`,
-            theme:'metroui',
-            progressBar:false,
-            layout:'bottomRight',
-            timeout:2000,
-            animation: {
-                open : 'animated fadeInRight',
-                close: 'animated fadeOutRight'
+        let exitCode = null;
+        if(output.trim().indexOf(appSettings.exitcodemagicword)  > -1){
+            exitCode = parseInt(output.trim().split(appSettings.exitcodemagicword)[1])
+        }
+        if(exitCode != null && exitCode != NaN){
+            if(exitCode === 0)
+            {
+                new Noty({
+                    type:'success',
+                    text: `Succesfuly!`,
+                    theme:'metroui',
+                    progressBar:false,
+                    layout:'bottomRight',
+                    timeout:2000,
+                    animation: {
+                        open : 'animated fadeInRight',
+                        close: 'animated fadeOutRight'
+                    }
+                }).show();
+
+            }else{
+                new Noty({
+                    type:'error',
+                    text: `Error`,
+                    theme:'metroui',
+                    progressBar:false,
+                    layout:'topRight',
+                    timeout:1000,
+                    animation: {
+                        open : 'animated fadeInRight',
+                        close: 'animated fadeOutRight'
+                    }
+                }).show();
             }
-        }).show();
+        }else{
+            new Noty({
+                type:'info',
+                text: `Error`,
+                theme:'metroui',
+                progressBar:false,
+                layout:'topRight',
+                timeout:1000,
+                animation: {
+                    open : 'animated fadeInRight',
+                    close: 'animated fadeOutRight'
+                }
+            }).show();
+        }
+        
         l.stop();
     })
     .catch(err => {
-        console.error("[HIBA]::"+err.msg);
+        console.error("[HIBA]::");
         l.stop();
     })
 })
@@ -86,6 +153,7 @@ $(document).on('click','#runfullprocessbtn',function (e) {
     e.preventDefault();
     DisableRunBtns(true);
     ResetStatus();
+    $(".resetBtn").hide();
     var l = Ladda.create(this);
     l.start();
     let scriptsArray = [];
@@ -100,17 +168,29 @@ $(document).on('click','#runfullprocessbtn',function (e) {
         }
     })
     console.log(scriptsArray);
-    runner(__dirname+"/PSscripts/Scripts",scriptsArray)
+    let session = editor.session;
+    session.setNewLineMode("unix");
+    session.insert({
+        row: session.getLength(),
+        column: 0
+     }, "\n" + `[${moment().format("HH:mm:ss")}] ------------ Start process ------------`)
+    runner(__dirname+"/PSscripts/Scripts",scriptsArray,session)
     .then(v => {
         console.log("End full procvess mode");
         $("#InfoModal").modal();
         DisableRunBtns(false);
         l.stop();
+        $(".resetBtn").show();
+        session.insert({
+            row: session.getLength(),
+            column: 0
+         }, "\n" + `[${moment().format("HH:mm:ss")}] ------------ End process ------------`)
     })
     .catch(err => {
-        console.error("[HIBA]::"+err.msg);
+        //console.error("[HIBA]::"+err.msg);
         DisableRunBtns(false);
         l.stop();
+        $(".resetBtn").show();
     })
 })
 
@@ -260,6 +340,16 @@ IDgenerate = function(){
             .substring(1);
     }
     return s4() + s4() + s4();
+}
+
+StopStatus = function(){
+    shareModule.stopStatus = true;
+    let session = editor.session;
+    session.setNewLineMode("unix");
+    session.insert({
+        row: session.getLength(),
+        column: 0
+     }, "\n" + `[${moment().format("HH:mm:ss")}] Cancel process...`)
 }
 
 ResetStatus = function(){
