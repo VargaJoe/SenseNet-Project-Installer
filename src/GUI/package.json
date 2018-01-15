@@ -28,7 +28,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "angular": "^1.6.6",
     "babel-core": "^6.26.0",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-polyfill": "^6.26.0",
@@ -65,8 +64,6 @@
   },
   "jspm": {
     "dependencies": {
-      "aurelia-bootstrapper": "npm:aurelia-bootstrapper@^2.1.1",
-      "aurelia-framework": "npm:aurelia-framework@^1.1.5",
       "bootstrap": "github:twbs/bootstrap@^3.3.7"
     },
     "devDependencies": {
