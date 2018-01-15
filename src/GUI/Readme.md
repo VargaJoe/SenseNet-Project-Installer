@@ -5,11 +5,11 @@ This is a GUI interface for SenseNet-Project-Installer. It build in Electron fra
 Application settings: PSscripts\Scripts\Settings\GUISettings.json
 
 ## Recommend install these global packages:
-npm install -g babel-core
-npm install -g babel-cli
-npm install -g browserify
-npm install -g electron
-npm install -g electron-packager
+- npm install -g babel-core
+- npm install -g babel-cli
+- npm install -g browserify
+- npm install -g electron
+- npm install -g electron-packager
 
 ## Install:
 npm install
