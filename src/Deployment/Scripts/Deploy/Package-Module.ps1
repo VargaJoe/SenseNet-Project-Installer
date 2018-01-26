@@ -7,6 +7,7 @@ Param(
 #mode: export, import, stb
 # schema???
 $ProjectSnAdminFilePath = Get-FullPath $ProjectSettings.Project.SnAdminFilePath
+$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 
-Write-Host $ProjectSnAdminFilePath "$PackagePath"
-& $ProjectSnAdminFilePath "$PackagePath"
+Write-Verbose "$ProjectSnAdminFilePath $PackagePath"
+& $ProjectSnAdminFilePath "$PackagePath" | & $Output

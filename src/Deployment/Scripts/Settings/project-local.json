@@ -1,14 +1,17 @@
 {
   "DataBase": {
     "DataSource": "MySenseNetContentRepositoryDatasource",
-    "InitialCatalog": "Project"
+    "InitialCatalog": "project"
   },
   "IIS": {
-    "WebAppName": "Project",
-    "AppPoolName": "Project",
-	"Hosts": [ "project", "testproject" ],
+    "WebAppName": "project",
+    "AppPoolName": "project",
+	"Hosts": [ "project", "testurl2" ],
     "DotNetVersion": "v4.0"
   },
+  "Packages": {
+    "PackagesPath": "..\\Packages"
+  }, 
   "Platform": {
     "PackageFolderPath": "",
     "PackageName": "",
@@ -28,6 +31,7 @@
     "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\tf.exe",
     "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
     "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
+	"NuGetSourceUrl": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
     "NuGetFolderPath": "..\\Tools\\nuget",
     "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
   }

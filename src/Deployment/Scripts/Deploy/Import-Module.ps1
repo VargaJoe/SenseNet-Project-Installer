@@ -6,9 +6,10 @@ Param(
 [string[]]$ToolParameters = "target:/Root"
 )
 
+$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 $ProjectSnAdminFilePath = Get-FullPath $ProjectSettings.Project.SnAdminFilePath
-Write-Host Import will running: $ProjectSnAdminFilePath import source:"$SourcePath" $ToolParameters
+Write-Verbose "Import will running: $ProjectSnAdminFilePath import source:$SourcePath $ToolParameters"
 
-& $ProjectSnAdminFilePath import source:"$SourcePath" $ToolParameters
+& $ProjectSnAdminFilePath import source:"$SourcePath" $ToolParameters | & $Output
 
-Write-Host Import was running: $ProjectSnAdminFilePath import source:"$SourcePath" $ToolParameters
+Write-Verbose "Import was running: $ProjectSnAdminFilePath import source:$SourcePath $ToolParameters"
