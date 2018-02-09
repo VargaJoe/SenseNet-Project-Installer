@@ -6,25 +6,27 @@
   "IIS": {
     "WebAppName": "project",
     "AppPoolName": "project",
-	"Hosts": [ "project", "testurl2" ],
+	"Hosts": [ "project", "sn7.sn.hu" ],
     "DotNetVersion": "v4.0"
   },
-  "Packages": {
-    "PackagesPath": "..\\Packages"
+  "Sources": {
+    "PackagesPath": "..\\Packages",
+	"DatabasesPath": "..\\Databases"
   }, 
   "Platform": {
     "PackageFolderPath": "",
     "PackageName": "",
     "SourceFolderPath": "",
-    "SolutionFilePath": ""
+    "SolutionFilePath": "",
+	"DbBackupFilePath": "..\\Databases\\project-20180209-1011.bak"
   }, 
   "Project": {
     "SourceFolderPath": "..\\..\\",
-    "WebFolderPath": "..\\..\\Source\\WebSite",
-	"WebConfigFilePath": "..\\..\\Source\\WebSite\\web.config",
-	"SnAdminFilePath": "..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": "..\\..\\Source\\WebSite\\Tools",
-	"DeployFolderPath": "..\\..\\Source\\WebSite\\deploy",
+    "WebFolderPath": "D:\\devexp\\webtest",
+	"WebConfigFilePath": "D:\\devexp\\webtest\\web.config",
+	"SnAdminFilePath": "D:\\devexp\\webtest\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": "D:\\devexp\\webtest\\Tools",
+	"DeployFolderPath": "D:\\devexp\\webtest\\deploy",
     "SolutionFilePath": "..\\..\\Source\\Project.sln"
   },
   "Tools": {
