@@ -458,3 +458,64 @@ Function Module-SetRepoUrl {
 	}
 	
 }
+
+Function Module-DbBackup {
+<#
+	.SYNOPSIS
+	Backup sql database
+	.DESCRIPTION
+	
+	#>
+	try {
+		$DataSource=$ProjectSettings.DataBase.DataSource
+		$InitialCatalog=$ProjectSettings.DataBase.InitialCatalog 
+		$CurrentDateTime = Get-Date -format -yyyyMMdd-HHmm
+		$BackupName = "$InitialCatalog" + $CurrentDateTime + ".bak"
+		$DatabaseBackupsFolderPath = Get-FullPath $ProjectSettings.Sources.DatabasesPath
+		& $ScriptBaseFolderPath\Ops\Backup-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DatabaseBackupsFolderPath\$BackupName"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+Function Module-DbRestore {
+<#
+	.SYNOPSIS
+	Restore sql database
+	.DESCRIPTION
+	
+	#>
+	try {
+		$DataSource=$ProjectSettings.DataBase.DataSource
+		$InitialCatalog=$ProjectSettings.DataBase.InitialCatalog 
+		$DatabaseBackupsFolderPath = Get-FullPath $ProjectSettings.Sources.DatabasesPath
+		$DbBackupFilePath = Get-FullPath $ProjectSettings.Platform.DbBackupFilePath
+		& $ScriptBaseFolderPath\Ops\Restore-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DbBackupFilePath"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+Function Module-SetConfigs {
+<#
+	.SYNOPSIS
+	Set project configurations
+	.DESCRIPTION
+	
+	#>
+	try {
+		$PackagePath = Get-FullPath "..\Packages\SetConfigs"
+		write-host $PackagePath
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath" -Parameters "LOGLEVEL:Console","datasource:$DataSource","initialcatalog:$InitialCatalog" 	
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
