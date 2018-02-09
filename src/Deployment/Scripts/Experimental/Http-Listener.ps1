@@ -28,8 +28,10 @@ While ($HttpListener.IsListening) {
     }
     $HttpResponse = $HttpContext.Response
     $HttpResponse.Headers.Add("Content-Type","application/json")
+    $HttpResponse.Headers.Add("Access-Control-Allow-Origin","http://localhost:8080")
     $HttpResponse.StatusCode = 200
-    $ResponseBuffer = [System.Text.Encoding]::UTF8.GetBytes("{ExitCode:$Result}")
+    $jsondata = "{ExitCode:$Result}" | ConvertTo-Json
+    $ResponseBuffer = [System.Text.Encoding]::UTF8.GetBytes($jsondata)
     $HttpResponse.ContentLength64 = $ResponseBuffer.Length
     $HttpResponse.OutputStream.Write($ResponseBuffer,0,$ResponseBuffer.Length)
     $HttpResponse.Close()
