@@ -364,8 +364,9 @@ Function Module-PrImport {
 	
 	#>
 	try {
-		Write-Verbose "Start import script"
-		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 "$ProjectStructureFolderPath"
+		$ProjectRepoFsFolderPath = Get-FullPath $ProjectSettings.Project.RepoFsFolderPath
+		Write-Verbose "Start import script with the path: $ProjectRepoFsFolderPath"		
+		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 -SourcePath "$ProjectRepoFsFolderPath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
