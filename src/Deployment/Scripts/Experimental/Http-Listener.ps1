@@ -30,7 +30,9 @@ While ($HttpListener.IsListening) {
     $HttpResponse.Headers.Add("Content-Type","application/json")
     $HttpResponse.Headers.Add("Access-Control-Allow-Origin","http://localhost:8080")
     $HttpResponse.StatusCode = 200
-    $jsondata = "{ExitCode:$Result}" | ConvertTo-Json
+    $jsondata = @{ExitCode = $Result} 
+    $object = new-object psobject -Property $jsondata 
+    $jsondata = $object | ConvertTo-Json
     $ResponseBuffer = [System.Text.Encoding]::UTF8.GetBytes($jsondata)
     $HttpResponse.ContentLength64 = $ResponseBuffer.Length
     $HttpResponse.OutputStream.Write($ResponseBuffer,0,$ResponseBuffer.Length)
