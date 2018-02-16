@@ -2,7 +2,7 @@
 # netsh http add sslcert ipport=0.0.0.0:443 certhash=3badca4f8d38a85269085aba598f0a8a51f057ae "appid={00112233-4455-6677-8899-AABBCCDDEEFF}"
 # netsh http delete sslcert ipport=0.0.0.0:443 
 $HttpListener = New-Object System.Net.HttpListener
-$HttpListener.Prefixes.Add("http://+:80/")
+$HttpListener.Prefixes.Add("http://+:5455/")
 $HttpListener.Prefixes.Add("https://+:443/")
 $HttpListener.Start()
 While ($HttpListener.IsListening) {
@@ -28,9 +28,11 @@ While ($HttpListener.IsListening) {
     }
     $HttpResponse = $HttpContext.Response
     $HttpResponse.Headers.Add("Content-Type","application/json")
-    $HttpResponse.Headers.Add("Access-Control-Allow-Origin","http://localhost:8080")
+    $HttpResponse.Headers.Add("Access-Control-Allow-Origin","http://172.17.17.195:8080")
     $HttpResponse.StatusCode = 200
-    $jsondata = "{ExitCode:$Result}" | ConvertTo-Json
+    $jsondata = @{ExitCode = $Result} 
+    $object = new-object psobject -Property $jsondata 
+    $jsondata = $object | ConvertTo-Json
     $ResponseBuffer = [System.Text.Encoding]::UTF8.GetBytes($jsondata)
     $HttpResponse.ContentLength64 = $ResponseBuffer.Length
     $HttpResponse.OutputStream.Write($ResponseBuffer,0,$ResponseBuffer.Length)
