@@ -364,8 +364,9 @@ Function Module-PrImport {
 	
 	#>
 	try {
-		Write-Verbose "Start import script"
-		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 "$ProjectStructureFolderPath"
+		$ProjectRepoFsFolderPath = Get-FullPath $ProjectSettings.Project.RepoFsFolderPath
+		Write-Verbose "Start import script with the path: $ProjectRepoFsFolderPath"		
+		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 -SourcePath "$ProjectRepoFsFolderPath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -481,7 +482,7 @@ Function Module-DbBackup {
 	
 }
 
-Function Module-DbRestore {
+Function Module-RestoreDb {
 <#
 	.SYNOPSIS
 	Restore sql database
@@ -509,13 +510,40 @@ Function Module-SetConfigs {
 	.DESCRIPTION
 	
 	#>
+	# "LOGLEVEL:Console",
 	try {
+		$DataSource=$ProjectSettings.DataBase.DataSource
+		# write-host $DataSource
+		$InitialCatalog=$ProjectSettings.DataBase.InitialCatalog 
+		# write-host $InitialCatalog
 		$PackagePath = Get-FullPath "..\Packages\SetConfigs"
-		write-host $PackagePath
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath" -Parameters "LOGLEVEL:Console","datasource:$DataSource","initialcatalog:$InitialCatalog" 	
+		# write-host $PackagePath
+		# write-host "$ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath $PackagePath -Parameters datasource:$DataSource initialcatalog:$InitialCatalog"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath" -Parameters "datasource:$DataSource","initialcatalog:$InitialCatalog" 	
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
 		$script:Result = 1
 	}
+}
+
+Function Module-TestWebfolder {
+<#
+	.SYNOPSIS
+	Unzip webfolder package
+	.DESCRIPTION
+	
+	#>
+	try {
+		$SnWebFolderFilePath = Get-FullPath $ProjectSettings.Platform.SnWebFolderFilePath
+		$ProjectWebFolderPath = Get-FullPath $ProjectSettings.Project.WebFolderPath
+		Write-Verbose "SnWebfolderPackPath: $SnWebFolderFilePath"
+		Write-Verbose "SnWebfolderDestName: $ProjectWebFolderPath"
+		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebFolderFilePath" -destname "$ProjectWebFolderPath"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
 }

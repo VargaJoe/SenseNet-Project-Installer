@@ -18,20 +18,22 @@
     "PackageName": "",
     "SourceFolderPath": "",
     "SolutionFilePath": "",
-	"DbBackupFilePath": "..\\Databases\\project-20180209-1011.bak"
+	"DbBackupFilePath": "..\\Packages\\Platform\\testsn7000db.bak",
+	"SnWebFolderFilePath": "..\\Packages\\Platform\\snwebfolder700.zip",
+	"SnWebFolderPath": "..\\Packages\\Platform\\snwebfolder700"
   }, 
   "Project": {
     "SourceFolderPath": "..\\..\\",
-    "WebFolderPath": "D:\\devexp\\webtest",
-	"WebConfigFilePath": "D:\\devexp\\webtest\\web.config",
-	"SnAdminFilePath": "D:\\devexp\\webtest\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": "D:\\devexp\\webtest\\Tools",
-	"DeployFolderPath": "D:\\devexp\\webtest\\deploy",
+    "WebFolderPath": "..\\..\\Source\\WebSite",
+	"WebConfigFilePath": "..\\..\\Source\\WebSite\\web.config",
+	"SnAdminFilePath": "..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": "..\\..\\Source\\WebSite\\Tools",
+	"DeployFolderPath": "..\\..\\Source\\WebSite\\deploy",
     "SolutionFilePath": "..\\..\\Source\\Project.sln"
   },
   "Tools": {
     "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe",
-    "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
+    "UnZipperFilePath": "C:\\Program Files\\7-Zip\\7z.exe",
     "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
 	"NuGetSourceUrl": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
     "NuGetFolderPath": "..\\Tools\\nuget",
