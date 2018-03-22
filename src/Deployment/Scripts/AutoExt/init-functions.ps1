@@ -380,25 +380,34 @@ function Get-MSBuild([switch]$xcopy = $false) {
     return $p
 }
 
+# if ($subproperty.Value.GetType().FullName -eq "System.Object[]") 
+
 # Merge two json object
 Function Merge-Settings {
 	Param(
 		[Parameter(Mandatory=$True)]
-        [Object]$default,
+        [Object]$prior,
 		[Parameter(Mandatory=$True)]
-        [Object]$custom
+        [Object]$fallback
 		)
 	
-	foreach ($property in $custom.psobject.Properties) {
-		# write-host $property.Name = $property.Value
-		if ($default.PSObject.Properties.Match($property.Name).Count) {
-				write-host $property.Name van
-				# ha van, akkor a tartalmat kell mergelni
+	foreach ($property in $fallback.psobject.Properties) {
+		if ($prior.PSObject.Properties.Match($property.Name).Count) {
+				# should be use with settings instead of hardcoded
+				$mergePropName = "Modes"   
+				# if prop exists and mergePropName we merge subproperties 
+				if ($property.Name -eq $mergePropName) {
+					$subobj = $prior."$mergePropName"
+					foreach ($subproperty in $property.Value.psobject.Properties) {
+						if (-Not $subobj.PSObject.Properties.Match($subproperty.Name).Count) {
+							$prior.Modes | Add-Member -MemberType NoteProperty -Name $subproperty.Name -Value $subproperty.Value
+						}
+					}
+				}
 		} else {
-				write-host $property.Name nincs
-				$default | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
-		 }
+				$prior | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
+		}
 	}
 	
-	return $default
+	return $prior
 }
