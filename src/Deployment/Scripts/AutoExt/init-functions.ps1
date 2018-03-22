@@ -380,3 +380,25 @@ function Get-MSBuild([switch]$xcopy = $false) {
     return $p
 }
 
+# Merge two json object
+Function Merge-Settings {
+	Param(
+		[Parameter(Mandatory=$True)]
+        [Object]$default,
+		[Parameter(Mandatory=$True)]
+        [Object]$custom
+		)
+	
+	foreach ($property in $custom.psobject.Properties) {
+		# write-host $property.Name = $property.Value
+		if ($default.PSObject.Properties.Match($property.Name).Count) {
+				write-host $property.Name van
+				# ha van, akkor a tartalmat kell mergelni
+		} else {
+				write-host $property.Name nincs
+				$default | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
+		 }
+	}
+	
+	return $default
+}
