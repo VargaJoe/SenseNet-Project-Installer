@@ -7,7 +7,7 @@ Param (
 	[string]$FileName
 )
 
-# https://docs.microsoft.com/en-us/powershell/module/sqlserver/backup-sqldatabase?view=sqlserver-ps
+# https://docs.microsoft.com/en-us/powershell/module/sqlserver/restore-sqldatabase?view=sqlserver-ps
 
 Import-module sqlserver
 write-host "Restoreing database has started..."

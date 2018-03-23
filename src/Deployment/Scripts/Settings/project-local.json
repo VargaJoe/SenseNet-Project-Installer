@@ -25,11 +25,20 @@
   "Project": {
     "SourceFolderPath": "..\\..\\",
     "WebFolderPath": "..\\..\\Source\\WebSite",
+	"AsmFolderPath": "..\\..\\Source\\WebSite\\bin",
 	"WebConfigFilePath": "..\\..\\Source\\WebSite\\web.config",
 	"SnAdminFilePath": "..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe",
 	"ToolsFolderPath": "..\\..\\Source\\WebSite\\Tools",
+	"RepoFsFolderPath": "..\\..\\Source\\\\WebSite\\Root",
 	"DeployFolderPath": "..\\..\\Source\\WebSite\\deploy",
     "SolutionFilePath": "..\\..\\Source\\Project.sln"
+  },
+  "Production": {
+    "WebFolderPath": "C:\\web\\projectlivewebfolder",
+	"AsmFolderPath": "C:\\web\\projectlivewebfolder\\bin",
+	"WebConfigFilePath": "C:\\web\\projectlivewebfolder\\web.config",
+	"SnAdminFilePath": "C:\\web\\projectlivewebfolder\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": "C:\\web\\projectlivewebfolder\\Tools"
   },
   "Tools": {
     "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe",
