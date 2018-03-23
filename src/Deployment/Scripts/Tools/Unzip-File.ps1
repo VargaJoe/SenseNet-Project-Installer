@@ -12,7 +12,7 @@ Param(
 # ================================================
 # .\unzip -filename "test.zip" -destname "unzip"
 $modulename = $MyInvocation.MyCommand.Name
-$UnZipperfilePath = Get-FullPath $DefaultSettings.Tools.UnZipperFilePath
+$UnZipperfilePath = Get-FullPath $GlobalSettings.Tools.UnZipperFilePath
 
 $Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 

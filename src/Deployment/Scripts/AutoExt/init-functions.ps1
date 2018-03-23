@@ -4,8 +4,8 @@ Function Set-SettingsPath {
             [Parameter(Mandatory=$False)]
             [String]$SettingName = "local"
          )
-	$ProjectSettingsPath = Get-FullPath ".\Settings\project-$SettingName.json"
-	return $ProjectSettingsPath
+	$SettingsPath = Get-FullPath ".\Settings\project-$SettingName.json"
+	return $SettingsPath
 }
 
 Function Load-Settings {
@@ -41,10 +41,10 @@ Function Run-Modules {
         [String]$Mode
 		)
 	$Output = if ($show) {'Out-Default'} else {'Out-Null'}
-	$ProcessSteps = $defaultsettings.modes."$Mode".Length
+	$ProcessSteps = $GlobalSettings.modes."$Mode".Length
 	$Step = 0
-	if (!($defaultsettings.modes."$Mode" -eq $Null)) {
-		foreach ($ModuleName in $defaultsettings.modes."$Mode") {
+	if (!($GlobalSettings.modes."$Mode" -eq $Null)) {
+		foreach ($ModuleName in $GlobalSettings.modes."$Mode") {
 			$script:Result = 0
 			$Step += 1
 			$Synopsis = Get-Help Module-"$ModuleName" |  foreach { $_.Synopsis  }
@@ -136,7 +136,7 @@ Function Write-Log {
 
 Function List-Packages {
 	[System.Collections.ArrayList]$Result = @()
-	$PackagesPath = Get-FullPath $ProjectSettings.Packages.PackagesPath	
+	$PackagesPath = Get-FullPath $GlobalSettings.Packages.PackagesPath	
 	$Packages = Get-ChildItem "$PackagesPath"
 	foreach ($pckg in $Packages) {
 		$Result.Add($pckg)

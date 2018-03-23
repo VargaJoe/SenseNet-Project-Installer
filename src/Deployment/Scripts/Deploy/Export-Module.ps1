@@ -6,7 +6,7 @@ Param(
 [string]$ExportFromFilePath 
 )
 
-$ProjectSnAdminFilePath = Get-FullPath $ProjectSettings.Project.SnAdminFilePath
+$ProjectSnAdminFilePath = Get-FullPath $GlobalSettings.Project.SnAdminFilePath
 $Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 
 Write-Verbose "$ProjectSnAdminFilePath $PackagePath"

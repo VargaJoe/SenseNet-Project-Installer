@@ -7,7 +7,7 @@ Param(
 )
 
 $Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
-$ProjectSnAdminFilePath = Get-FullPath $ProjectSettings.Project.SnAdminFilePath
+$ProjectSnAdminFilePath = Get-FullPath $GlobalSettings.Project.SnAdminFilePath
 Write-Verbose "Import will running: $ProjectSnAdminFilePath import source:$SourcePath $ToolParameters"
 
 & $ProjectSnAdminFilePath import source:"$SourcePath" $ToolParameters | & $Output
