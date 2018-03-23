@@ -29,36 +29,39 @@ $Global:DefaultSettings = $null
 $Global:OutputMode = $OutputMode
 $Global:ShowOutput = $ShowOutput
 
+$Global:GlobalSettings = $null
+$Global:JsonResult=$Null
+
 $AutoLoadExtensions = [IO.Path]::GetFullPath([IO.Path]::Combine($ScriptBaseFolderPath, "AutoExt"))
 
 # ================================================
 # ================ MAIN SCRIPT ===================
 # ================================================
 
+# Load steps and functions for plot manager
 $AutoLoadExtensionFiles = Get-ChildItem "$AutoLoadExtensions\*.ps1"
 foreach ($file in $AutoLoadExtensionFiles) {
 	. "$file"
 }
 
  if (Is-Administrator) {
+	# Load default settings
 	$defaultsettingspath = set-settingspath -settingname "default"
 	Write-Log "default setting path: $defaultsettingspath"
-	$defaultsettings = load-settings -settingspath $defaultsettingspath
+	$DefaultSettings = load-settings -settingspath $defaultsettingspath
 
+	# Load Project settings
 	$projectsettingspath = set-settingspath $settings
 	Write-Log "project setting path: $projectsettingspath"
 	$ProjectSettings = load-settings -settingspath $projectsettingspath
 
-	# $mergedsettings = Join-Object -Left $projectsettings -Right $defaultsettings -LeftJoinProperty * -RightJoinProperty * -Type AllInBoth | ConvertTo-Json -depth 100  | Out-File "test.json"
-	# Write-Verbose 3 $mergedsettings
+	# Extend project settings with default
+	$GlobalSettings = Merge-Settings -prior $ProjectSettings -fallback $DefaultSettings
 	
-	# Start-Transcript -path output.txt 
+	# Run given process
 	Run-Modules "$Mode"  
-	# Stop-Transcript
 	
-	# Package list	
-	 # $pckgs = List-Packages
-	 # Write-Verbose $pckgs
+	$Global:JsonResult=$JsonResult
 } else {
 	Write-Verbose you have to run this script in administrator mode!
 }
