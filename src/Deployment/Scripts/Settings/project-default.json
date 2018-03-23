@@ -2,6 +2,7 @@
   "Modes": {
     "firstinstall": ["restorepckgs", "prbuild", "sninstall", "removedemo",  "prinstall", "setrepourl", "createsite", "sethost", "start"],
 	"fullinstall": [ "stop", "getlatest", "restorepckgs", "prbuild", "sninstall", "removedemo", "adminusers", "prinstall", "setrepourl", "createsite", "sethost", "start" ],
+	"updateproject": [ "stop", "getlatest", "restorepckgs", "prbuild", "prinstall", "setrepourl", "start" ],
 	"demoinstall": ["restorepckgs", "prbuild", "sninstall", "createsite", "sethost", "start"],
 	"deploy" : [ "initwebfolder", "deploywebfolder", "sninstall","createsite", "sethost", "start"],
 	"restoresite" : [ "testwebfolder", "restoredb", "setconfigs", "prindex", "createsite", "sethost", "start"]
