@@ -6,7 +6,7 @@ Param(
 [string[]]$Parameters
 )
 
-$ProjectSnAdminFilePath = Get-FullPath $ProjectSettings.Project.SnAdminFilePath
+$ProjectSnAdminFilePath = Get-FullPath $GlobalSettings.Project.SnAdminFilePath
 write-host $ProjectSnAdminFilePath 
 $Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 write-host $Output 
