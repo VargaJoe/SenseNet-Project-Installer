@@ -58,9 +58,12 @@ foreach ($file in $AutoLoadExtensionFiles) {
 	# Extend project settings with default
 	$GlobalSettings = Merge-Settings -prior $ProjectSettings -fallback $DefaultSettings
 	
+	# Add steps section to settings
+	$GlobalSettings = Steps-Settings -setting $GlobalSettings
+	
 	# Run given process
 	Run-Modules "$Mode"  
-	
+
 	$Global:JsonResult=$JsonResult
 } else {
 	Write-Verbose you have to run this script in administrator mode!

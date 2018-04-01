@@ -411,3 +411,13 @@ Function Merge-Settings {
 	
 	return $prior
 }
+
+Function Steps-Settings {
+	Param(
+		[Parameter(Mandatory=$True)]
+        [Object]$setting
+		)
+	$steps = (Get-ChildItem function:\Module-*).Name.Substring(7)
+	$setting | Add-Member -MemberType NoteProperty -Name Steps -Value $steps
+	return $setting
+}
