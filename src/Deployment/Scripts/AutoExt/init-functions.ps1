@@ -44,7 +44,16 @@ Function Run-Modules {
 	$ProcessSteps = $GlobalSettings.modes."$Mode".Length
 	$Step = 0
 	if (!($GlobalSettings.modes."$Mode" -eq $Null)) {
-		foreach ($ModuleName in $GlobalSettings.modes."$Mode") {
+		foreach ($ModuleNameSt in $GlobalSettings.modes."$Mode") {
+			# Temporary solution for set setting section
+			$ModuleNameArr = $ModuleNameSt.Split(":")
+			$ModuleName = $ModuleNameArr[0]
+			$Section = "Project"
+			if (-not ($ModuleNameArr[1] -eq $Null)){
+				$Section = $ModuleNameArr[1]
+			}
+			# end
+		
 			$script:Result = 0
 			$Step += 1
 			$Synopsis = Get-Help Module-"$ModuleName" |  foreach { $_.Synopsis  }
@@ -59,7 +68,8 @@ Function Run-Modules {
 			# write-progress -id 1 -activity "$Mode" -status "$Synopsis" -percentComplete (($Step/($ProcessSteps))*100);
 			
 			try {
-				Invoke-Expression "Module-$ModuleName" 
+				# Invoke-Expression "Module-$ModuleName" 
+				& "Module-$ModuleName" -Section "$Section"
 			}
 			catch {
 				$script:Result = 1

@@ -206,7 +206,7 @@ Function Module-RemoveDemo {
 	#>
 	try {
 		$PackagePath = Get-FullPath "..\Packages\RemoveDemo"
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -223,7 +223,7 @@ Function Module-AdminUsers {
 	#>
 	try {
 		$PackagePath = Get-FullPath "..\Packages\UsersStructure"
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -241,7 +241,7 @@ Function Module-PrInstall {
 	#>
 	try {
 		$PackagePath =  Get-FullPath $GlobalSettings.Project.DeployFolderPath
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath"	
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath"	
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -382,18 +382,24 @@ Function Module-PrExport {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
 	try {
 		# & iisreset
 
 		$GETDate = Get-Date
 		$CurrentDateTime = "[$($GETDate.Year)-$($GETDate.Month)-$($GETDate.Day)_$($GETDate.Hour)-$($GETDate.Minute)-$($GETDate.Second)]"
-		$ProjectWebFolderPath = Get-FullPath $GlobalSettings.Project.WebFolderPath
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		if (!($Exportfromfilepath)){
 			Write-Verbose "Start export script"
-			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime"
+			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime"
 		}else{
 			Write-Verbose "Start export script by filter: $Exportfromfilepath"
-			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime" "$ExportFilter"
+			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime" -ExportFromFilePath "$ExportFilter"
 		}
 		$script:Result = $LASTEXITCODE
 	}
