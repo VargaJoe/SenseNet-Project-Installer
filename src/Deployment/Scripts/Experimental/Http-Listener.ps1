@@ -54,7 +54,7 @@ While ($HttpListener.IsListening) {
     $HttpResponse.StatusCode = 200
     $jsondata = @{ExitCode = $Result; Output = $JsonResult} 
     $object = new-object psobject -Property $jsondata 
-    $jsondata = $object | ConvertTo-Json
+    $jsondata = $object | ConvertTo-Json -depth 100
     $ResponseBuffer = [System.Text.Encoding]::UTF8.GetBytes($jsondata)
     $HttpResponse.ContentLength64 = $ResponseBuffer.Length
     $HttpResponse.OutputStream.Write($ResponseBuffer,0,$ResponseBuffer.Length)
