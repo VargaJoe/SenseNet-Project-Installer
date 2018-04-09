@@ -29,23 +29,23 @@ Prerequisits are mostly come from the scripts that are made for managing Sense/N
 	- some scripts may use the 7-Zip application, if so download and install it from http://www.7-zip.org/
 	- Enable the powershell script running permission: PS C:\PowerShell-PowerUp> Set-ExecutionPolicy unrestricted
 
-## Powershell script modules:
+## Powershell script files:
 
-- `StartWebsiteAppPool`: starts the site by the given parameter. 
+- `Start-IISSite`: starts the site by the given parameter. 
 ```powershell
-StartWebsiteAppPool.ps1 [SiteName]
+Start-IISSite.ps1 [SiteName]
 ```
-- `StopWebsiteAppPool`: stops the site by the given parameter.
+- `Stop-IISSite`: stops the site by the given parameter.
 ```powershell
-StopWebsiteAppPool.ps1 [SiteName]
+Stop-IISSite.ps1 [SiteName]
 ```
-- BuildSnSolution: builds the solution by the given parameter.
+- Build-Solution: builds the solution by the given parameter.
 ```powershell
-BuildSnSolution.ps1` -slnPath [Solution file path. It is .sln file]
+Build-Solution.ps1` -slnPath [Solution file path. It is .sln file]
 ```
 - `Create-IISSite`: creates the application pool and the site. In the first parameter you need to set the application pool (same site name) and in the second parameter you need to set the site’s physical path on the hard drive.
 ```powershell
-Create-IISSite.ps1 [SiteName] [site’s physicalPath]
+Create-IISSite.ps1 -DirectoryPath [site’s physicalPath] -SiteName [SiteName] -PoolName [Application Pool Name] -SiteHosts [string list of urls for bindings]
 ```
 - `GetLatestSolution`: gets the latest version from the repository.
 ```powershell
@@ -55,23 +55,33 @@ GetLatestSolution.ps1 -tfexepath [tf.exe physical path] –location [project sou
 - `Export-Module`: exports the project files from the repository.
 - `Index-Project`: runs indexpopulation process.
 - `Init-Assemblies`: copies the SenseNet dlls into /bin and /tools folders and edits the config files.
-- `init-functions`: initialization functions.
-- `Initialization`: initializes the script variables.
-- `Install-SenseNet`: installs the sensenet.
-- `RemoveDemo`: removse the default site from the SenseNet portal.
-- `SetHostFile`: set in the `web.config` host attribute.
-- `Unzip`: unzips the zip file (example: SenseNet package) to the destination folder.
+- `init-functions`: initialization helper functions.
+- `Set-Host`: set urls in hosts file.
+- `Unzip-File`: unzips the zip file (example: SenseNet package) to the destination folder.
 ```
-unzip.ps1 -filename [zip file path] -destname [destination path]
+Unzip-File.ps1 -filename [zip file path] -destname [destination path]
 ```
-- `Run`: You can run it in different plots: 
-** fullinstall: runs sensenet install process.
+- `Run`: We've created predefined `steps` that call the scripts with parameters from projects settings. You can run these different set of steps called `plots`. An example plot is `fullinstall`: 
+** fullinstall: runs sensenet install process from creating the database through install custom project to create iis site.
 
 ## Local install 
 
 If everything've set right, you can call the scripts simply with the following parameter:
 ```powershell
 Run.ps1 fullinstall
+```
+
+which is a short version of
+
+```powershell
+Run.ps1 -plot fullinstall -settings local 
+```
+
+By deafult installer scripts shows output of tools but not custom comments or informations.
+To hide all feedback call the `Run` script with -showoutput $false or to show custom informations use -verbose parameter
+
+```powershell
+Run.ps1 -plot fullinstall -settings local -showoutput $true -verbose
 ```
 
 ## Build server example steps
