@@ -9,8 +9,8 @@ Param (
 #$output="..\..\Tools\nuget\nuget.exe"
 
 if (Test-Path $Output) {
-	write-host "Nuget file already exists!"	
+	write-host "File already exists!"	
 } else {
-	write-host "Nuget file downloading started..."
+	write-host "File downloading started..."
 	Invoke-WebRequest -Uri $Url -OutFile $Output
 }

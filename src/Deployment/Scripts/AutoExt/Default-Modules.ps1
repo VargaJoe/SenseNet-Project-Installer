@@ -9,7 +9,7 @@ Function Module-Test {
 	Stop IIS site and application pool
 	#>
 	try{
-		$ProjectSiteName = $ProjectSettings.IIS.WebAppName
+		$ProjectSiteName = $GlobalSettings.IIS.WebAppName
 		& "$ScriptBaseFolderPath\Ops\Stop-IISSite.ps1" $ProjectSiteName
 		$script:ResultJson = @"
 			{
@@ -39,7 +39,7 @@ Function Module-Stop {
 	#>
 	try {
 		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
-		$ProjectSiteName = $ProjectSettings.IIS.WebAppName
+		$ProjectSiteName = $GlobalSettings.IIS.WebAppName
 		
 		& "$ScriptBaseFolderPath\Ops\Stop-IISSite.ps1" $ProjectSiteName
 		$script:Result = $LASTEXITCODE		
@@ -57,7 +57,7 @@ Function Module-Start {
 	Start IIS site and application pool
 	#>
 	try {
-		$ProjectSiteName = $ProjectSettings.IIS.WebAppName
+		$ProjectSiteName = $GlobalSettings.IIS.WebAppName
 		& $ScriptBaseFolderPath\Ops\Start-IISSite.ps1 $ProjectSiteName
 		$script:Result = $LASTEXITCODE
 	}
@@ -75,8 +75,8 @@ Function Module-GetLatest {
 	#>
 	# GET-LATEST - TODO: check if there is tfs
 	try {
-		$ProjectSourceFolderPath = Get-FullPath $ProjectSettings.Project.SourceFolderPath
-		$TfExePath = Get-FullPath $ProjectSettings.Tools.VisualStudio
+		$ProjectSourceFolderPath = Get-FullPath $GlobalSettings.Project.SourceFolderPath
+		$TfExePath = Get-FullPath $GlobalSettings.Tools.VisualStudio
 		& $ScriptBaseFolderPath\Dev\GetLatestSolution.ps1 -tfexepath "$TfExePath" -location "$ProjectSourceFolderPath"
 		$script:Result = $LASTEXITCODE
 	}
@@ -97,11 +97,11 @@ Function Module-RestorePckgs {
 	try {
 		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 		Write-Verbose "RESTORE PACKAGES REFERENCED BY SOLUTION" 
-		$NuGetSourcePath = $ProjectSettings.Tools.NuGetSourceUrl
-		$NuGetFilePath = Get-FullPath $ProjectSettings.Tools.NuGetFilePath
+		$NuGetSourcePath = $GlobalSettings.Tools.NuGetSourceUrl
+		$NuGetFilePath = Get-FullPath $GlobalSettings.Tools.NuGetFilePath
 		Write-Verbose "Check if $NuGetFilePath exists..."
 		& $ScriptBaseFolderPath\Dev\Download-File.ps1 -Url $NuGetSourcePath -Output $NuGetFilePath
-		$ProjectSolutionFilePath = Get-FullPath $ProjectSettings.Project.SolutionFilePath
+		$ProjectSolutionFilePath = Get-FullPath $GlobalSettings.Project.SolutionFilePath
 		Write-Verbose "$NuGetFilePath restore $ProjectSolutionFilePath" 
 		& "$NuGetFilePath" restore "$ProjectSolutionFilePath" | & $Output
 		$script:Result = $LASTEXITCODE
@@ -121,7 +121,7 @@ Function Module-PrBuild {
 	
 	#>	
 	try {
-		$ProjectSolutionFilePath = Get-FullPath $ProjectSettings.Project.SolutionFilePath
+		$ProjectSolutionFilePath = Get-FullPath $GlobalSettings.Project.SolutionFilePath
 		& $ScriptBaseFolderPath\Dev\Build-Solution.ps1 -slnPath $ProjectSolutionFilePath 
 		$script:Result = $LASTEXITCODE
 	}
@@ -159,19 +159,19 @@ Function Module-SnServices {
 	try {
 		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 	
-		$ProjectWebConfigFilePath = Get-FullPath $ProjectSettings.Project.WebConfigFilePath
+		$ProjectWebConfigFilePath = Get-FullPath $GlobalSettings.Project.WebConfigFilePath
 		if (Test-Path  ("$ProjectWebConfigFilePath")){
 			Write-Verbose "Remove write protection from web.config: $ProjectWebConfigFilePath"
 			Set-ItemProperty $ProjectWebConfigFilePath -Name IsReadOnly -Value $false
 		}
-		$ProjectToolsFolderPath = Get-FullPath $ProjectSettings.Project.ToolsFolderPath
+		$ProjectToolsFolderPath = Get-FullPath $GlobalSettings.Project.ToolsFolderPath
 		if (Test-Path  ("$ProjectToolsFolderPath")){
 			Write-Verbose "Remove write protection from files under Tools folder: $ProjectToolsFolderPath"
 			& "c:\Windows\System32\attrib.exe" -r "$ProjectToolsFolderPath\*.*" /s | & $Output
 		}
 		
-		$DataSource=$ProjectSettings.DataBase.DataSource
-		$InitialCatalog=$ProjectSettings.DataBase.InitialCatalog 
+		$DataSource=$GlobalSettings.DataBase.DataSource
+		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
 		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -ToolName "install-services" -ToolParameters "datasource:$DataSource","initialcatalog:$InitialCatalog","FORCEDREINSTALL:true" 
 		$script:Result = $LASTEXITCODE
 	}
@@ -206,7 +206,7 @@ Function Module-RemoveDemo {
 	#>
 	try {
 		$PackagePath = Get-FullPath "..\Packages\RemoveDemo"
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -223,7 +223,7 @@ Function Module-AdminUsers {
 	#>
 	try {
 		$PackagePath = Get-FullPath "..\Packages\UsersStructure"
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -240,8 +240,8 @@ Function Module-PrInstall {
 	
 	#>
 	try {
-		$PackagePath =  Get-FullPath $ProjectSettings.Project.DeployFolderPath
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 "$PackagePath"	
+		$PackagePath =  Get-FullPath $GlobalSettings.Project.DeployFolderPath
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath"	
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -258,10 +258,10 @@ Function Module-CreateSite {
 	
 	#>
 	try {
-		$ProjectWebFolderPath = Get-FullPath $ProjectSettings.Project.WebFolderPath
-		$ProjectSiteName = $ProjectSettings.IIS.WebAppName 
-		$ProjectAppPoolName = $ProjectSettings.IIS.AppPoolName 
-		$ProjectSiteHosts = $ProjectSettings.IIS.Hosts
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings.Project.WebFolderPath
+		$ProjectSiteName = $GlobalSettings.IIS.WebAppName 
+		$ProjectAppPoolName = $GlobalSettings.IIS.AppPoolName 
+		$ProjectSiteHosts = $GlobalSettings.IIS.Hosts
 		& $ScriptBaseFolderPath\Ops\Create-IISSite.ps1 -DirectoryPath $ProjectWebFolderPath -SiteName $ProjectSiteName -PoolName $ProjectAppPoolName -SiteHosts $ProjectSiteHosts
 		$script:Result = $LASTEXITCODE
 	}
@@ -279,7 +279,7 @@ Function Module-SetHost {
 	
 	#>
 	try {
-		$ProjectSiteHosts = $ProjectSettings.IIS.Hosts
+		$ProjectSiteHosts = $GlobalSettings.IIS.Hosts
 		& $ScriptBaseFolderPath\Ops\Set-Host.ps1 -SiteHosts $ProjectSiteHosts
 		$script:Result = $LASTEXITCODE
 	}
@@ -297,9 +297,9 @@ Function Module-InitWebfolder {
 	
 	#>
 	try {
-		$SnWebfolderPackPath = Get-FullPath $ProjectSettings.Platform.PackageName
+		$SnWebfolderPackPath = Get-FullPath $GlobalSettings.Platform.PackageName
 		Write-Verbose "SnWebfolderPackPath: $SnWebfolderPackPath"
-		$SnWebfolderPackName = (Get-FullPath $ProjectSettings.Platform.PackageName) + ".zip"
+		$SnWebfolderPackName = (Get-FullPath $GlobalSettings.Platform.PackageName) + ".zip"
 		Write-Verbose "SnWebfolderPackName: $SnWebfolderPackName"
 		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebfolderPackName" -destname "$SnWebfolderPackPath"
 		$script:Result = $LASTEXITCODE
@@ -319,8 +319,8 @@ Function Module-DeployWebFolder {
 	#>
 	try {
 		Write-Verbose "`r`nCopy webfolder files from package to destination"
-		$SnWebfolderPackPath = Get-FullPath $ProjectSettings.Platform.PackageName
-		$ProjectWebFolderPath = Get-FullPath $ProjectSettings.Project.WebFolderPath
+		$SnWebfolderPackPath = Get-FullPath $GlobalSettings.Platform.PackageName
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings.Project.WebFolderPath
 		Write-Verbose "Source: $SnWebfolderPackPath"
 		Write-Verbose "Target: $ProjectWebFolderPath"
 		Copy-Item -Path "$SnWebfolderPackPath" -Destination "$ProjectWebFolderPath" -recurse -Force
@@ -364,8 +364,9 @@ Function Module-PrImport {
 	
 	#>
 	try {
-		Write-Verbose "Start import script"
-		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 "$ProjectStructureFolderPath"
+		$ProjectRepoFsFolderPath = Get-FullPath $GlobalSettings.Project.RepoFsFolderPath
+		Write-Verbose "Start import script with the path: $ProjectRepoFsFolderPath"		
+		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 -SourcePath "$ProjectRepoFsFolderPath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -381,18 +382,24 @@ Function Module-PrExport {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
 	try {
 		# & iisreset
 
 		$GETDate = Get-Date
 		$CurrentDateTime = "[$($GETDate.Year)-$($GETDate.Month)-$($GETDate.Day)_$($GETDate.Hour)-$($GETDate.Minute)-$($GETDate.Second)]"
-		$ProjectWebFolderPath = Get-FullPath $ProjectSettings.Project.WebFolderPath
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		if (!($Exportfromfilepath)){
 			Write-Verbose "Start export script"
-			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime"
+			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime"
 		}else{
 			Write-Verbose "Start export script by filter: $Exportfromfilepath"
-			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime" "$ExportFilter"
+			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime" -ExportFromFilePath "$ExportFilter"
 		}
 		$script:Result = $LASTEXITCODE
 	}
@@ -433,8 +440,8 @@ Function Module-SetRepoUrl {
 	# Technical Debt: it should be called an independent ps1 file from here, instead a hardcoded business logic
 	try {
 		# Site name, url and authentication type must be get from settings json, probably with iteration
-		$ProjectSiteHosts = $ProjectSettings.IIS.Hosts
-		# $ProjectSiteName = $ProjectSettings.IIS.WebAppName
+		$ProjectSiteHosts = $GlobalSettings.IIS.Hosts
+		# $ProjectSiteName = $GlobalSettings.IIS.WebAppName
 		$AuthenticationType="Forms"
 		
 		foreach ($hostCombinedUrl in $ProjectSiteHosts) {				
@@ -457,4 +464,110 @@ Function Module-SetRepoUrl {
 		$script:Result = 1
 	}
 	
+}
+
+Function Module-DbBackup {
+<#
+	.SYNOPSIS
+	Backup sql database
+	.DESCRIPTION
+	
+	#>
+	try {
+		$DataSource=$GlobalSettings.DataBase.DataSource
+		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
+		$CurrentDateTime = Get-Date -format -yyyyMMdd-HHmm
+		$BackupName = "$InitialCatalog" + $CurrentDateTime + ".bak"
+		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
+		& $ScriptBaseFolderPath\Ops\Backup-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DatabaseBackupsFolderPath\$BackupName"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+Function Module-RestoreDb {
+<#
+	.SYNOPSIS
+	Restore sql database
+	.DESCRIPTION
+	
+	#>
+	try {
+		$DataSource=$GlobalSettings.DataBase.DataSource
+		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
+		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
+		$DbBackupFilePath = Get-FullPath $GlobalSettings.Platform.DbBackupFilePath
+		& $ScriptBaseFolderPath\Ops\Restore-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DbBackupFilePath"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+Function Module-SetConfigs {
+<#
+	.SYNOPSIS
+	Set project configurations
+	.DESCRIPTION
+	
+	#>
+	# "LOGLEVEL:Console",
+	try {
+		$DataSource=$GlobalSettings.DataBase.DataSource
+		# write-host $DataSource
+		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
+		# write-host $InitialCatalog
+		$PackagePath = Get-FullPath "..\Packages\SetConfigs"
+		# write-host $PackagePath
+		# write-host "$ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath $PackagePath -Parameters datasource:$DataSource initialcatalog:$InitialCatalog"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath" -Parameters "datasource:$DataSource","initialcatalog:$InitialCatalog" 	
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Module-TestWebfolder {
+<#
+	.SYNOPSIS
+	Unzip webfolder package
+	.DESCRIPTION
+	
+	#>
+	try {
+		$SnWebFolderFilePath = Get-FullPath $GlobalSettings.Platform.SnWebFolderFilePath
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings.Project.WebFolderPath
+		Write-Verbose "SnWebfolderPackPath: $SnWebFolderFilePath"
+		Write-Verbose "SnWebfolderDestName: $ProjectWebFolderPath"
+		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebFolderFilePath" -destname "$ProjectWebFolderPath"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+
+Function Module-GetSettings {
+	<#
+	.SYNOPSIS
+	Get merged settings json
+	.DESCRIPTION
+
+	#>
+	try {
+		$script:JsonResult = $GlobalSettings 
+		# | ConvertTo-Json
+		$script:Result = 0
+	}
+	catch {
+		$script:Result = 1
+	}
 }

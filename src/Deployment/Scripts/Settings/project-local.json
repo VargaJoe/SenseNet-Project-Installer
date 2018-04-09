@@ -6,30 +6,43 @@
   "IIS": {
     "WebAppName": "project",
     "AppPoolName": "project",
-	"Hosts": [ "project", "testurl2" ],
+	"Hosts": [ "project", "sn7.sn.hu" ],
     "DotNetVersion": "v4.0"
   },
-  "Packages": {
-    "PackagesPath": "..\\Packages"
+  "Sources": {
+    "PackagesPath": "..\\Packages",
+	"DatabasesPath": "..\\Databases"
   }, 
   "Platform": {
     "PackageFolderPath": "",
     "PackageName": "",
     "SourceFolderPath": "",
-    "SolutionFilePath": ""
+    "SolutionFilePath": "",
+	"DbBackupFilePath": "..\\Packages\\Platform\\testsn7000db.bak",
+	"SnWebFolderFilePath": "..\\Packages\\Platform\\snwebfolder700.zip",
+	"SnWebFolderPath": "..\\Packages\\Platform\\snwebfolder700"
   }, 
   "Project": {
     "SourceFolderPath": "..\\..\\",
     "WebFolderPath": "..\\..\\Source\\WebSite",
+	"AsmFolderPath": "..\\..\\Source\\WebSite\\bin",
 	"WebConfigFilePath": "..\\..\\Source\\WebSite\\web.config",
 	"SnAdminFilePath": "..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe",
 	"ToolsFolderPath": "..\\..\\Source\\WebSite\\Tools",
+	"RepoFsFolderPath": "..\\..\\Source\\\\WebSite\\Root",
 	"DeployFolderPath": "..\\..\\Source\\WebSite\\deploy",
     "SolutionFilePath": "..\\..\\Source\\Project.sln"
   },
+  "Production": {
+    "WebFolderPath": "C:\\web\\projectlivewebfolder",
+	"AsmFolderPath": "C:\\web\\projectlivewebfolder\\bin",
+	"WebConfigFilePath": "C:\\web\\projectlivewebfolder\\web.config",
+	"SnAdminFilePath": "C:\\web\\projectlivewebfolder\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": "C:\\web\\projectlivewebfolder\\Tools"
+  },
   "Tools": {
     "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\tf.exe",
-    "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
+    "UnZipperFilePath": "C:\\Program Files\\7-Zip\\7z.exe",
     "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
 	"NuGetSourceUrl": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
     "NuGetFolderPath": "..\\Tools\\nuget",

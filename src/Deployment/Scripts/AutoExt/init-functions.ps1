@@ -4,8 +4,8 @@ Function Set-SettingsPath {
             [Parameter(Mandatory=$False)]
             [String]$SettingName = "local"
          )
-	$ProjectSettingsPath = Get-FullPath ".\Settings\project-$SettingName.json"
-	return $ProjectSettingsPath
+	$SettingsPath = Get-FullPath ".\Settings\project-$SettingName.json"
+	return $SettingsPath
 }
 
 Function Load-Settings {
@@ -41,10 +41,19 @@ Function Run-Modules {
         [String]$Mode
 		)
 	$Output = if ($show) {'Out-Default'} else {'Out-Null'}
-	$ProcessSteps = $defaultsettings.modes."$Mode".Length
+	$ProcessSteps = $GlobalSettings.modes."$Mode".Length
 	$Step = 0
-	if (!($defaultsettings.modes."$Mode" -eq $Null)) {
-		foreach ($ModuleName in $defaultsettings.modes."$Mode") {
+	if (!($GlobalSettings.modes."$Mode" -eq $Null)) {
+		foreach ($ModuleNameSt in $GlobalSettings.modes."$Mode") {
+			# Temporary solution for set setting section
+			$ModuleNameArr = $ModuleNameSt.Split(":")
+			$ModuleName = $ModuleNameArr[0]
+			$Section = "Project"
+			if (-not ($ModuleNameArr[1] -eq $Null)){
+				$Section = $ModuleNameArr[1]
+			}
+			# end
+		
 			$script:Result = 0
 			$Step += 1
 			$Synopsis = Get-Help Module-"$ModuleName" |  foreach { $_.Synopsis  }
@@ -59,7 +68,8 @@ Function Run-Modules {
 			# write-progress -id 1 -activity "$Mode" -status "$Synopsis" -percentComplete (($Step/($ProcessSteps))*100);
 			
 			try {
-				Invoke-Expression "Module-$ModuleName" 
+				# Invoke-Expression "Module-$ModuleName" 
+				& "Module-$ModuleName" -Section "$Section"
 			}
 			catch {
 				$script:Result = 1
@@ -136,7 +146,7 @@ Function Write-Log {
 
 Function List-Packages {
 	[System.Collections.ArrayList]$Result = @()
-	$PackagesPath = Get-FullPath $ProjectSettings.Packages.PackagesPath	
+	$PackagesPath = Get-FullPath $GlobalSettings.Packages.PackagesPath	
 	$Packages = Get-ChildItem "$PackagesPath"
 	foreach ($pckg in $Packages) {
 		$Result.Add($pckg)
@@ -380,3 +390,44 @@ function Get-MSBuild([switch]$xcopy = $false) {
     return $p
 }
 
+# if ($subproperty.Value.GetType().FullName -eq "System.Object[]") 
+
+# Merge two json object
+Function Merge-Settings {
+	Param(
+		[Parameter(Mandatory=$True)]
+        [Object]$prior,
+		[Parameter(Mandatory=$True)]
+        [Object]$fallback
+		)
+	
+	foreach ($property in $fallback.psobject.Properties) {
+		if ($prior.PSObject.Properties.Match($property.Name).Count) {
+				# should be use with settings instead of hardcoded
+				$mergePropName = "Modes"   
+				# if prop exists and mergePropName we merge subproperties 
+				if ($property.Name -eq $mergePropName) {
+					$subobj = $prior."$mergePropName"
+					foreach ($subproperty in $property.Value.psobject.Properties) {
+						if (-Not $subobj.PSObject.Properties.Match($subproperty.Name).Count) {
+							$prior.Modes | Add-Member -MemberType NoteProperty -Name $subproperty.Name -Value $subproperty.Value
+						}
+					}
+				}
+		} else {
+				$prior | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
+		}
+	}
+	
+	return $prior
+}
+
+Function Steps-Settings {
+	Param(
+		[Parameter(Mandatory=$True)]
+        [Object]$setting
+		)
+	$steps = (Get-ChildItem function:\Module-*).Name.Substring(7)
+	$setting | Add-Member -MemberType NoteProperty -Name Steps -Value $steps
+	return $setting
+}
