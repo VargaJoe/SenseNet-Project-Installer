@@ -427,7 +427,7 @@ Function Steps-Settings {
 		[Parameter(Mandatory=$True)]
         [Object]$setting
 		)
-	$steps = (Get-ChildItem function:\Step-*).Name.Substring(7)
-	$setting | Add-Member -MemberType NoteProperty -Name Steps -Value $steps
+	$loadedsteps = (Get-ChildItem function:\Step-*).Name.Substring(5)
+	$setting | Add-Member -MemberType NoteProperty -Name Steps -Value $loadedsteps
 	return $setting
 }
