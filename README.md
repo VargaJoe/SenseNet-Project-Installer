@@ -62,6 +62,7 @@ GetLatestSolution.ps1 -tfexepath [tf.exe physical path] –location [project sou
 Unzip-File.ps1 -filename [zip file path] -destname [destination path]
 ```
 - `Run`: We've created predefined `steps` that call the scripts with parameters from projects settings. You can run these different set of steps called `plots`. An example plot is `fullinstall`: 
+
 ** fullinstall: runs sensenet install process from creating the database through install custom project to create iis site.
 
 ## Local install 
