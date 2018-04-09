@@ -1,10 +1,10 @@
 # SenseNet Project Installer
 
-> Outdated, update needed, if you're looking for the older version of the script, it's in the 'installer-6.5' branch.
-
 ## How it works
 
-This is basically a package of various scripts used by my team creating and managing custom project installations. There are some batch scripts as previously used solution, but lately we replaced them with powershell scripts.
+This is basically a package of various powershell scripts used by my team creating and managing custom project installations. It's uses predefined vs solution with SN7 packages at the moment and contains sn-webpages for easy to understand sensenet handling, but official channels promote to avoid sn-webpages package and use only sn-services with custom client-side solution based (e.g. React). For fine tuning or to create custom solution for the installer see sensenet official channels (e.g.  https://community.sensenet.com/docs/install-sn-from-nuget/)
+We aim for an easy to use gui alongside with the scripts too eventually, but it can basically run manually from ps window for now. 
+
 It contains the following scripts for now:
 - Create, start and stop IIS sites
 - Setup host file
@@ -23,10 +23,10 @@ Prerequisits are mostly come from the scripts that are made for managing Sense/N
 	a.       SQL Server Configuration Manager
 2. Visual Studio
 3. IIS
-3. PowerShell (or obsolate batch scripts uses command line)
+3. PowerShell 
 4. Environment settings
-	- SenseNet package install needs the package file into Releases folder.
-	- Download and install the 7-Zip application from http://www.7-zip.org/.
+	- snadmin sensenet install (at least some steps) needs a solution with predefined nuget packages and webfolder configuration, the installer contains an example under "Source" folder for now 
+	- some scripts may use the 7-Zip application, if so download and install it from http://www.7-zip.org/
 	- Enable the powershell script running permission: PS C:\PowerShell-PowerUp> Set-ExecutionPolicy unrestricted
 
 ## Powershell script modules:
@@ -64,14 +64,14 @@ GetLatestSolution.ps1 -tfexepath [tf.exe physical path] –location [project sou
 ```
 unzip.ps1 -filename [zip file path] -destname [destination path]
 ```
-- `START`: You can run it in different modes: 
+- `Run`: You can run it in different plots: 
 ** fullinstall: runs sensenet install process.
 
 ## Local install 
 
 If everything've set right, you can call the scripts simply with the following parameter:
 ```powershell
-START.ps1 fullinstall
+Run.ps1 fullinstall
 ```
 
 ## Build server example steps
@@ -93,8 +93,6 @@ The same scripts that are used locally can be used with visual studio's build se
 
 There are some steps we've not fully automated yet. So some manual setups may required, such as:
 
-- The plan was to use different json settings for different projects and/or environments, but only local settings work for now
 - The script won't automatically map your Visual Studio version and its location which is needed to get latest tfs and solution build steps. You have to set `tf.exe` path properly in `project-local.json`'s Tools.VisualStudio property
 - Unziping archive script uses 7zip, the location for `7za.exe` file needs to be set in `project-local.json` too
 - If you use sql alias like `MySenseNetContentRepositoryDatasource` in default Sense/Net install, you have to set it manually before using the script or you have to set different Datasource in `project-local.json`
-- Project references should be checked if they're matching the proper Sense/Net version.
