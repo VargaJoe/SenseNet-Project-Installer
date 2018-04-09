@@ -12,6 +12,7 @@ $LASTEXITCODE = 0
 # https://docs.microsoft.com/en-us/powershell/module/sqlserver/restore-sqldatabase?view=sqlserver-ps
 # Import-module sqlserver
 
+# https://redmondmag.com/articles/2009/12/21/automated-restores.aspx
 # Load dlls instead of module, so we don't have to install the module
 [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SMO') | out-null 
 [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SmoExtended') | out-null

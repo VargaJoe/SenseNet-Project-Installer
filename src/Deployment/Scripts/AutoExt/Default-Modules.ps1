@@ -466,7 +466,7 @@ Function Step-SetRepoUrl {
 	
 }
 
-Function Step-DbBackup {
+Function Step-BackupDb {
 <#
 	.SYNOPSIS
 	Backup sql database
@@ -476,10 +476,30 @@ Function Step-DbBackup {
 	try {
 		$DataSource=$GlobalSettings.DataBase.DataSource
 		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		$CurrentDateTime = Get-Date -format -yyyyMMdd-HHmm
+		$DbBackupFilePath = Get-FullPath $GlobalSettings.Platform.DbBackupFilePath
+		& $ScriptBaseFolderPath\Ops\Backup-Db.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" -FileName "$DbBackupFilePath"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+Function Step-AutoBackupDb {
+<#
+	.SYNOPSIS
+	Backup sql database
+	.DESCRIPTION
+	
+	#>
+	try {
+		$DataSource=$GlobalSettings.DataBase.DataSource
+		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
+		$CurrentDateTime = Get-Date -format -yyyyMMddHHmm
 		$BackupName = "$InitialCatalog" + $CurrentDateTime + ".bak"
 		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
-		& $ScriptBaseFolderPath\Ops\Backup-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DatabaseBackupsFolderPath\$BackupName"
+		& $ScriptBaseFolderPath\Ops\Backup-Db.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" -FileName "$DatabaseBackupsFolderPath\$BackupName"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -498,7 +518,6 @@ Function Step-RestoreDb {
 	try {
 		$DataSource=$GlobalSettings.DataBase.DataSource
 		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
 		$DbBackupFilePath = Get-FullPath $GlobalSettings.Platform.DbBackupFilePath
 		& $ScriptBaseFolderPath\Ops\Restore-Db.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" -FileName "$DbBackupFilePath"
 		$script:Result = $LASTEXITCODE
