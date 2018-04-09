@@ -1,0 +1,21 @@
+#processOrder ul{
+    list-style-type:none;
+    min-width: 350px;
+}
+
+#processOrder li{
+    padding: 6px;
+    border: 1px solid rgba(197, 191, 191, 0.3);
+    margin-bottom: 2px;
+    background-color: rgba(56, 40, 40, 0.62);
+    cursor: pointer;
+    color:white;
+}
+
+.marginBottom10{
+    margin-bottom: 10px;
+}
+
+.marginTop10{
+    margin-top: 10px;
+}

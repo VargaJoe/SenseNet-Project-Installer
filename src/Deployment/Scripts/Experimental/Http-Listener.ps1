@@ -45,7 +45,6 @@ While ($HttpListener.IsListening) {
 		& ../Run.ps1 -mode $Mode
 		$Result = $LASTEXITCODE
 	}
-
 	
     $HttpResponse = $HttpContext.Response
     $HttpResponse.Headers.Add("Content-Type","application/json")

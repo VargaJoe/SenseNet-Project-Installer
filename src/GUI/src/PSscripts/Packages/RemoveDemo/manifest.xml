@@ -1,0 +1,14 @@
+﻿<!-- <Package type='Application' level='Tool'> -->
+<Package type='Tool'>
+	<Id>RorWeb</Id>
+	<Description>Remove default contents</Description>
+	<Version>1.0</Version>
+	<ReleaseDate>2017-05-31</ReleaseDate>
+	<Steps>
+		<Phase>
+			<StartRepository />
+			<Trace>Remove default contents by import with delete commands...</Trace>
+			<Import source='import' target='/Root' />
+		</Phase>
+	</Steps>
+</Package>
