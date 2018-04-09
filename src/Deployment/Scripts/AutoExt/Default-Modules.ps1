@@ -1,7 +1,7 @@
 
 
-# ******************************************************************  Modules ******************************************************************
-Function Module-Test {
+# ******************************************************************  Steps ******************************************************************
+Function Step-Test {
 	<#
 	.SYNOPSIS
 	Stop site
@@ -30,7 +30,7 @@ Function Module-Test {
 }
 
 
-Function Module-Stop {
+Function Step-Stop {
 	<#
 	.SYNOPSIS
 	Stop site
@@ -49,7 +49,7 @@ Function Module-Stop {
 	}
 }
 
-Function Module-Start {
+Function Step-Start {
 <#
 	.SYNOPSIS
 	Start site
@@ -66,7 +66,7 @@ Function Module-Start {
 	}
 }
 
-Function Module-GetLatest {
+Function Step-GetLatest {
 <#
 	.SYNOPSIS
 	Get Latest Version
@@ -87,7 +87,7 @@ Function Module-GetLatest {
 
 }
 
-Function Module-RestorePckgs {
+Function Step-RestorePckgs {
 <#
 	.SYNOPSIS
 	Nuget restore
@@ -113,7 +113,7 @@ Function Module-RestorePckgs {
 	
 }
 
-Function Module-PrBuild {
+Function Step-PrBuild {
 <#
 	.SYNOPSIS
 	Build Solution
@@ -131,7 +131,7 @@ Function Module-PrBuild {
 	
 }
 
-Function Module-SnInstall {
+Function Step-SnInstall {
 <#
 	.SYNOPSIS
 	Sensenet install
@@ -139,8 +139,8 @@ Function Module-SnInstall {
 	
 	#>
 	try {
-		Module-SnServices
-		Module-SnWebPages
+		Step-SnServices
+		Step-SnWebPages
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -149,7 +149,7 @@ Function Module-SnInstall {
 	
 }
 
-Function Module-SnServices {
+Function Step-SnServices {
 <#
 	.SYNOPSIS
 	Sensenet install services
@@ -180,7 +180,7 @@ Function Module-SnServices {
 	}
 }
 
-Function Module-SnWebPages {
+Function Step-SnWebPages {
 <#
 	.SYNOPSIS
 	Sensenet install webpages
@@ -197,7 +197,7 @@ Function Module-SnWebPages {
 	
 }
 
-Function Module-RemoveDemo {
+Function Step-RemoveDemo {
 <#
 	.SYNOPSIS
 	Remove demo contents
@@ -214,7 +214,7 @@ Function Module-RemoveDemo {
 	}
 }
 
-Function Module-AdminUsers {
+Function Step-AdminUsers {
 <#
 	.SYNOPSIS
 	Set common administrators and group memberships
@@ -232,7 +232,7 @@ Function Module-AdminUsers {
 	
 }
 
-Function Module-PrInstall {
+Function Step-PrInstall {
 <#
 	.SYNOPSIS
 	Project solution structure install
@@ -250,7 +250,7 @@ Function Module-PrInstall {
 	
 }
 
-Function Module-CreateSite {
+Function Step-CreateSite {
 <#
 	.SYNOPSIS
 	Create IIS Site and Application Pool
@@ -271,7 +271,7 @@ Function Module-CreateSite {
 	
 }
 
-Function Module-SetHost {
+Function Step-SetHost {
 <#
 	.SYNOPSIS
 	Set urls in hosts file
@@ -289,7 +289,7 @@ Function Module-SetHost {
 	
 }
 
-Function Module-InitWebfolder {
+Function Step-InitWebfolder {
 <#
 	.SYNOPSIS
 	Unzip webfolder package
@@ -310,7 +310,7 @@ Function Module-InitWebfolder {
 	
 }
 
-Function Module-DeployWebFolder {
+Function Step-DeployWebFolder {
 <#
 	.SYNOPSIS
 	Copy starter webfolder to detination
@@ -338,7 +338,7 @@ Function Module-DeployWebFolder {
 # ================================================
 # unchecked
 
-Function Module-PrIndex {
+Function Step-PrIndex {
 <#
 	.SYNOPSIS
 	Populate full index on repository
@@ -356,7 +356,7 @@ Function Module-PrIndex {
 	
 }
 
-Function Module-PrImport {
+Function Step-PrImport {
 <#
 	.SYNOPSIS
 	Import project - not refactored
@@ -375,7 +375,7 @@ Function Module-PrImport {
 	
 }
 
-Function Module-PrExport {
+Function Step-PrExport {
 <#
 	.SYNOPSIS
 	Export project 
@@ -409,7 +409,7 @@ Function Module-PrExport {
 	
 }
 
-Function Module-CreatePackage {
+Function Step-CreatePackage {
 <#
 	.SYNOPSIS
 	Create SnAdmin package - not refactored
@@ -430,7 +430,7 @@ Function Module-CreatePackage {
 	
 }
 
-Function Module-SetRepoUrl {
+Function Step-SetRepoUrl {
 <#
 	.SYNOPSIS
 	Set sensenet site repository url
@@ -466,7 +466,7 @@ Function Module-SetRepoUrl {
 	
 }
 
-Function Module-DbBackup {
+Function Step-DbBackup {
 <#
 	.SYNOPSIS
 	Backup sql database
@@ -488,7 +488,7 @@ Function Module-DbBackup {
 	
 }
 
-Function Module-RestoreDb {
+Function Step-RestoreDb {
 <#
 	.SYNOPSIS
 	Restore sql database
@@ -509,7 +509,7 @@ Function Module-RestoreDb {
 	
 }
 
-Function Module-SetConfigs {
+Function Step-SetConfigs {
 <#
 	.SYNOPSIS
 	Set project configurations
@@ -533,7 +533,7 @@ Function Module-SetConfigs {
 	}
 }
 
-Function Module-TestWebfolder {
+Function Step-TestWebfolder {
 <#
 	.SYNOPSIS
 	Unzip webfolder package
@@ -555,7 +555,7 @@ Function Module-TestWebfolder {
 }
 
 
-Function Module-GetSettings {
+Function Step-GetSettings {
 	<#
 	.SYNOPSIS
 	Get merged settings json

@@ -13,13 +13,13 @@ While ($HttpListener.IsListening) {
     # $RequestUrl = $HttpRequest.Url.OriginalString
 	$requestUrl = $HttpContext.Request.Url
 	$localPath = $requestUrl.LocalPath
-    # $Mode = ($localPath) -replace '//','/' 
-	# $Mode = $Mode.Substring(1)
+    # $Plot = ($localPath) -replace '//','/' 
+	# $Plot = $Plot.Substring(1)
 	
-	$Mode = $HttpRequest.QueryString["mode"] 
+	$Plot = $HttpRequest.QueryString["plot"] 
 	
     Write-Host "$RequestUrl"
-	Write-Host "$Mode"
+	Write-Host "$Plot"
 
     if($HttpRequest.HasEntityBody) {
 		$Reader = New-Object System.IO.StreamReader($HttpRequest.InputStream)
@@ -27,22 +27,22 @@ While ($HttpListener.IsListening) {
 		$json = $Reader.ReadToEnd() 
 
 		Write-Host Param: $json
-		if($json -match '.*mode=(?<Mode>.+)')
+		if($json -match '.*plot=(?<Plot>.+)')
 		{
-			$Mode = $Matches.Mode
+			$Plot = $Matches.Plot
 		}
     }
 	
-	if ($Mode -eq "quit") {
+	if ($Plot -eq "quit") {
 		Write-Host "`nQuitting..."
 		$HttpListener.Stop()
 		break;
 	}
 	
-	if (-Not [string]::IsNullOrEmpty($Mode))
+	if (-Not [string]::IsNullOrEmpty($Plot))
 	{
-		Write-Host mode: $Mode
-		& ../Run.ps1 -mode $Mode
+		Write-Host plot: $Plot
+		& ../Run.ps1 -plot $Plot
 		$Result = $LASTEXITCODE
 	}
 	
@@ -58,7 +58,7 @@ While ($HttpListener.IsListening) {
     $HttpResponse.ContentLength64 = $ResponseBuffer.Length
     $HttpResponse.OutputStream.Write($ResponseBuffer,0,$ResponseBuffer.Length)
     $HttpResponse.Close()
-	$Mode = ""
+	$Plot = ""
     Write-Output "end..." # Newline
 }
 $HttpListener.Stop()

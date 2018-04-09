@@ -1,7 +1,7 @@
 [CmdletBinding(SupportsShouldProcess=$True)]
 Param(
 [Parameter(Mandatory=$false)]
-[string]$Mode,
+[string]$Plot,
 [Parameter(Mandatory=$false)] 
 [string]$Settings = "local",
 [Parameter(Mandatory=$false)] 
@@ -62,7 +62,7 @@ foreach ($file in $AutoLoadExtensionFiles) {
 	$GlobalSettings = Steps-Settings -setting $GlobalSettings
 	
 	# Run given process
-	Run-Modules "$Mode"  
+	Run-Steps "$Plot"  
 
 	$Global:JsonResult=$JsonResult
 } else {

@@ -35,41 +35,41 @@ Function Get-FullPath {
 	return $FullPath
 }
 
-Function Run-Modules {
+Function Run-Steps {
 	Param(
 		[Parameter(Mandatory=$True)]
-        [String]$Mode
+        [String]$Plot
 		)
 	$Output = if ($show) {'Out-Default'} else {'Out-Null'}
-	$ProcessSteps = $GlobalSettings.modes."$Mode".Length
+	$ProcessSteps = $GlobalSettings.plots."$Plot".Length
 	$Step = 0
-	if (!($GlobalSettings.modes."$Mode" -eq $Null)) {
-		foreach ($ModuleNameSt in $GlobalSettings.modes."$Mode") {
+	if (!($GlobalSettings.plots."$Plot" -eq $Null)) {
+		foreach ($StepNameSt in $GlobalSettings.plots."$Plot") {
 			# Temporary solution for set setting section
-			$ModuleNameArr = $ModuleNameSt.Split(":")
-			$ModuleName = $ModuleNameArr[0]
+			$StepNameArr = $StepNameSt.Split(":")
+			$StepName = $StepNameArr[0]
 			$Section = "Project"
-			if (-not ($ModuleNameArr[1] -eq $Null)){
-				$Section = $ModuleNameArr[1]
+			if (-not ($StepNameArr[1] -eq $Null)){
+				$Section = $StepNameArr[1]
 			}
 			# end
 		
 			$script:Result = 0
 			$Step += 1
-			$Synopsis = Get-Help Module-"$ModuleName" |  foreach { $_.Synopsis  }
+			$Synopsis = Get-Help Step-"$StepName" |  foreach { $_.Synopsis  }
 			$Progress=(($Step/($ProcessSteps))*100)
 			
 			Write-Log "================================================" -foregroundcolor "green"
-			Write-Log "============= $Mode/$ModuleName =============" -foregroundcolor "green"
+			Write-Log "============= $Plot/$StepName =============" -foregroundcolor "green"
 			Write-Log "================================================" -foregroundcolor "green"
 			Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"			
 			Write-Log "Progress: $Progress/100" -foregroundcolor "green"
 			
-			# write-progress -id 1 -activity "$Mode" -status "$Synopsis" -percentComplete (($Step/($ProcessSteps))*100);
+			# write-progress -id 1 -activity "$Plot" -status "$Synopsis" -percentComplete (($Step/($ProcessSteps))*100);
 			
 			try {
-				# Invoke-Expression "Module-$ModuleName" 
-				& "Module-$ModuleName" -Section "$Section"
+				# Invoke-Expression "Step-$StepName" 
+				& "Step-$StepName" -Section "$Section"
 			}
 			catch {
 				$script:Result = 1
@@ -85,15 +85,15 @@ Function Run-Modules {
 		Write-Log "-------------------- FINISH ----------------------"
 		Write-Log "--------------------------------------------------"
 	} else {
-		$Synopsis = Get-Help Module-"$Mode" |  foreach { $_.Synopsis  }
+		$Synopsis = Get-Help Step-"$Plot" |  foreach { $_.Synopsis  }
 		Write-Log "================================================" -foregroundcolor "green"
-		Write-Log "============= $Mode/$Mode =============" -foregroundcolor "green"
+		Write-Log "============= $Plot/$Plot =============" -foregroundcolor "green"
 		Write-Log "================================================" -foregroundcolor "green"
 		Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"			
 		Write-Log "Progress: 100/100" -foregroundcolor "green"
 		
 		try {
-			Invoke-Expression "Module-$Mode" 
+			Invoke-Expression "Step-$Plot" 
 		}
 		catch {
 			$script:Result = 1
@@ -123,13 +123,13 @@ Function Write-Log {
 		[Parameter(Mandatory=$False)]
         [String]$Message,
 		[Parameter(Mandatory=$False)]
-        [String]$Mode=$OutputMode,
+        [String]$Plot=$OutputMode,
 		[Parameter(Mandatory=$False)]
         [String]$ForegroundColor=(get-host).ui.rawui.ForegroundColor	
 		)
 		
 	if ($ShowOutput -eq $True){
-		switch ($Mode) 
+		switch ($Plot) 
 		{ 
 			"Output" {
 				Write-Output $Message
@@ -404,13 +404,13 @@ Function Merge-Settings {
 	foreach ($property in $fallback.psobject.Properties) {
 		if ($prior.PSObject.Properties.Match($property.Name).Count) {
 				# should be use with settings instead of hardcoded
-				$mergePropName = "Modes"   
+				$mergePropName = "Plots"   
 				# if prop exists and mergePropName we merge subproperties 
 				if ($property.Name -eq $mergePropName) {
 					$subobj = $prior."$mergePropName"
 					foreach ($subproperty in $property.Value.psobject.Properties) {
 						if (-Not $subobj.PSObject.Properties.Match($subproperty.Name).Count) {
-							$prior.Modes | Add-Member -MemberType NoteProperty -Name $subproperty.Name -Value $subproperty.Value
+							$prior.Plots | Add-Member -MemberType NoteProperty -Name $subproperty.Name -Value $subproperty.Value
 						}
 					}
 				}
@@ -427,7 +427,7 @@ Function Steps-Settings {
 		[Parameter(Mandatory=$True)]
         [Object]$setting
 		)
-	$steps = (Get-ChildItem function:\Module-*).Name.Substring(7)
+	$steps = (Get-ChildItem function:\Step-*).Name.Substring(7)
 	$setting | Add-Member -MemberType NoteProperty -Name Steps -Value $steps
 	return $setting
 }
