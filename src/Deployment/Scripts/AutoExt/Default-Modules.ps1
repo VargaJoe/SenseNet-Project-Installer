@@ -500,7 +500,7 @@ Function Step-RestoreDb {
 		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
 		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
 		$DbBackupFilePath = Get-FullPath $GlobalSettings.Platform.DbBackupFilePath
-		& $ScriptBaseFolderPath\Ops\Restore-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DbBackupFilePath"
+		& $ScriptBaseFolderPath\Ops\Restore-Db.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" -FileName "$DbBackupFilePath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
