@@ -48,10 +48,12 @@ Function Run-Steps {
 			# Temporary solution for set setting section
 			$StepNameArr = $StepNameSt.Split(":")
 			$StepName = $StepNameArr[0]
-			$Section = "Project"
+			
 			if (-not ($StepNameArr[1] -eq $Null)){
-				$Section = $StepNameArr[1]
-			}
+				$stepParameters = @{
+					Section = $StepNameArr[1]
+				}	
+			} else {$stepParameters = @{}}
 			# end
 		
 			$script:Result = 0
@@ -69,7 +71,7 @@ Function Run-Steps {
 			
 			try {
 				# Invoke-Expression "Step-$StepName" 
-				& "Step-$StepName" -Section "$Section"
+				& "Step-$StepName" @stepParameters
 			}
 			catch {
 				$script:Result = 1
@@ -85,7 +87,15 @@ Function Run-Steps {
 		Write-Log "-------------------- FINISH ----------------------"
 		Write-Log "--------------------------------------------------"
 	} else {
-		$Synopsis = Get-Help Step-"$Plot" |  foreach { $_.Synopsis  }
+		$StepNameArr = $Plot.Split(":")
+		$StepName = $StepNameArr[0]
+		if (-not ($StepNameArr[1] -eq $Null)){
+			$stepParameters = @{
+				Section = $StepNameArr[1]
+			}			
+		} else {$stepParameters = @{}}
+			
+		$Synopsis = Get-Help Step-"$StepName" |  foreach { $_.Synopsis  }
 		Write-Log "================================================" -foregroundcolor "green"
 		Write-Log "============= $Plot/$Plot =============" -foregroundcolor "green"
 		Write-Log "================================================" -foregroundcolor "green"
@@ -93,7 +103,8 @@ Function Run-Steps {
 		Write-Log "Progress: 100/100" -foregroundcolor "green"
 		
 		try {
-			Invoke-Expression "Step-$Plot" 
+			# Invoke-Expression "Step-$Plot" 
+			& "Step-$StepName" @stepParameters
 		}
 		catch {
 			$script:Result = 1
@@ -162,7 +173,6 @@ function Set-ConnectionString {
             [String]$ConnectionString
          )
 	
-	Write-Log "Config path: $ConfigPath"
 	Set-ItemProperty $ConfigPath -name IsReadOnly -value $false
 	$doc = [xml](get-content $ConfigPath)
 	$root = $doc.get_DocumentElement();

@@ -31,9 +31,9 @@ $dbbk.Database = $dbname
 $dbbk.MediaDescription = "Disk"
 $dbbk.Devices.AddDevice($FileName, 'File')
 
-Write-Verbose "Restoring $CatalogName database has started..."
+Write-Verbose "Backuping $CatalogName database has started..."
 $dbbk.SqlBackup($dbServer) 
-Write-Verbose "Restore of $CatalogName to $FileName complete"
+Write-Verbose "Backup of $CatalogName to $FileName complete"
 
 # write-host "Backuping database has started..."
 # Backup-SqlDatabase -ServerInstance "$ServerName" -Database "$CatalogName" -BackupFile "$FileName"

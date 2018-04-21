@@ -30,17 +30,26 @@ Function Step-Test {
 }
 
 
-Function Step-Stop {
+Function Step-Stop {	
 	<#
 	.SYNOPSIS
 	Stop site
 	.DESCRIPTION
 	Stop IIS site and application pool
 	#>
-	try {
-		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
-		$ProjectSiteName = $GlobalSettings.IIS.WebAppName
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[parameter(Mandatory=$false)]
+		[String]$section="Project"
+	)
 		
+	write-host sct: $section	
+
+	try {		
+		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
+		$ProjectSiteName = $GlobalSettings."$section".WebAppName
+		write-host $section
+		write-host naem: $ProjectSiteName
 		& "$ScriptBaseFolderPath\Ops\Stop-IISSite.ps1" $ProjectSiteName
 		$script:Result = $LASTEXITCODE		
 	}
@@ -56,8 +65,14 @@ Function Step-Start {
 	.DESCRIPTION
 	Start IIS site and application pool
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
 	try {
-		$ProjectSiteName = $GlobalSettings.IIS.WebAppName
+		$ProjectSiteName = $GlobalSettings."$Section".WebAppName
 		& $ScriptBaseFolderPath\Ops\Start-IISSite.ps1 $ProjectSiteName
 		$script:Result = $LASTEXITCODE
 	}
@@ -156,23 +171,31 @@ Function Step-SnServices {
 	.DESCRIPTION
 	
 	#>
+	
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
 	try {
 		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 	
-		$ProjectWebConfigFilePath = Get-FullPath $GlobalSettings.Project.WebConfigFilePath
+		$ProjectWebConfigFilePath = Get-FullPath $GlobalSettings."$Section".WebConfigFilePath
 		if (Test-Path  ("$ProjectWebConfigFilePath")){
 			Write-Verbose "Remove write protection from web.config: $ProjectWebConfigFilePath"
 			Set-ItemProperty $ProjectWebConfigFilePath -Name IsReadOnly -Value $false
 		}
-		$ProjectToolsFolderPath = Get-FullPath $GlobalSettings.Project.ToolsFolderPath
+		$ProjectToolsFolderPath = Get-FullPath $GlobalSettings."$Section".ToolsFolderPath
 		if (Test-Path  ("$ProjectToolsFolderPath")){
 			Write-Verbose "Remove write protection from files under Tools folder: $ProjectToolsFolderPath"
 			& "c:\Windows\System32\attrib.exe" -r "$ProjectToolsFolderPath\*.*" /s | & $Output
 		}
 		
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -ToolName "install-services" -ToolParameters "datasource:$DataSource","initialcatalog:$InitialCatalog","FORCEDREINSTALL:true" 
+		$DataSource=$GlobalSettings."$Section".DataSource
+		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-services" -ToolParameters "datasource:$DataSource","initialcatalog:$InitialCatalog","FORCEDREINSTALL:true" 
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -187,8 +210,15 @@ Function Step-SnWebPages {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
 	try {
-		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -ToolName "install-webpages" 
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-webpages" 
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -204,9 +234,16 @@ Function Step-RemoveDemo {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
 	try {
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		$PackagePath = Get-FullPath "..\Packages\RemoveDemo"
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath "$SnAdminPath" -PackagePath "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -221,9 +258,16 @@ Function Step-AdminUsers {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
 	try {
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		$PackagePath = Get-FullPath "..\Packages\UsersStructure"
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath "$SnAdminPath" -PackagePath "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -239,9 +283,16 @@ Function Step-PrInstall {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
 	try {
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		$PackagePath =  Get-FullPath $GlobalSettings.Project.DeployFolderPath
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath"	
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath "$SnAdminPath" -PackagePath "$PackagePath"	
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -257,11 +308,17 @@ Function Step-CreateSite {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
 	try {
-		$ProjectWebFolderPath = Get-FullPath $GlobalSettings.Project.WebFolderPath
-		$ProjectSiteName = $GlobalSettings.IIS.WebAppName 
-		$ProjectAppPoolName = $GlobalSettings.IIS.AppPoolName 
-		$ProjectSiteHosts = $GlobalSettings.IIS.Hosts
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		$ProjectSiteName = $GlobalSettings."$Section".WebAppName 
+		$ProjectAppPoolName = $GlobalSettings."$Section".AppPoolName 
+		$ProjectSiteHosts = $GlobalSettings."$Section".Hosts
 		& $ScriptBaseFolderPath\Ops\Create-IISSite.ps1 -DirectoryPath $ProjectWebFolderPath -SiteName $ProjectSiteName -PoolName $ProjectAppPoolName -SiteHosts $ProjectSiteHosts
 		$script:Result = $LASTEXITCODE
 	}
@@ -278,30 +335,15 @@ Function Step-SetHost {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
 	try {
-		$ProjectSiteHosts = $GlobalSettings.IIS.Hosts
+		$ProjectSiteHosts = $GlobalSettings."$Section".Hosts
 		& $ScriptBaseFolderPath\Ops\Set-Host.ps1 -SiteHosts $ProjectSiteHosts
-		$script:Result = $LASTEXITCODE
-	}
-	catch {
-		$script:Result = 1
-	}
-	
-}
-
-Function Step-InitWebfolder {
-<#
-	.SYNOPSIS
-	Unzip webfolder package
-	.DESCRIPTION
-	
-	#>
-	try {
-		$SnWebfolderPackPath = Get-FullPath $GlobalSettings.Platform.PackageName
-		Write-Verbose "SnWebfolderPackPath: $SnWebfolderPackPath"
-		$SnWebfolderPackName = (Get-FullPath $GlobalSettings.Platform.PackageName) + ".zip"
-		Write-Verbose "SnWebfolderPackName: $SnWebfolderPackName"
-		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebfolderPackName" -destname "$SnWebfolderPackPath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -313,17 +355,23 @@ Function Step-InitWebfolder {
 Function Step-DeployWebFolder {
 <#
 	.SYNOPSIS
-	Copy starter webfolder to detination
+	Copy starter webfolder to detination / untested
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Production"
+		)
+	
 	try {
 		Write-Verbose "`r`nCopy webfolder files from package to destination"
-		$SnWebfolderPackPath = Get-FullPath $GlobalSettings.Platform.PackageName
-		$ProjectWebFolderPath = Get-FullPath $GlobalSettings.Project.WebFolderPath
+		$SnWebfolderPackPath = Get-FullPath $GlobalSettings.Source.SnWebFolderFilePath
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		Write-Verbose "Source: $SnWebfolderPackPath"
 		Write-Verbose "Target: $ProjectWebFolderPath"
-		Copy-Item -Path "$SnWebfolderPackPath" -Destination "$ProjectWebFolderPath" -recurse -Force
+		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebfolderPackPath" -destname "$ProjectWebFolderPath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -331,7 +379,6 @@ Function Step-DeployWebFolder {
 	}
 	
 }
-
 
 # ================================================
 # ================ EXT SCRIPTS ===================
@@ -345,9 +392,15 @@ Function Step-PrIndex {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+		
 	try {
-		# & iisreset
-		& $ScriptBaseFolderPath\Deploy\Index-Project.ps1 
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		& $ScriptBaseFolderPath\Deploy\Index-Project.ps1 -SnAdminPath $SnAdminPath
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -392,7 +445,7 @@ Function Step-PrExport {
 		# & iisreset
 
 		$GETDate = Get-Date
-		$CurrentDateTime = "[$($GETDate.Year)-$($GETDate.Month)-$($GETDate.Day)_$($GETDate.Hour)-$($GETDate.Minute)-$($GETDate.Second)]"
+		$CurrentDateTime = Get-Date -format [yyyy-MM-dd-HH-mm-ss]
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		if (!($Exportfromfilepath)){
 			Write-Verbose "Start export script"
@@ -437,13 +490,19 @@ Function Step-SetRepoUrl {
 	.DESCRIPTION
 	-SiteHosts $ProjectSiteHosts
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+		
 	# Technical Debt: it should be called an independent ps1 file from here, instead a hardcoded business logic
 	try {
 		# Site name, url and authentication type must be get from settings json, probably with iteration
-		$ProjectSiteHosts = $GlobalSettings.IIS.Hosts
+		$ProjectSiteHosts = $GlobalSettings."$Section".Hosts
 		# $ProjectSiteName = $GlobalSettings.IIS.WebAppName
 		$AuthenticationType="Forms"
-		
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		foreach ($hostCombinedUrl in $ProjectSiteHosts) {				
 			$hostUrlComponents = $hostCombinedUrl.Split(":")
 			if ($hostUrlComponents[1] -eq $Null){
@@ -456,7 +515,7 @@ Function Step-SetRepoUrl {
 			
 			$HostnameToLower = $hostUrl.ToLower()
 			Write-Verbose "Set $HostnameToLower on $ProjectSiteName with $AuthenticationType authentication type"
-			& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -ToolName "seturl" -ToolParameters "site:$ProjectSiteName","url:$HostnameToLower","authenticationType:$AuthenticationType"
+			& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "seturl" -ToolParameters "site:$ProjectSiteName","url:$HostnameToLower","authenticationType:$AuthenticationType"
 		}
 		$script:Result = $LASTEXITCODE
 	}
@@ -473,10 +532,16 @@ Function Step-BackupDb {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+		
 	try {
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		$DbBackupFilePath = Get-FullPath $GlobalSettings.Platform.DbBackupFilePath
+		$DataSource=$GlobalSettings."$Section".DataSource
+		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
+		$DbBackupFilePath = Get-FullPath $GlobalSettings.Source.DbBackupFilePath
 		& $ScriptBaseFolderPath\Ops\Backup-Db.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" -FileName "$DbBackupFilePath"
 		$script:Result = $LASTEXITCODE
 	}
@@ -493,12 +558,18 @@ Function Step-AutoBackupDb {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+		
 	try {
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
+		$DataSource=$GlobalSettings."$Section".DataSource
+		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
 		$CurrentDateTime = Get-Date -format -yyyyMMddHHmm
 		$BackupName = "$InitialCatalog" + $CurrentDateTime + ".bak"
-		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
+		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Source.DatabasesPath
 		& $ScriptBaseFolderPath\Ops\Backup-Db.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" -FileName "$DatabaseBackupsFolderPath\$BackupName"
 		$script:Result = $LASTEXITCODE
 	}
@@ -515,10 +586,16 @@ Function Step-RestoreDb {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="DataBase"
+		)
+		
 	try {
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		$DbBackupFilePath = Get-FullPath $GlobalSettings.Platform.DbBackupFilePath
+		$DataSource=$GlobalSettings."$Section".DataSource
+		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
+		$DbBackupFilePath = Get-FullPath $GlobalSettings.Source.DbBackupFilePath
 		& $ScriptBaseFolderPath\Ops\Restore-Db.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" -FileName "$DbBackupFilePath"
 		$script:Result = $LASTEXITCODE
 	}
@@ -535,44 +612,25 @@ Function Step-SetConfigs {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
 	# "LOGLEVEL:Console",
 	try {
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		# write-host $DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		# write-host $InitialCatalog
+		$DataSource=$GlobalSettings."$Section".DataSource
+		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
 		$PackagePath = Get-FullPath "..\Packages\SetConfigs"
-		# write-host $PackagePath
-		# write-host "$ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath $PackagePath -Parameters datasource:$DataSource initialcatalog:$InitialCatalog"
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath" -Parameters "datasource:$DataSource","initialcatalog:$InitialCatalog" 	
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath $SnAdminPath -PackagePath "$PackagePath" -Parameters "datasource:$DataSource","initialcatalog:$InitialCatalog" 	
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
 		$script:Result = 1
 	}
 }
-
-Function Step-TestWebfolder {
-<#
-	.SYNOPSIS
-	Unzip webfolder package
-	.DESCRIPTION
-	
-	#>
-	try {
-		$SnWebFolderFilePath = Get-FullPath $GlobalSettings.Platform.SnWebFolderFilePath
-		$ProjectWebFolderPath = Get-FullPath $GlobalSettings.Project.WebFolderPath
-		Write-Verbose "SnWebfolderPackPath: $SnWebFolderFilePath"
-		Write-Verbose "SnWebfolderDestName: $ProjectWebFolderPath"
-		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebFolderFilePath" -destname "$ProjectWebFolderPath"
-		$script:Result = $LASTEXITCODE
-	}
-	catch {
-		$script:Result = 1
-	}
-	
-}
-
 
 Function Step-GetSettings {
 	<#
@@ -585,6 +643,33 @@ Function Step-GetSettings {
 		$script:JsonResult = $GlobalSettings 
 		# | ConvertTo-Json
 		$script:Result = 0
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Step-SetConnection {
+<#
+	.SYNOPSIS
+	Set project configurations
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$aConfigFilePath = Get-FullPath $GlobalSettings."$Section".SnAdminRCFilePath
+		$wConfigFilePath = Get-FullPath $GlobalSettings."$Section".WebConfigFilePath
+		$DataSource=$GlobalSettings."$Section".DataSource
+		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
+		& $ScriptBaseFolderPath\Deploy\Set-Connection.ps1 -ConfigFilePath "$aConfigFilePath" -DataSource "$DataSource" -InitialCatalog "$InitialCatalog" 
+		& $ScriptBaseFolderPath\Deploy\Set-Connection.ps1 -ConfigFilePath "$wConfigFilePath" -DataSource "$DataSource" -InitialCatalog "$InitialCatalog" 
+		$script:Result = $LASTEXITCODE
 	}
 	catch {
 		$script:Result = 1

@@ -1,51 +1,45 @@
 {
-  "DataBase": {
-    "DataSource": "MySenseNetContentRepositoryDatasource",
-    "InitialCatalog": "project"
-  },
-  "IIS": {
-    "WebAppName": "project",
-    "AppPoolName": "project",
-	"Hosts": [ "project", "sn7.sn.hu" ],
-    "DotNetVersion": "v4.0"
-  },
-  "Sources": {
-    "PackagesPath": "..\\Packages",
-	"DatabasesPath": "..\\Databases"
-  }, 
-  "Platform": {
-    "PackageFolderPath": "",
-    "PackageName": "",
-    "SourceFolderPath": "",
-    "SolutionFilePath": "",
-	"DbBackupFilePath": "..\\Packages\\Platform\\testsn7000db.bak",
-	"SnWebFolderFilePath": "..\\Packages\\Platform\\snwebfolder700.zip",
-	"SnWebFolderPath": "..\\Packages\\Platform\\snwebfolder700"
+  "Source": {
+	"PackagesPath": 		"..\\Packages\\",
+    "PackageFolderPath": 	"",
+    "PackageName": 			"",
+    "SourceFolderPath": 	"",
+    "SolutionFilePath":	 	"",
+	"DbBackupFilePath": 	"..\\Databases\\project-201804212312.bak",
+	"DatabasesPath": 		"..\\Databases\\",
+	"SnWebFolderFilePath": 	"..\\Archives\\project-Web710.zip",
+	"SnWebFolderPath": 		"..\\Archives\\snwebfolder700"
   }, 
   "Project": {
-    "SourceFolderPath": "..\\..\\",
-    "WebFolderPath": "..\\..\\Source\\WebSite",
-	"AsmFolderPath": "..\\..\\Source\\WebSite\\bin",
-	"WebConfigFilePath": "..\\..\\Source\\WebSite\\web.config",
-	"SnAdminFilePath": "..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": "..\\..\\Source\\WebSite\\Tools",
-	"RepoFsFolderPath": "..\\..\\Source\\\\WebSite\\Root",
-	"DeployFolderPath": "..\\..\\Source\\WebSite\\deploy",
-    "SolutionFilePath": "..\\..\\Source\\Project.sln"
+	"DataSource": 			"MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": 		"project",
+	"WebAppName": 			"project",
+    "AppPoolName": 			"project",
+	"Hosts": 				[ "project", "sn7.sn.hu" ],
+    "DotNetVersion": 		"v4.0",
+    "SourceFolderPath": 	"..\\..\\",
+    "WebFolderPath": 		"..\\..\\Source\\WebSite",
+	"AsmFolderPath": 		"..\\..\\Source\\WebSite\\bin",
+	"WebConfigFilePath": 	"..\\..\\Source\\WebSite\\web.config",
+	"SnAdminFilePath": 		"..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\..\\Source\\WebSite\\Tools",
+	"SnAdminRCFilePath": 	"..\\..\\Source\\WebSite\\Tools\\SnAdminRuntime.exe.config",
+	"RepoFsFolderPath": 	"..\\..\\Source\\WebSite\\Root",
+	"DeployFolderPath": 	"..\\..\\Source\\WebSite\\deploy",
+    "SolutionFilePath": 	"..\\..\\Source\\Project.sln"
   },
   "Production": {
-    "WebFolderPath": "C:\\web\\projectlivewebfolder",
-	"AsmFolderPath": "C:\\web\\projectlivewebfolder\\bin",
-	"WebConfigFilePath": "C:\\web\\projectlivewebfolder\\web.config",
-	"SnAdminFilePath": "C:\\web\\projectlivewebfolder\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": "C:\\web\\projectlivewebfolder\\Tools"
-  },
-  "Tools": {
-    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\tf.exe",
-    "UnZipperFilePath": "C:\\Program Files\\7-Zip\\7z.exe",
-    "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
-	"NuGetSourceUrl": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
-    "NuGetFolderPath": "..\\Tools\\nuget",
-    "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
+	"DataSource": 			"MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": 		"projectlive",
+	"WebAppName": 			"projectlive",
+    "AppPoolName": 			"projectlive",
+	"Hosts": 				[ "projectlive" ],
+    "DotNetVersion": 		"v4.0",
+    "WebFolderPath": 		"D:\\web\\projectlivewebfolder",
+	"AsmFolderPath": 		"D:\\web\\projectlivewebfolder\\bin",
+	"WebConfigFilePath": 	"D:\\web\\projectlivewebfolder\\web.config",
+	"SnAdminFilePath": 		"D:\\web\\projectlivewebfolder\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"D:\\web\\projectlivewebfolder\\Tools",
+	"SnAdminRCFilePath": 	"D:\\web\\projectlivewebfolder\\Tools\\SnAdminRuntime.exe.config"
   }
 }
