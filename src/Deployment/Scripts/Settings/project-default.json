@@ -6,7 +6,7 @@
 	"demoinstall": 			["restorepckgs", "prbuild", "sninstall", "createsite", "sethost", "start"],
 	"deploy" : 				[ "initwebfolder", "deploywebfolder", "sninstall","createsite", "sethost", "start"],
 	"restoresite" : 		[ "testwebfolder", "restoredb", "setconfigs", "prindex", "createsite", "sethost", "start"],
-	"projectbackup" : 		[ "restoredb" ],
+	"projectbackup" : 		[ "stop", "backupdb", "start" ],
 	"fulldeploy" : 			[ "stop:Production", "restoredb:Production", "deploywebfolder:Production", "setconnection:Production", "prindex:Production", "setrepourl:Production", "createsite:Production", "sethost:Production", "start:Production"]
   },
   "Tools": {

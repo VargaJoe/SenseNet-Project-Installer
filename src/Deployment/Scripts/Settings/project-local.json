@@ -5,10 +5,10 @@
     "PackageName": 			"",
     "SourceFolderPath": 	"",
     "SolutionFilePath":	 	"",
-	"DbBackupFilePath": 	"..\\Databases\\project-201804212312.bak",
+	"DbBackupFilePath": 	"..\\Databases\\project-latest.bak",
 	"DatabasesPath": 		"..\\Databases\\",
 	"SnWebFolderFilePath": 	"..\\Archives\\project-Web710.zip",
-	"SnWebFolderPath": 		"..\\Archives\\snwebfolder700"
+	"SnWebFolderPath": 		""
   }, 
   "Project": {
 	"DataSource": 			"MySenseNetContentRepositoryDatasource",
