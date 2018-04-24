@@ -43,13 +43,9 @@ Function Step-Stop {
 		[String]$section="Project"
 	)
 		
-	write-host sct: $section	
-
 	try {		
 		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 		$ProjectSiteName = $GlobalSettings."$section".WebAppName
-		write-host $section
-		write-host naem: $ProjectSiteName
 		& "$ScriptBaseFolderPath\Ops\Stop-IISSite.ps1" $ProjectSiteName
 		$script:Result = $LASTEXITCODE		
 	}
@@ -241,8 +237,9 @@ Function Step-RemoveDemo {
 	)
 	
 	try {
+		$PackagesPath = Get-FullPath $GlobalSettings.Source.PackagesPath
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
-		$PackagePath = Get-FullPath "..\Packages\RemoveDemo"
+		$PackagePath = Get-FullPath "$PackagesPath\RemoveDemo"
 		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath "$SnAdminPath" -PackagePath "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
@@ -265,8 +262,9 @@ Function Step-AdminUsers {
 	)
 	
 	try {
+		$PackagesPath = Get-FullPath $GlobalSettings.Source.PackagesPath
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
-		$PackagePath = Get-FullPath "..\Packages\UsersStructure"
+		$PackagePath = Get-FullPath "$PackagesPath\UsersStructure"
 		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath "$SnAdminPath" -PackagePath "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
@@ -620,9 +618,10 @@ Function Step-SetConfigs {
 	
 	# "LOGLEVEL:Console",
 	try {
+		$PackagesPath = Get-FullPath $GlobalSettings.Source.PackagesPath
 		$DataSource=$GlobalSettings."$Section".DataSource
 		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
-		$PackagePath = Get-FullPath "..\Packages\SetConfigs"
+		$PackagePath = Get-FullPath "$PackagesPath\SetConfigs"
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath $SnAdminPath -PackagePath "$PackagePath" -Parameters "datasource:$DataSource","initialcatalog:$InitialCatalog" 	
 		$script:Result = $LASTEXITCODE
