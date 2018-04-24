@@ -416,8 +416,9 @@ Function Step-PrImport {
 	#>
 	try {
 		$ProjectRepoFsFolderPath = Get-FullPath $GlobalSettings.Project.RepoFsFolderPath
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		Write-Verbose "Start import script with the path: $ProjectRepoFsFolderPath"		
-		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 -SourcePath "$ProjectRepoFsFolderPath"
+		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 -SnAdminPath $SnAdminPath -SourcePath "$ProjectRepoFsFolderPath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -445,12 +446,13 @@ Function Step-PrExport {
 		$GETDate = Get-Date
 		$CurrentDateTime = Get-Date -format [yyyy-MM-dd-HH-mm-ss]
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		if (!($Exportfromfilepath)){
 			Write-Verbose "Start export script"
-			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime"
+			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -SnAdminPath $SnAdminPath -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime"
 		}else{
 			Write-Verbose "Start export script by filter: $Exportfromfilepath"
-			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime" -ExportFromFilePath "$ExportFilter"
+			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -SnAdminPath $SnAdminPath -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime" -ExportFromFilePath "$ExportFilter"
 		}
 		$script:Result = $LASTEXITCODE
 	}
