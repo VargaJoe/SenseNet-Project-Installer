@@ -43,13 +43,9 @@ Function Step-Stop {
 		[String]$section="Project"
 	)
 		
-	write-host sct: $section	
-
 	try {		
 		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 		$ProjectSiteName = $GlobalSettings."$section".WebAppName
-		write-host $section
-		write-host naem: $ProjectSiteName
 		& "$ScriptBaseFolderPath\Ops\Stop-IISSite.ps1" $ProjectSiteName
 		$script:Result = $LASTEXITCODE		
 	}
@@ -241,8 +237,9 @@ Function Step-RemoveDemo {
 	)
 	
 	try {
+		$PackagesPath = Get-FullPath $GlobalSettings.Source.PackagesPath
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
-		$PackagePath = Get-FullPath "..\Packages\RemoveDemo"
+		$PackagePath = Get-FullPath "$PackagesPath\RemoveDemo"
 		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath "$SnAdminPath" -PackagePath "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
@@ -265,8 +262,9 @@ Function Step-AdminUsers {
 	)
 	
 	try {
+		$PackagesPath = Get-FullPath $GlobalSettings.Source.PackagesPath
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
-		$PackagePath = Get-FullPath "..\Packages\UsersStructure"
+		$PackagePath = Get-FullPath "$PackagesPath\UsersStructure"
 		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath "$SnAdminPath" -PackagePath "$PackagePath"
 		$script:Result = $LASTEXITCODE
 	}
@@ -418,8 +416,9 @@ Function Step-PrImport {
 	#>
 	try {
 		$ProjectRepoFsFolderPath = Get-FullPath $GlobalSettings.Project.RepoFsFolderPath
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		Write-Verbose "Start import script with the path: $ProjectRepoFsFolderPath"		
-		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 -SourcePath "$ProjectRepoFsFolderPath"
+		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 -SnAdminPath $SnAdminPath -SourcePath "$ProjectRepoFsFolderPath"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -447,12 +446,13 @@ Function Step-PrExport {
 		$GETDate = Get-Date
 		$CurrentDateTime = Get-Date -format [yyyy-MM-dd-HH-mm-ss]
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		if (!($Exportfromfilepath)){
 			Write-Verbose "Start export script"
-			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime"
+			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -SnAdminPath $SnAdminPath -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime"
 		}else{
 			Write-Verbose "Start export script by filter: $Exportfromfilepath"
-			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime" -ExportFromFilePath "$ExportFilter"
+			& $ScriptBaseFolderPath\Deploy\Export-Module.ps1 -SnAdminPath $SnAdminPath -TargetPath "$ProjectWebFolderPath\App_Data\Export$CurrentDateTime" -ExportFromFilePath "$ExportFilter"
 		}
 		$script:Result = $LASTEXITCODE
 	}
@@ -605,6 +605,32 @@ Function Step-RestoreDb {
 	
 }
 
+Function Step-DropDb {
+<#
+	.SYNOPSIS
+	Drop sql database
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+		
+	try {
+		$DataSource=$GlobalSettings."$Section".DataSource
+		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
+		& $ScriptBaseFolderPath\Ops\Drop-Db.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" 
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+
 Function Step-SetConfigs {
 <#
 	.SYNOPSIS
@@ -620,9 +646,10 @@ Function Step-SetConfigs {
 	
 	# "LOGLEVEL:Console",
 	try {
+		$PackagesPath = Get-FullPath $GlobalSettings.Source.PackagesPath
 		$DataSource=$GlobalSettings."$Section".DataSource
 		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
-		$PackagePath = Get-FullPath "..\Packages\SetConfigs"
+		$PackagePath = Get-FullPath "$PackagesPath\SetConfigs"
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath $SnAdminPath -PackagePath "$PackagePath" -Parameters "datasource:$DataSource","initialcatalog:$InitialCatalog" 	
 		$script:Result = $LASTEXITCODE
