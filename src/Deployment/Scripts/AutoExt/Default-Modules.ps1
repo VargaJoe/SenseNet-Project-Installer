@@ -289,7 +289,7 @@ Function Step-PrInstall {
 	
 	try {
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
-		$PackagePath =  Get-FullPath $GlobalSettings.Project.DeployFolderPath
+		$PackagePath =  Get-FullPath $GlobalSettings."$Section".DeployFolderPath
 		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath "$SnAdminPath" -PackagePath "$PackagePath"	
 		$script:Result = $LASTEXITCODE
 	}
