@@ -1,0 +1,5 @@
+{
+    "serverURL": "http://localhost",
+    "port": "5455",
+    "getSettingsCommand":"getsettings"
+}
