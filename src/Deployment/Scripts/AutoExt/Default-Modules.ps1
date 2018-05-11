@@ -702,3 +702,49 @@ Function Step-SetConnection {
 		$script:Result = 1
 	}
 }
+
+Function Step-DownloadDatabase {
+<#
+	.SYNOPSIS
+	Download demo database
+	.DESCRIPTION
+	
+	#>
+	try {
+		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
+		$WebPath = $GlobalSettings.Source.DbBackupFileUrl
+		Write-Verbose "Download demo database backup from $WebPath" 
+		$LocalPath = Get-FullPath $GlobalSettings.Source.DbBackupFilePath
+		Write-Verbose "Check if $LocalPath exists..."
+		& $ScriptBaseFolderPath\Dev\Download-File.ps1 -Url $WebPath -Output $LocalPath
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+		Write-Verbose $_
+	}
+	
+}
+
+Function Step-DownloadWebPack {
+<#
+	.SYNOPSIS
+	Download demo webfolder
+	.DESCRIPTION
+	
+	#>
+	try {
+		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
+		$WebPath = $GlobalSettings.Source.SnWebFolderFileUrl
+		Write-Verbose "Download demo webfolder package from $WebPath" 
+		$LocalPath = Get-FullPath $GlobalSettings.Source.SnWebFolderFilePath
+		Write-Verbose "Check if $LocalPath exists..."
+		& $ScriptBaseFolderPath\Dev\Download-File.ps1 -Url $WebPath -Output $LocalPath
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+		Write-Verbose $_
+	}
+	
+}

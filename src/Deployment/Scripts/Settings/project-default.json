@@ -1,11 +1,11 @@
 {
   "Plots": {
-	"fullinstall": 			[ "stop", "getlatest", "restorepckgs", "prbuild", "sninstall", "sninstall","removedemo", "adminusers", "prinstall", "setrepourl", "createsite", "sethost", "start" ],
-	"updateproject": 		[ "stop", "getlatest", "restorepckgs", "prbuild", "prinstall", "setrepourl", "start" ],
-	"demoinstall": 			["restorepckgs", "prbuild", "sninstall", "createsite", "sethost", "start"],
-	"restorelocal" : 		[ "stop", "restoredb", "prindex", "setrepourl", "createsite", "sethost", "start"],
+	"fullinstall": 			[ "stop", "getlatest", "restorepckgs", "prbuild", "snservices", "snwebpages","removedemo", "adminusers", "prinstall", "setrepourl", "createsite", "sethost", "start" ],
+	"updateproject": 		[ "stop", "getlatest", "restorepckgs", "prbuild", "snservices", "snwebpages", "setrepourl", "start" ],
+	"demoinstall": 			["restorepckgs", "prbuild", "snservices", "snwebpages", "createsite", "sethost", "start"],
+	"restorelocal" : 		[ "stop", "restoredb", "prindex", "setrepourl", "createsite", "setrepourl:Demo", "sethost:Demo", "start"],
 	"projectbackup" : 		[ "stop", "backupdb", "start" ],
-	"fulldeploy" : 			[ "stop:Production", "restoredb:Production", "deploywebfolder:Production", "setconnection:Production", "prindex:Production", "setrepourl:Production", "createsite:Production", "sethost:Production", "start:Production"]
+	"fulldeploy" : 			[ "stop:Production", "downloaddatabase", "restoredb:Production", "downloadwebpack", "deploywebfolder:Production", "setconnection:Production", "prindex:Production", "setrepourl:Production", "createsite:Production", "sethost:Production", "start:Production"]
   },
   "Tools": {
     "VisualStudio": 		"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer\\tf.exe",
