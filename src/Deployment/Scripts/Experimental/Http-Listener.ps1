@@ -51,7 +51,7 @@ While ($HttpListener.IsListening) {
     $HttpResponse.Headers.Add("Access-Control-Allow-Origin","http://172.17.17.195:8080")
     $HttpResponse.Headers.Add("Access-Control-Allow-Headers","Content-Type")
     $HttpResponse.StatusCode = 200
-    $jsondata = @{ExitCode = $Result; Output = $JsonResult} 
+    $jsondata = @{Step = $Plot; ExitCode = $Result; Output = $JsonResult} 
     $object = new-object psobject -Property $jsondata 
     $jsondata = $object | ConvertTo-Json -depth 100
     $ResponseBuffer = [System.Text.Encoding]::UTF8.GetBytes($jsondata)
