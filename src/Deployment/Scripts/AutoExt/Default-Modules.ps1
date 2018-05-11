@@ -748,3 +748,58 @@ Function Step-DownloadWebPack {
 	}
 	
 }
+
+Function Step-StopRemote {	
+	<#
+	.SYNOPSIS
+	Stop remote site
+	.DESCRIPTION
+	Stop IIS site and application pool on remote machine
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[parameter(Mandatory=$false)]
+		[String]$section="Project"
+	)
+		
+	try {		
+		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
+		$ProjectSiteName = $GlobalSettings."$section".WebAppName
+		$MachineName = $GlobalSettings."$section".MachineName
+		write-host $ProjectSiteName
+		write-host $MachineName
+		& "$ScriptBaseFolderPath\Ops\Run-Remote.ps1" -RemoteServerName $MachineName -PsFilePath ".\Ops\Stop-IISSite.ps1" -PsFileArgumentList "$ProjectSiteName"
+		$script:Result = $LASTEXITCODE		
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Step-StartRemote {	
+	<#
+	.SYNOPSIS
+	Stop remote site
+	.DESCRIPTION
+	Stop IIS site and application pool on remote machine
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[parameter(Mandatory=$false)]
+		[String]$section="Project"
+	)
+		
+	try {		
+		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
+		$ProjectSiteName = $GlobalSettings."$section".WebAppName
+		$MachineName = $GlobalSettings."$section".MachineName
+		write-host $ProjectSiteName
+		write-host $MachineName
+		& "$ScriptBaseFolderPath\Ops\Run-Remote.ps1" -RemoteServerName $MachineName -PsFilePath ".\Ops\Start-IISSite.ps1" -PsFileArgumentList "$ProjectSiteName"
+		$script:Result = $LASTEXITCODE		
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
