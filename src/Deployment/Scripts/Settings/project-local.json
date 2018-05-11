@@ -5,11 +5,16 @@
     "PackageName": 			"",
     "SourceFolderPath": 	"",
     "SolutionFilePath":	 	"",
+	"DbBackupFileUrl": 		"http://172.17.17.195:8080/sn-installer/Databases/project-latest.bak",
 	"DbBackupFilePath": 	"..\\Databases\\project-latest.bak",
 	"DatabasesPath": 		"..\\Databases\\",
 	"SnWebFolderFilePath": 	"..\\Archives\\project-Web710.zip",
+	"SnWebFolderFileUrl": 	"http://172.17.17.195:8080/sn-installer/Archives/project-Web710.zip",
 	"SnWebFolderPath": 		""
   }, 
+  "Demo": {
+	"Hosts": 				[ "Defult_Site:project" ]
+  },
   "Project": {
 	"DataSource": 			"MySenseNetContentRepositoryDatasource",
     "InitialCatalog": 		"project",
