@@ -1,6 +1,6 @@
 {
   "Plots": {
-	"fullinstall": 			[ "stop", "getlatest", "restorepckgs", "prbuild", "snservices", "snwebpages","removedemo", "adminusers", "prinstall", "setrepourl", "createsite", "sethost", "start" ],
+	"fullinstall": 			[ "stop", "getlatest", "restorepckgs", "prbuild", "snservices", "snwebpages", "removedemo", "adminusers", "prinstall", "setrepourl", "createsite", "sethost", "start" ],
 	"updateproject": 		[ "stop", "getlatest", "restorepckgs", "prbuild", "snservices", "snwebpages", "setrepourl", "start" ],
 	"demoinstall": 			[ "restorepckgs", "prbuild", "snservices", "snwebpages", "createsite", "sethost", "start" ],
 	"restorelocal" : 		[ "stop", "restoredb", "prindex", "setrepourl", "createsite", "setrepourl:Demo", "sethost:Demo", "start"],
