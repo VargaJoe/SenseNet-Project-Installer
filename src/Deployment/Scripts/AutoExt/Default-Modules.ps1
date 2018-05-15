@@ -274,7 +274,7 @@ Function Step-AdminUsers {
 	
 }
 
-Function Step-PrInstall {
+Function Step-Install {
 <#
 	.SYNOPSIS
 	Project solution structure install
@@ -383,7 +383,7 @@ Function Step-DeployWebFolder {
 # ================================================
 # unchecked
 
-Function Step-PrIndex {
+Function Step-Index {
 <#
 	.SYNOPSIS
 	Populate full index on repository
@@ -407,15 +407,21 @@ Function Step-PrIndex {
 	
 }
 
-Function Step-PrImport {
+Function Step-Import {
 <#
 	.SYNOPSIS
 	Import project - not refactored
 	.DESCRIPTION
 	
 	#>
+		[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+
 	try {
-		$ProjectRepoFsFolderPath = Get-FullPath $GlobalSettings.Project.RepoFsFolderPath
+		$ProjectRepoFsFolderPath = Get-FullPath $GlobalSettings."$Section".RepoFsFolderPath
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
 		Write-Verbose "Start import script with the path: $ProjectRepoFsFolderPath"		
 		& $ScriptBaseFolderPath\Deploy\Import-Module.ps1 -SnAdminPath $SnAdminPath -SourcePath "$ProjectRepoFsFolderPath"
@@ -427,7 +433,8 @@ Function Step-PrImport {
 	
 }
 
-Function Step-PrExport {
+
+Function Step-Export {
 <#
 	.SYNOPSIS
 	Export project 
