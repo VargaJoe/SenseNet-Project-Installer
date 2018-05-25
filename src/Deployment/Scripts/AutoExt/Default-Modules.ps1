@@ -596,7 +596,7 @@ Function Step-RestoreDb {
 	[CmdletBinding(SupportsShouldProcess=$True)]
 		Param(
 		[Parameter(Mandatory=$false)]
-		[string]$Section="DataBase"
+		[string]$Section="Project"
 		)
 		
 	try {

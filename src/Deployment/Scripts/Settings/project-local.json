@@ -29,6 +29,9 @@
 	"SnAdminFilePath": 		"..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe",
 	"ToolsFolderPath": 		"..\\..\\Source\\WebSite\\Tools",
 	"SnAdminRCFilePath": 	"..\\..\\Source\\WebSite\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\..\\Source\\WebSite\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\..\\Source\\WebSite\\Tools\\import.exe",
+	"ExporterPath": 		"..\\..\\Source\\WebSite\\Tools\\export.exe",														
 	"RepoFsFolderPath": 	"..\\..\\Source\\WebSite\\Root",
 	"DeployFolderPath": 	"..\\..\\Source\\WebSite\\deploy",
     "SolutionFilePath": 	"..\\..\\Source\\Project.sln"
@@ -40,11 +43,17 @@
     "AppPoolName": 			"projectlive",
 	"Hosts": 				[ "projectlive" ],
     "DotNetVersion": 		"v4.0",
-    "WebFolderPath": 		"D:\\web\\projectlivewebfolder",
-	"AsmFolderPath": 		"D:\\web\\projectlivewebfolder\\bin",
-	"WebConfigFilePath": 	"D:\\web\\projectlivewebfolder\\web.config",
-	"SnAdminFilePath": 		"D:\\web\\projectlivewebfolder\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": 		"D:\\web\\projectlivewebfolder\\Tools",
-	"SnAdminRCFilePath": 	"D:\\web\\projectlivewebfolder\\Tools\\SnAdminRuntime.exe.config"
-  }
+	"MachineName": 			"remotemachine",																		
+    "WebFolderPath": 		"\\\\remotemachine\\web\\projectlivewebfolder",
+	"AsmFolderPath": 		"\\\\remotemachine\\web\\projectlivewebfolder\\bin",
+	"WebConfigFilePath": 	"\\\\remotemachine\\web\\projectlivewebfolder\\web.config",
+	"SnAdminFilePath": 		"\\\\remotemachine\\web\\projectlivewebfolder\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"\\\\remotemachine\\web\\projectlivewebfolder\\Tools",
+	"SnAdminRCFilePath": 	"\\\\remotemachine\\web\\projectlivewebfolder\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"\\\\remotemachine\\Web\\projectlivewebfolder\\Tools\\indexpopulator.exe",
+    "ImporterPath": 		"\\\\remotemachine\\Web\\projectlivewebfolder\\Tools\\import.exe",
+    "ExporterPath": 		"\\\\remotemachine\\Web\\projectlivewebfolder\\Tools\\export.exe",
+    "RepoFsFolderPath": 	"\\\\remotemachine\\Web\\projectlivewebfolder\\Root",
+    "DeployFolderPath": 	"\\\\remotemachine\\Web\\projectlivewebfolder\\deploy"
+ }
 }

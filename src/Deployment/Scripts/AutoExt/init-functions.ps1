@@ -26,7 +26,7 @@ Function Get-FullPath {
 		[Parameter(Mandatory=$False)]
         [String]$SubFolder
 		)
-	if ($Path -like "*:\*") {
+	if (($Path -like "*:\*") -or ($Path -like "\\*")) {
 		$FullPath = "$Path"
 	} else {
 		$CombinedPath = [IO.Path]::Combine($ScriptBaseFolderPath, "$Path")
