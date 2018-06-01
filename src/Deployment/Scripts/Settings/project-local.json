@@ -1,4 +1,7 @@
 {
+	"Plots": {
+		"testinstall": [ "stop", "restorepckgs", "prbuild", "snservices", "snwebpages", "setrepourl:Demo", "createsite", "sethost", "start" ]
+	  },
   "Source": {
 	"PackagesPath": 		"..\\Packages\\",
     "PackageFolderPath": 	"",
@@ -13,7 +16,8 @@
 	"SnWebFolderPath": 		""
   }, 
   "Demo": {
-	"Hosts": 				[ "Defult_Site:project" ]
+	"Hosts": 				[ "Default_Site:project" ],
+	"SnAdminFilePath": 		"..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe"
   },
   "Project": {
 	"DataSource": 			"MySenseNetContentRepositoryDatasource",
