@@ -187,11 +187,31 @@ Function Step-SnServices {
 			Write-Verbose "Remove write protection from files under Tools folder: $ProjectToolsFolderPath"
 			& "c:\Windows\System32\attrib.exe" -r "$ProjectToolsFolderPath\*.*" /s | & $Output
 		}
-		
+
 		$DataSource=$GlobalSettings."$Section".DataSource
 		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
-		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
-		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-services" -ToolParameters "datasource:$DataSource","initialcatalog:$InitialCatalog","FORCEDREINSTALL:true" 
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath		
+		$params = "datasource:$DataSource","initialcatalog:$InitialCatalog","FORCEDREINSTALL:true"
+		
+		$UserName = $GlobalSettings."$Section".UserName
+		$UserPsw = $GlobalSettings."$Section".UserPsw
+		$DbUserName = $GlobalSettings."$Section".DbUserName
+		$DbUserPsw = $GlobalSettings."$Section".DbUserPsw		
+		
+		if ($UserName) {
+			if (-Not ($DbUserName)) {
+				$DbUserName = $UserName
+			}
+			
+			if ($UserPsw -and -Not ($DbUserPsw)) {
+				$DbUserPsw = $UserPsw
+			}
+			
+			write-output "Username: $Username"
+			$params = $params,"username:$UserName","password:$UserPsw","dbusername:$DbUserName","dbpassword:$DbUserPsw" 
+		}
+		
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-services" -ToolParameters $params
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -596,7 +616,7 @@ Function Step-RestoreDb {
 	[CmdletBinding(SupportsShouldProcess=$True)]
 		Param(
 		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
+		[string]$Section="DataBase"
 		)
 		
 	try {
@@ -786,9 +806,9 @@ Function Step-StopRemote {
 Function Step-StartRemote {	
 	<#
 	.SYNOPSIS
-	Stop remote site
+	Start remote site
 	.DESCRIPTION
-	Stop IIS site and application pool on remote machine
+	Start IIS site and application pool on remote machine
 	#>
 	[CmdletBinding(SupportsShouldProcess=$True)]
 	Param(
@@ -810,3 +830,56 @@ Function Step-StartRemote {
 	}
 }
 
+function Step-WebAppOff {
+<#
+	.SYNOPSIS
+	Set app offline
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
+		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
+		if ([System.IO.File]::Exists($AppOnlineFilePath)){
+			Rename-Item $AppOnlineFilePath app_offline.htm
+		}
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+function Step-WebAppOn {
+<#
+	.SYNOPSIS
+	Set app online
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
+		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
+		if ([System.IO.File]::Exists($AppOfflineFilePath)){
+			Rename-Item $AppOfflineFilePath app_offline1.htm
+		}
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
