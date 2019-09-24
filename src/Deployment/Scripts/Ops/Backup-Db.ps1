@@ -35,6 +35,7 @@ Write-Verbose "Backuping $CatalogName database has started..."
 $dbbk.SqlBackup($dbServer) 
 Write-Verbose "Backup of $CatalogName to $FileName complete"
 
+# backup by module 
 # write-host "Backuping database has started..."
 # Backup-SqlDatabase -ServerInstance "$ServerName" -Database "$CatalogName" -BackupFile "$FileName"
 # write-host "Done"

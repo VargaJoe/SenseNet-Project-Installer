@@ -883,3 +883,109 @@ function Step-WebAppOn {
 		$script:Result = 1
 	}
 }
+
+Function Module-DbBackup {
+<#
+	.SYNOPSIS
+	Backup sql database
+	.DESCRIPTION
+	
+	#>
+	try {
+		$DataSource=$GlobalSettings.DataBase.DataSource
+		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
+		$CurrentDateTime = Get-Date -format -yyyyMMdd-HHmm
+		$BackupName = "$InitialCatalog" + $CurrentDateTime + ".bak"
+		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
+		& $ScriptBaseFolderPath\Ops\Backup-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DatabaseBackupsFolderPath\$BackupName"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+Function Module-RestoreDb {
+<#
+	.SYNOPSIS
+	Restore sql database
+	.DESCRIPTION
+	
+	#>
+	try {
+		$DataSource=$GlobalSettings.DataBase.DataSource
+		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
+		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
+		$DbBackupFilePath = Get-FullPath $GlobalSettings.Platform.DbBackupFilePath
+		& $ScriptBaseFolderPath\Ops\Restore-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DbBackupFilePath"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+Function Module-SetConfigs {
+<#
+	.SYNOPSIS
+	Set project configurations
+	.DESCRIPTION
+	
+	#>
+	# "LOGLEVEL:Console",
+	try {
+		$DataSource=$GlobalSettings.DataBase.DataSource
+		# write-host $DataSource
+		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
+		# write-host $InitialCatalog
+		$PackagePath = Get-FullPath "..\Packages\SetConfigs"
+		# write-host $PackagePath
+		# write-host "$ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath $PackagePath -Parameters datasource:$DataSource initialcatalog:$InitialCatalog"
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath" -Parameters "datasource:$DataSource","initialcatalog:$InitialCatalog" 	
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Module-TestWebfolder {
+<#
+	.SYNOPSIS
+	Unzip webfolder package
+	.DESCRIPTION
+	
+	#>
+	try {
+		$SnWebFolderFilePath = Get-FullPath $GlobalSettings.Platform.SnWebFolderFilePath
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings.Project.WebFolderPath
+		Write-Verbose "SnWebfolderPackPath: $SnWebFolderFilePath"
+		Write-Verbose "SnWebfolderDestName: $ProjectWebFolderPath"
+		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebFolderFilePath" -destname "$ProjectWebFolderPath"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+
+Function Module-GetSettings {
+	<#
+	.SYNOPSIS
+	Get merged settings json
+	.DESCRIPTION
+
+	#>
+	try {
+		$script:JsonResult = $GlobalSettings 
+		# | ConvertTo-Json
+		$script:Result = 0
+	}
+	catch {
+		$script:Result = 1
+	}
+}
