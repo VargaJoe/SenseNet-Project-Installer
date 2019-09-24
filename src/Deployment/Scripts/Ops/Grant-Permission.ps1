@@ -8,12 +8,7 @@ Param(
 [string]$User 	
 )
 
-#$DataSource = "MySenseNetContentRepositoryDatasource"
-#$Catalog = "RorWeb"
-#$User = "SN\sndev11$"
 $DBrole = "'db_owner'" 	
-
-#Add role script
 $ARS = "exec sp_addrolemember @rolename = $DBRole, @membername = '$User'"
 
 function Import-Module-SQLPS {
@@ -34,14 +29,8 @@ Import-Module-SQLPS
 if(get-module sqlps){"yes"}else{"no"}
 
 #Grant Owner role
-#Invoke-Sqlcmd -ServerInstance $DataSource -Database $Catalog -Query $ARS
-
 Write-Verbose "ServerInstance: $DataSource"
 Write-Verbose "Database: $Catalog" 
 Write-Verbose "Rolename: $DBRole"
 Write-Verbose "Membername: $User"
 Invoke-Sqlcmd -ServerInstance "$DataSource" -Database "$Catalog" -Query "$ARS"
-
-
-
-#Invoke-Sqlcmd -ServerInstance MySenseNetContentRepositoryDatasource -Database RorWeb -Query $ARS
