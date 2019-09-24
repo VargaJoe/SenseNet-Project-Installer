@@ -1,0 +1,46 @@
+/* Variables */
+
+/* Fonts */
+@global-font: 'Gotham Light';
+
+/* Backgrounds, colors */
+@background-color-from: #38ffca;
+@background-color-to: #008080;
+
+// Bootstrap 4 less files
+@import "../node_modules/bootstrap-less-port/less/_functions";
+@import "../node_modules/bootstrap-less-port/less/_variables";
+@import "../node_modules/bootstrap-less-port/less/_mixins";
+@import "../node_modules/bootstrap-less-port/less/bootstrap";
+
+// Hover less files
+@import "../node_modules/hover.css/less/hover";
+
+body{
+    /* background-image: url("../img/background_v21.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed; */
+    background: -moz-linear-gradient(45deg, @background-color-from 0%, @background-color-to 100%);
+    background: -webkit-gradient(linear, left bottom, right top, color-stop(0%, @background-color-from), color-stop(100%, @background-color-to)); 
+    background: -webkit-linear-gradient(45deg, @background-color-from 0%, @background-color-to 100%); 
+    background: -o-linear-gradient(45deg, @background-color-from 0%, @background-color-to 100%); 
+    background: -ms-linear-gradient(45deg, @background-color-from 0%, @background-color-to 100%); 
+    background: linear-gradient(45deg, @background-color-from 0%, @background-color-to 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='@background-color-to', endColorstr='@background-color-from',GradientType=1 );
+    height: 100%;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed; 
+    font-family: @global-font, sans-serif;
+}
+
+.hide{
+    display: none;
+}
+
+.right{
+    text-align: right;
+}
+

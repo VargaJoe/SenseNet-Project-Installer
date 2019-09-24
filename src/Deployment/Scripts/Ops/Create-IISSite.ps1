@@ -12,6 +12,8 @@ Param(
 [string]$DotNetVersion = "v4.0"
 )
 
+$LASTEXITCODE = 0
+
 Write-Verbose "================================================" 
 Write-Verbose "CREATE IIS SITE"
 Write-Verbose "================================================"

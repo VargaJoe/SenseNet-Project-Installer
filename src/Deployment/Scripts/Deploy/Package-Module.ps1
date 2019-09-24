@@ -1,16 +1,15 @@
 [CmdletBinding(SupportsShouldProcess=$True)]
 Param(
 [Parameter(Mandatory=$true)]
+[string]$SnAdminPath,
+[Parameter(Mandatory=$true)]
 [string]$PackagePath, 
 [Parameter(Mandatory=$false)]
 [string[]]$Parameters
 )
 
-$ProjectSnAdminFilePath = Get-FullPath $GlobalSettings.Project.SnAdminFilePath
-write-host $ProjectSnAdminFilePath 
-$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
-write-host $Output 
-Write-Verbose "$ProjectSnAdminFilePath $PackagePath $Parameters"
-& $ProjectSnAdminFilePath $PackagePath $Parameters | & $Output
-
+$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"} 
+Write-Verbose "Starting: $SnAdminPath $PackagePath $Parameters"
+& $SnAdminPath $PackagePath $Parameters | & $Output
+Write-Verbose "Completed: $SnAdminPath $PackagePath $Parameters"
 

@@ -1,20 +1,18 @@
 {
-  "Modes": {
-    "firstinstall": ["restorepckgs", "prbuild", "sninstall", "removedemo",  "prinstall", "setrepourl", "createsite", "sethost", "start"],
-	"fullinstall": [ "stop", "getlatest", "restorepckgs", "prbuild", "sninstall", "removedemo", "adminusers", "prinstall", "setrepourl", "createsite", "sethost", "start" ],
-	"updateproject": [ "stop", "getlatest", "restorepckgs", "prbuild", "prinstall", "setrepourl", "start" ],
-	"demoinstall": ["restorepckgs", "prbuild", "sninstall", "createsite", "sethost", "start"],
-	"deploy" : [ "initwebfolder", "deploywebfolder", "sninstall","createsite", "sethost", "start"],
-	"restoresite" : [ "testwebfolder", "restoredb", "setconfigs", "prindex", "createsite", "sethost", "start"]
+  "Plots": {
+    "fullinstall": [ "stop", "restorepckgs", "prbuild", "dropdb", "snservices", "snwebpages", "removedemo", "adminusers", "prinstall", "setrepourl", "index", "createsite", "sethost", "start" ],
+    "projectbackup": [ "stop", "backupdb", "start" ],
+    "restorelocal": [ "stop", "restoredb", "index", "setrepourl", "createsite", "sethost", "start" ],
+    "restoredeploy": [ "stop:Production", "restoredb:Production", "deploywebfolder:Production", "setconnection:Production", "prinstall:Production", "index:Production", "setrepourl:Production", "createsite:Production", "sethost:Production", "start:Production" ],
+    "fulldeploy": [ "stop:Production", "restorepckgs", "prbuild", "prasmdeploy:Production", "dropdb:Production", "snservices:Production", "snwebpages:Production", "removedemo:Production", "adminusers:Production", "prinstall:Production", "setrepourl:Production", "index:Production", "start:Production" ],
+    "prodexport": [ "export:Production" ]
   },
   "Tools": {
-    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe",
+    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer\\tf.exe",
     "UnZipperFilePath": "C:\\Program Files\\7-Zip\\7z.exe",
     "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
+    "NuGetSourceUrl": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
     "NuGetFolderPath": "..\\Tools\\nuget",
-	"NuGetSourceUrl": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
     "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
   }
-
-
 }

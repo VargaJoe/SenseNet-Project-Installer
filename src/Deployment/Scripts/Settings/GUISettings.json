@@ -3,7 +3,7 @@
     "settingsPath":"/PSscripts/Scripts/Settings/",
     "defaultInstallJSON": "project-default.json",
     "localInstallJSON": "project-local.json",
-    "myInstallJSON":"project-rorweb.json",
+    "myInstallJSON":"project-custom.json",
     "exitcodemagicword":"ExitCode:",
     "exitcodeErrorMsg":{
         "1":"General error.",

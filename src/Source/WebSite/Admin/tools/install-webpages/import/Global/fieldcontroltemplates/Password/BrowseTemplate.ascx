@@ -1,4 +1,0 @@
-<%@  Language="C#" EnableViewState="false" %>
-
-
-
