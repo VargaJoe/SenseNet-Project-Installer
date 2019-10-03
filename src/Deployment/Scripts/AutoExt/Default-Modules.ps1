@@ -575,7 +575,6 @@ Function Step-BackupDb {
 	catch {
 		$script:Result = 1
 	}
-	
 }
 
 Function Step-AutoBackupDb {
@@ -602,8 +601,7 @@ Function Step-AutoBackupDb {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
 
 Function Step-RestoreDb {
@@ -628,8 +626,7 @@ Function Step-RestoreDb {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
 
 Function Step-DropDb {
@@ -753,6 +750,7 @@ Function Step-DownloadDatabase {
 	
 }
 
+# Need a similar step with download template solution and create artifact for web template
 Function Step-DownloadWebPack {
 <#
 	.SYNOPSIS
@@ -884,66 +882,22 @@ function Step-WebAppOn {
 	}
 }
 
-Function Module-DbBackup {
-<#
+Function Step-WarmApp {
+	<#
 	.SYNOPSIS
-	Backup sql database
+	Warm up IIS site
 	.DESCRIPTION
-	
-	#>
-	try {
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		$CurrentDateTime = Get-Date -format -yyyyMMdd-HHmm
-		$BackupName = "$InitialCatalog" + $CurrentDateTime + ".bak"
-		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
-		& $ScriptBaseFolderPath\Ops\Backup-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DatabaseBackupsFolderPath\$BackupName"
-		$script:Result = $LASTEXITCODE
-	}
-	catch {
-		$script:Result = 1
-	}
-	
-}
 
-Function Module-RestoreDb {
-<#
-	.SYNOPSIS
-	Restore sql database
-	.DESCRIPTION
-	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	$LASTEXITCODE = 0
 	try {
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
-		$DbBackupFilePath = Get-FullPath $GlobalSettings.Platform.DbBackupFilePath
-		& $ScriptBaseFolderPath\Ops\Restore-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DbBackupFilePath"
-		$script:Result = $LASTEXITCODE
-	}
-	catch {
-		$script:Result = 1
-	}
-	
-}
-
-Function Module-SetConfigs {
-<#
-	.SYNOPSIS
-	Set project configurations
-	.DESCRIPTION
-	
-	#>
-	# "LOGLEVEL:Console",
-	try {
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		# write-host $DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		# write-host $InitialCatalog
-		$PackagePath = Get-FullPath "..\Packages\SetConfigs"
-		# write-host $PackagePath
-		# write-host "$ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath $PackagePath -Parameters datasource:$DataSource initialcatalog:$InitialCatalog"
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath" -Parameters "datasource:$DataSource","initialcatalog:$InitialCatalog" 	
+		$siteName=$GlobalSettings."$Section".WebAppName
+		& $ScriptBaseFolderPath\Ops\warmup-Site.ps1 -siteName "$siteName"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -951,7 +905,9 @@ Function Module-SetConfigs {
 	}
 }
 
-Function Module-TestWebfolder {
+
+# Something experimental 
+Function Step-TestWebfolder {
 <#
 	.SYNOPSIS
 	Unzip webfolder package
@@ -965,25 +921,6 @@ Function Module-TestWebfolder {
 		Write-Verbose "SnWebfolderDestName: $ProjectWebFolderPath"
 		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebFolderFilePath" -destname "$ProjectWebFolderPath"
 		$script:Result = $LASTEXITCODE
-	}
-	catch {
-		$script:Result = 1
-	}
-	
-}
-
-
-Function Module-GetSettings {
-	<#
-	.SYNOPSIS
-	Get merged settings json
-	.DESCRIPTION
-
-	#>
-	try {
-		$script:JsonResult = $GlobalSettings 
-		# | ConvertTo-Json
-		$script:Result = 0
 	}
 	catch {
 		$script:Result = 1
