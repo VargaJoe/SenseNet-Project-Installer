@@ -33,49 +33,54 @@ a.       SQL Server Configuration Manager: we usually use a default server alias
 - Download and install the 7-Zip application from http://www.7-zip.org/.
 
 ## How to execute a "plot" 
-Mint korábban említettem, a megoldás előre meghatározott feladatok sorrendben történő végrehajtására van kihegyezve. Ezt a forgatókönyvet "plot"-nak nevezzük, egy végrehajtandó feladatot "step"-nek. Alapvetően - pl fejlesztőkörnyezet létrehozásakor vagy frissítésekor - a "plot" működés kap nagyobb szerepet. Ez az amivel a gyakran ismételt több lépésből álló feladat automatizálásával időt spórolhatunk. Ezek a forgatókönyvek a settings file-ban vannak deklarálva, ahol az adott plothoz tartozó lépések vannak rögzítve. Egy ilyen plot például az általáunk leggyakrabban hazsnált "fullinstall" is, ami gyakorlatilag nulláról felhúzza az adott projekthez szükséges sensenet site-ot. Ez például az alábbi lépésekből áll (ez persze projektenként változhat):
-- leállítja a site-ot (ha már korábban telepítve volt)
-- letölti a projektünkben deklarált nuget package-eket
-- előállítja a szükséges assembly-ket (a.k.a. build-eli a solution-t)
-- törli az adatbázist
-- létrehozza az adatbázist és feltelepíti az sn services-t 
-- feltelepíti az sn webpages-t
-- törli a demo tartalmakat
-- előre definiált usereket injektál a repoba
-- telepíti a projekt custom tartalmait
-- beregisztrálja a projekthez meghatározott url-eket a repo megfelelő site-jaihoz
-- populálja a lucene index-et
-- létrehozza az IIS site-ot
-- felveszi a lokál gép host file-jába a definiált url-eket
-- elindítja az IIS site-ot
-  
-Kis áttekintő után nézzük, hogy is kell futtatni. Ha az adott projekthez minden beállítás megfelelően elő van készítve és a futtatáshoz szükséges előfeltételek teljesülnek, az adott fejlesztőnek, tegyük fel most csatlakozott a projekthez, nincs más feladata, mint leszedni a kódot, nyitni egy powershell ablakot, majd futtatni az alábbi kódot:
+As it was mentioned earlier, the solutions main goal is to do specified tasks syncronously. The scenario names "plot" the executable task is the "step". Since in most of the cases "plot" makes it possibel to automate tasks with multiple steps, saving us time, in basic scenarios (e.g. creating or updating the development enviroment) the "plot" plays the bigger role. These scenarios are declared in the settings file storing the steps of related plot. 'fullinstall' is a good example for that, installing sensenet from schratch configured for the specified project. This plot is made up from the following steps (may be different from project to project of course):
+- stops the site (if it was installed before)
+- downloads the nuget packages that are declared in the project
+- creates the needed assembly files (e.g. it builds the solution)
+- clears the database
+- creates the new database and installs the [sn-services](https://github.com/SenseNet/sensenet) package
+- installs [sn-webpages](https://github.com/SenseNet/sn-webpages)
+- removes demo content
+- adds predefined users to the repository
+- installs custom, project related content
+- sets the project-specific urls on the related site's of the repository
+- populates lucene index
+- creates the site in IIS
+- adds the defined urls into the HOST file of the local machine
+- starts the IIS site 
+
+After this quick overview, see how it should be executed actually. If a project is well-configured and prepared and all the prerequisites for executing are fulfilled, the developer - who let's say you've just joined the project - has only need to get the code, open a powershell window and execute the following code:
+
 ```powershell
 .\Run.ps1 fullinstall
 ```
 
-A fenti sor futtatni fogja a "fullinstall" forgatókönyvet a "Project" beállításra a "local" settingsből. Magyarul felhúzza lokálban a fejlesztő környezetet (esetünkben a sensenet site-ot).
-Ebben az esetben a script minimális visszajelzéssel fog futni, csak az jelenik meg, amit a segédprogramok visszaadnak. Ha bővebb információra lenne szükség, a script-ek összeállítói által fontosnak tartott visszajelzések a következő kiegészítéssel hívhatók elő:
+The code above will execute the "fullinstall" scenario for configure the "Project" with the "local" settings, which means it creates the local development enviroment (in this case a sensenet site).
+In this case the script will give you a minimal feedback, only those messages will shown that are returned from the helper tools. If you need further information the feedbacks considered important by the creators of the script can be reached with the following addition:
+
 ```powershell
 .\Run.ps1 fullinstall -Verbose
 ```
 
-Illetve, ha még a segédprogramok visszajelzéseit sem szeretnénk, akkor:
+And if you want to skip the feedback messages of the helper tools, then use:
+
 ```powershell
 .\Run.ps1 fullinstall -ShowOutput false
 ```
 
-A fenti példák előre definiált forgatókönyvek lokál környezetben való futtatásához elegendőek, de definiálhatunk egyedi forgatókönyveket, lokáltól eltérő környezeteket (pl teszt szerver), vagy akár kezelhetünk egyszerre több projektet is. Ehhez kicsit bővebben kell ismerni a paramétereket. A fenti második példa kifejtve például így néz ki:
+The examples above are sufficient only if we execute predefined scenarios in local enviroment, but we can also define custom scenarios, non-local enviroments (e.g. test server) or handle multiple projects. In this cases you have know the parameters a bit more. The second example above could be look like this:
+
 ```powershell
 .\Run.ps1 -Plot fullinstall:Project -Settings local -ShowOutput true -Verbose
 ```
 
-Tegyük fel tehát, hogy egy közös teszt szerverre szeretnénk update-elni a custom projekt tartalmakat a Custom nevű projektben, amihez külön settings file-t hoztunk létre, valahogy így nézne ki:
+Suppose that we want to update custom project content on a distributed test server in a project names 'Custom', that has a custom settings file which could be the following:
+
 ```powershell
 .\Run.ps1 -Plot updatetestsite -Settings custom -ShowOutput true -Verbose
 ```
 
-Ennek kifejtésébe most nem megyek bele, de a "Project Installer" szinte minden darabja bővíthető. Később ezekről is szó lesz.
+Almost all parts of the "Project Installer" is extendable, it will be discussed later.
 
 ## How to execute steps
 Már szó esett a forgatókönyv végrehajtandó lépéseiről. Egy forgatókönyv általában több lépést tartalmaz, de semmi sem gátol minket abban, hogy 1 lépést definiáljunk benne. Itt jegyezném meg, hogy a lépések direktben is meghívhatók, arra kell figyelnünk csupán, hogy a lépés és forgatókönyv neve nem lehet ugyanaz. Jelenleg, ha a végrehajtó logika nem talál az adott néven (-Plot valami) végrehajtandó forgatókönyvet, akkor keres egy ugyanolyan nevű lépést. Ha talál, akkor azt az egyet hajtja végre. Korábban a Plot paraméter más néven szerepelt, így kevésbé volt zavaró, szóval ez a működés később lehet, hogy szét lesz szedve. Vagy a közvetlen végrehajtás lesz megszüntetve, de egyelőre sokszor igen hasznosnak bizonyul ez a lehetőség, ez indítja el a folyamatot és ha szükséges itt ad vissztérési értéket a hívónak. 
