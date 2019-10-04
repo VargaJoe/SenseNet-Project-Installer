@@ -142,6 +142,25 @@ Function Step-PrBuild {
 	
 }
 
+Function Step-PrPublishTemplate {
+<#
+	.SYNOPSIS
+	Build Solution
+	.DESCRIPTION
+	
+	#>	
+	try {
+		$ProjectSolutionFilePath = Get-FullPath $GlobalSettings.Project.SolutionFilePath
+		& $ScriptBaseFolderPath\Dev\Publish-Solution.ps1 -slnPath $ProjectSolutionFilePath 
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
+}
+
+
 Function Step-SnInstall {
 <#
 	.SYNOPSIS
