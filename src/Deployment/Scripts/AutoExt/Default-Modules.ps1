@@ -94,8 +94,34 @@ Function Step-GetLatest {
 	catch {
 		$script:Result = 1
 	}
-	
+}
 
+Function Step-GetLatestVsTemplates {
+<#
+	.SYNOPSIS
+	Get Latest Version
+	.DESCRIPTION
+	Initiate a Getlatest process on TFS
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
+	Write-Output "Visual Studio solution templates fetched from GitHub"
+	try {
+		$VsTemplatesRepo = $GlobalSettings.Source.VsTemplatesRepo
+		$TemplatesClonePath = $GlobalSettings.Source.TemplatesClonePath
+		Write-Output "Use github repo as source: $VsTemplatesRepo"
+		Write-Output "Repository will be cloned here: $VsTemplatesRepo"
+		# $GitExePath = Get-FullPath $GlobalSettings.Tools.Git
+		& $ScriptBaseFolderPath\Dev\Download-VsTemplates.ps1 -Url "$VsTemplatesRepo" -TargetPath "$TemplatesClonePath" 
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
 }
 
 Function Step-RestorePckgs {
@@ -138,45 +164,24 @@ Function Step-PrBuild {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
 
-Function Step-PrPublishTemplate {
+Function Step-CrArtifact {
 <#
 	.SYNOPSIS
-	Build Solution
+	Build Solution and create artifact
 	.DESCRIPTION
 	
 	#>	
 	try {
 		$ProjectSolutionFilePath = Get-FullPath $GlobalSettings.Project.SolutionFilePath
-		& $ScriptBaseFolderPath\Dev\Publish-Solution.ps1 -slnPath $ProjectSolutionFilePath 
+		& $ScriptBaseFolderPath\Dev\Create-Artifact.ps1 -slnPath $ProjectSolutionFilePath 
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
 		$script:Result = 1
-	}
-	
-}
-
-
-Function Step-SnInstall {
-<#
-	.SYNOPSIS
-	Sensenet install
-	.DESCRIPTION
-	
-	#>
-	try {
-		Step-SnServices
-		Step-SnWebPages
-		$script:Result = $LASTEXITCODE
-	}
-	catch {
-		$script:Result = 1
-	}
-	
+	}	
 }
 
 Function Step-SnServices {
@@ -392,6 +397,45 @@ Function Step-SetHost {
 Function Step-DeployWebFolder {
 <#
 	.SYNOPSIS
+	Copy starter webfolder to destination from template
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$LASTEXITCODE = 0
+		Write-Output "`r`nCopy webfolder files from package to destination"
+		$TemplateWebfolderPath = Get-FullPath $GlobalSettings.Source.TemplateWebFolderPath
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		Write-Output "Source: $TemplateWebfolderPath"
+		Write-Output "Target: $ProjectWebFolderPath"		
+		
+		if (-not(Test-Path $ProjectWebFolderPath)) {
+			$parentPath = $ProjectWebFolderPath | split-path -parent
+			$folderName = $ProjectWebFolderPath | split-path -leaf		
+			Write-Output "Create target webfolder"
+			Write-Output "`twith name: $folderName"
+			Write-Output "`tunder: $parentPath"
+			New-Item -Path "$parentPath" -Name "$folderName" -ItemType "directory"
+		}	
+		
+		Copy-Item -Path "$TemplateWebfolderPath/*" -Destination "$ProjectWebFolderPath" -recurse -Force
+		$script:Result = $LASTEXITCODE		
+	}
+	catch {
+		Write-Output "`tSomething went wrong: $_"
+		$script:Result = 1
+	}	
+}
+
+Function Step-DeployWebFolderFromZip {
+<#
+	.SYNOPSIS
 	Copy starter webfolder to detination / untested
 	.DESCRIPTION
 	
@@ -399,7 +443,7 @@ Function Step-DeployWebFolder {
 	[CmdletBinding(SupportsShouldProcess=$True)]
 		Param(
 		[Parameter(Mandatory=$false)]
-		[string]$Section="Production"
+		[string]$Section="Project"
 		)
 	
 	try {
@@ -413,8 +457,7 @@ Function Step-DeployWebFolder {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
 
 # ================================================

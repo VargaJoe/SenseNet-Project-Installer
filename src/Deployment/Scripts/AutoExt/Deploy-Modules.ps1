@@ -79,6 +79,5 @@ Function Step-PrAsmDeploy {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
