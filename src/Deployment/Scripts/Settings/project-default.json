@@ -5,7 +5,16 @@
     "restorelocal": [ "stop", "restoredb", "index", "setrepourl", "createsite", "sethost", "start" ],
     "restoredeploy": [ "stop:Production", "restoredb:Production", "deploywebfolder:Production", "setconnection:Production", "prinstall:Production", "index:Production", "setrepourl:Production", "createsite:Production", "sethost:Production", "start:Production" ],
     "fulldeploy": [ "stop:Production", "restorepckgs", "prbuild", "prasmdeploy:Production", "dropdb:Production", "snservices:Production", "snwebpages:Production", "removedemo:Production", "adminusers:Production", "prinstall:Production", "setrepourl:Production", "index:Production", "start:Production" ],
-    "prodexport": [ "export:Production" ]
+    "prodexport": [ "export:Production" ],
+	"newinstall": [ "getlatestvstemplates", "restorepckgs", "crartifact", "deploywebFolder", "dropdb", "snservices", "createsite", "sethost", "start" ]
+  },
+  "Source": {
+	"PackagesPath": 		"..\\Packages\\",
+	"DbBackupFilePath": 	"..\\Databases\\project-latest.bak",
+	"DatabasesPath": 		"..\\Databases\\",
+	"VsTemplatesRepo": 		"https://github.com/SenseNet/sn-vs-projecttemplates",
+	"TemplatesClonePath": 	"..\\..\\Templates",
+	"TemplateWebFolderPath":"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication\\obj\\Release\\Package\\PackageTmp"
   },
   "Tools": {
     "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer\\tf.exe",

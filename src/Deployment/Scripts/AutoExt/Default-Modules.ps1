@@ -94,8 +94,34 @@ Function Step-GetLatest {
 	catch {
 		$script:Result = 1
 	}
-	
+}
 
+Function Step-GetLatestVsTemplates {
+<#
+	.SYNOPSIS
+	Get Latest Version
+	.DESCRIPTION
+	Initiate a Getlatest process on TFS
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
+	Write-Output "Visual Studio solution templates fetched from GitHub"
+	try {
+		$VsTemplatesRepo = $GlobalSettings.Source.VsTemplatesRepo
+		$TemplatesClonePath = $GlobalSettings.Source.TemplatesClonePath
+		Write-Output "Use github repo as source: $VsTemplatesRepo"
+		Write-Output "Repository will be cloned here: $VsTemplatesRepo"
+		# $GitExePath = Get-FullPath $GlobalSettings.Tools.Git
+		& $ScriptBaseFolderPath\Dev\Download-VsTemplates.ps1 -Url "$VsTemplatesRepo" -TargetPath "$TemplatesClonePath" 
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
 }
 
 Function Step-RestorePckgs {
@@ -138,26 +164,24 @@ Function Step-PrBuild {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
 
-Function Step-SnInstall {
+Function Step-CrArtifact {
 <#
 	.SYNOPSIS
-	Sensenet install
+	Build Solution and create artifact
 	.DESCRIPTION
 	
-	#>
+	#>	
 	try {
-		Step-SnServices
-		Step-SnWebPages
+		$ProjectSolutionFilePath = Get-FullPath $GlobalSettings.Project.SolutionFilePath
+		& $ScriptBaseFolderPath\Dev\Create-Artifact.ps1 -slnPath $ProjectSolutionFilePath 
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
 
 Function Step-SnServices {
@@ -373,6 +397,45 @@ Function Step-SetHost {
 Function Step-DeployWebFolder {
 <#
 	.SYNOPSIS
+	Copy starter webfolder to destination from template
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$LASTEXITCODE = 0
+		Write-Output "`r`nCopy webfolder files from package to destination"
+		$TemplateWebfolderPath = Get-FullPath $GlobalSettings.Source.TemplateWebFolderPath
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		Write-Output "Source: $TemplateWebfolderPath"
+		Write-Output "Target: $ProjectWebFolderPath"		
+		
+		if (-not(Test-Path $ProjectWebFolderPath)) {
+			$parentPath = $ProjectWebFolderPath | split-path -parent
+			$folderName = $ProjectWebFolderPath | split-path -leaf		
+			Write-Output "Create target webfolder"
+			Write-Output "`twith name: $folderName"
+			Write-Output "`tunder: $parentPath"
+			New-Item -Path "$parentPath" -Name "$folderName" -ItemType "directory"
+		}	
+		
+		Copy-Item -Path "$TemplateWebfolderPath/*" -Destination "$ProjectWebFolderPath" -recurse -Force
+		$script:Result = $LASTEXITCODE		
+	}
+	catch {
+		Write-Output "`tSomething went wrong: $_"
+		$script:Result = 1
+	}	
+}
+
+Function Step-DeployWebFolderFromZip {
+<#
+	.SYNOPSIS
 	Copy starter webfolder to detination / untested
 	.DESCRIPTION
 	
@@ -380,7 +443,7 @@ Function Step-DeployWebFolder {
 	[CmdletBinding(SupportsShouldProcess=$True)]
 		Param(
 		[Parameter(Mandatory=$false)]
-		[string]$Section="Production"
+		[string]$Section="Project"
 		)
 	
 	try {
@@ -394,8 +457,7 @@ Function Step-DeployWebFolder {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
 
 # ================================================
@@ -575,7 +637,6 @@ Function Step-BackupDb {
 	catch {
 		$script:Result = 1
 	}
-	
 }
 
 Function Step-AutoBackupDb {
@@ -602,8 +663,7 @@ Function Step-AutoBackupDb {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
 
 Function Step-RestoreDb {
@@ -628,8 +688,7 @@ Function Step-RestoreDb {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
 
 Function Step-DropDb {
@@ -753,6 +812,7 @@ Function Step-DownloadDatabase {
 	
 }
 
+# Need a similar step with download template solution and create artifact for web template
 Function Step-DownloadWebPack {
 <#
 	.SYNOPSIS
@@ -884,66 +944,22 @@ function Step-WebAppOn {
 	}
 }
 
-Function Module-DbBackup {
-<#
+Function Step-WarmApp {
+	<#
 	.SYNOPSIS
-	Backup sql database
+	Warm up IIS site
 	.DESCRIPTION
-	
-	#>
-	try {
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		$CurrentDateTime = Get-Date -format -yyyyMMdd-HHmm
-		$BackupName = "$InitialCatalog" + $CurrentDateTime + ".bak"
-		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
-		& $ScriptBaseFolderPath\Ops\Backup-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DatabaseBackupsFolderPath\$BackupName"
-		$script:Result = $LASTEXITCODE
-	}
-	catch {
-		$script:Result = 1
-	}
-	
-}
 
-Function Module-RestoreDb {
-<#
-	.SYNOPSIS
-	Restore sql database
-	.DESCRIPTION
-	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	$LASTEXITCODE = 0
 	try {
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		$DatabaseBackupsFolderPath = Get-FullPath $GlobalSettings.Sources.DatabasesPath
-		$DbBackupFilePath = Get-FullPath $GlobalSettings.Platform.DbBackupFilePath
-		& $ScriptBaseFolderPath\Ops\Restore-Db.ps1 -Server "$DataSource" -Catalog "$InitialCatalog" -FileName "$DbBackupFilePath"
-		$script:Result = $LASTEXITCODE
-	}
-	catch {
-		$script:Result = 1
-	}
-	
-}
-
-Function Module-SetConfigs {
-<#
-	.SYNOPSIS
-	Set project configurations
-	.DESCRIPTION
-	
-	#>
-	# "LOGLEVEL:Console",
-	try {
-		$DataSource=$GlobalSettings.DataBase.DataSource
-		# write-host $DataSource
-		$InitialCatalog=$GlobalSettings.DataBase.InitialCatalog 
-		# write-host $InitialCatalog
-		$PackagePath = Get-FullPath "..\Packages\SetConfigs"
-		# write-host $PackagePath
-		# write-host "$ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath $PackagePath -Parameters datasource:$DataSource initialcatalog:$InitialCatalog"
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -PackagePath "$PackagePath" -Parameters "datasource:$DataSource","initialcatalog:$InitialCatalog" 	
+		$siteName=$GlobalSettings."$Section".WebAppName
+		& $ScriptBaseFolderPath\Ops\warmup-Site.ps1 -siteName "$siteName"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -951,7 +967,9 @@ Function Module-SetConfigs {
 	}
 }
 
-Function Module-TestWebfolder {
+
+# Something experimental 
+Function Step-TestWebfolder {
 <#
 	.SYNOPSIS
 	Unzip webfolder package
@@ -965,25 +983,6 @@ Function Module-TestWebfolder {
 		Write-Verbose "SnWebfolderDestName: $ProjectWebFolderPath"
 		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebFolderFilePath" -destname "$ProjectWebFolderPath"
 		$script:Result = $LASTEXITCODE
-	}
-	catch {
-		$script:Result = 1
-	}
-	
-}
-
-
-Function Module-GetSettings {
-	<#
-	.SYNOPSIS
-	Get merged settings json
-	.DESCRIPTION
-
-	#>
-	try {
-		$script:JsonResult = $GlobalSettings 
-		# | ConvertTo-Json
-		$script:Result = 0
 	}
 	catch {
 		$script:Result = 1
