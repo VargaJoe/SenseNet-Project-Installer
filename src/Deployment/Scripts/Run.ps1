@@ -11,7 +11,9 @@ Param(
 [Parameter(Mandatory=$false)] 
 [string]$ShowOutput = $True,
 [Parameter(Mandatory=$false)] 
-[string]$OutputMode = "Host"
+[string]$OutputMode = "Host",
+[Parameter(Mandatory=$false)] 
+[string]$Help
 )
 
 $ErrorActionPreference = "Stop"
@@ -44,7 +46,21 @@ foreach ($file in $AutoLoadExtensionFiles) {
 	. "$file"
 }
 
- if (Is-Administrator) {
+if ($help -eq "steps") {
+	Write-Output "You can call steps* by the following syntaxt:"
+	Write-Output "`t.\Run.ps1 <stepname>"
+	Write-Output "`n*Please note that if there is a plot with similar name, it will triggered instead."
+	Write-Output "`nAvailable steps:"
+	foreach ($stepName in (Get-ChildItem function:\Step-*).Name.Substring(5)) {
+		Write-Output "`t$stepName"
+	}
+	exit
+}
+
+if (!$plot) {
+	exit
+} 
+elseif (Is-Administrator) {
 	# Load default settings
 	$defaultsettingspath = set-settingspath -settingname "default"
 	Write-Log "default setting path: $defaultsettingspath"
@@ -62,7 +78,7 @@ foreach ($file in $AutoLoadExtensionFiles) {
 	$GlobalSettings = Steps-Settings -setting $GlobalSettings
 	
 	# Run given process
-	Run-Steps "$Plot"  
+	Run-Steps "$Plot"  	  
 
 	$Global:JsonResult=$JsonResult
 } else {
