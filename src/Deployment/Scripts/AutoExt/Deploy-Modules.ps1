@@ -79,5 +79,37 @@ Function Step-PrAsmDeploy {
 	}
 	catch {
 		$script:Result = 1
-	}	
+	}
+	
+}
+
+Function Step-PrLucDeploy {
+<#
+	.SYNOPSIS
+	Copy lucene to production 
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="DemoSiteNlb2"
+		)
+	
+	try {
+		$ProjectLucFolderPackPath = Get-FullPath $GlobalSettings.Project.LucFolderPath
+		$ProductionLucFolderPath = Get-FullPath $GlobalSettings."$Section".LucFolderPath
+		Write-Verbose "Source: $ProjectLucFolderPackPath"
+		Write-Verbose "Target: $ProductionLucFolderPath"
+		Write-Verbose "Remove old files from $ProductionLucFolderPath/* has been started..."
+		Remove-Item -Path "$ProductionLucFolderPath/*" -Recurse  
+		Write-Verbose "...and now copy files..."
+		Copy-Item -Path "$ProjectLucFolderPackPath/*" -Destination "$ProductionLucFolderPath" -Recurse -Force 
+		Write-Verbose "Done!"		
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+	
 }
