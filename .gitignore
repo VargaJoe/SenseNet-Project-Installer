@@ -3,7 +3,8 @@ src/Deployment/Tools/CTT/ctt.exe.config
 src/Deployment/Tools/7zip/license.txt
 src/Deployment/Tools/7zip/history.txt
 src/Deployment/Scripts/test.json
-src/Deployment/Packages/
+src/WebSitWithServices/
+src/WebSitWithWebpages/
 src/WebSite/
 test*
 
