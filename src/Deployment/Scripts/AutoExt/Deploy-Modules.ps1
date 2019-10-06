@@ -79,8 +79,7 @@ Function Step-PrAsmDeploy {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
 }
 
 Function Step-PrLucDeploy {
@@ -110,6 +109,71 @@ Function Step-PrLucDeploy {
 	}
 	catch {
 		$script:Result = 1
-	}
+	}	
+}
+
+Function Step-DeployWebFolder {
+	<#
+	.SYNOPSIS
+	Copy starter webfolder to destination from template
+	.DESCRIPTION
 	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$LASTEXITCODE = 0
+		Write-Output "`r`nCopy webfolder files from package to destination"
+		$TemplateWebfolderPath = Get-FullPath $GlobalSettings.Source.TemplateWebFolderPath
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		Write-Output "Source: $TemplateWebfolderPath"
+		Write-Output "Target: $ProjectWebFolderPath"		
+		
+		if (-not(Test-Path $ProjectWebFolderPath)) {
+			$parentPath = $ProjectWebFolderPath | split-path -parent
+			$folderName = $ProjectWebFolderPath | split-path -leaf		
+			Write-Output "Create target webfolder"
+			Write-Output "`twith name: $folderName"
+			Write-Output "`tunder: $parentPath"
+			New-Item -Path "$parentPath" -Name "$folderName" -ItemType "directory"
+		}	
+		
+		Copy-Item -Path "$TemplateWebfolderPath/*" -Destination "$ProjectWebFolderPath" -recurse -Force
+		$script:Result = $LASTEXITCODE		
+	}
+	catch {
+		Write-Output "`tSomething went wrong: $_"
+		$script:Result = 1
+	}	
+}
+
+Function Step-DeployWebFolderFromZip {
+<#
+	.SYNOPSIS
+	Copy starter webfolder to detination / untested
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		Write-Verbose "`r`nCopy webfolder files from package to destination"
+		$SnWebfolderPackPath = Get-FullPath $GlobalSettings.Source.SnWebFolderFilePath
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		Write-Verbose "Source: $SnWebfolderPackPath"
+		Write-Verbose "Target: $ProjectWebFolderPath"
+		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebfolderPackPath" -destname "$ProjectWebFolderPath"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}	
 }
