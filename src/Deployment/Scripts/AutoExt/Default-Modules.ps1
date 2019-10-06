@@ -114,7 +114,7 @@ Function Step-GetLatestVsTemplates {
 		$VsTemplatesRepo = $GlobalSettings.Source.VsTemplatesRepo
 		$TemplatesClonePath = $GlobalSettings.Source.TemplatesClonePath
 		Write-Output "Use github repo as source: $VsTemplatesRepo"
-		Write-Output "Repository will be cloned here: $VsTemplatesRepo"
+		Write-Output "Repository will be cloned here: $TemplatesClonePath"
 		# $GitExePath = Get-FullPath $GlobalSettings.Tools.Git
 		& $ScriptBaseFolderPath\Dev\Download-VsTemplates.ps1 -Url "$VsTemplatesRepo" -TargetPath "$TemplatesClonePath" 
 		$script:Result = $LASTEXITCODE
