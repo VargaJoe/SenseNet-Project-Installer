@@ -1,0 +1,29 @@
+{
+  "Source": {
+  "DbBackupFilePath": 	"..\\Databases\\project-services.bak",
+  "TemplateWebFolderPath":"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+  "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication.sln",
+  "SnWebFolderFilePath": 	"..\\Archives\\project-services.zip"
+  },
+  "Project": {
+	"DataSource": 			"MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": 		"projectservices",
+	"WebAppName": 			"projectservices",
+    "AppPoolName": 			"projectservices",
+	"Hosts": 				[ "projectservices" ],
+    "DotNetVersion": 		"v4.0",
+    "SourceFolderPath": 	"..\\..\\",
+    "WebFolderPath": 		"..\\..\\WebSitWithServices",
+	"AsmFolderPath": 		"..\\..\\WebSitWithServices\\bin",
+	"WebConfigFilePath": 	"..\\..\\WebSitWithServices\\web.config",
+	"SnAdminFilePath": 		"..\\..\\WebSitWithServices\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\..\\WebSitWithServices\\Tools",
+	"SnAdminRCFilePath": 	"..\\..\\WebSitWithServices\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\..\\WebSitWithServices\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\..\\WebSitWithServices\\Tools\\import.exe",
+	"ExporterPath": 		"..\\..\\WebSitWithServices\\Tools\\export.exe",														
+	"RepoFsFolderPath": 	"..\\..\\WebSitWithServices\\Root",
+	"DeployFolderPath": 	"..\\..\\WebSitWithServices\\deploy",
+    "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication.sln"
+  }
+}
