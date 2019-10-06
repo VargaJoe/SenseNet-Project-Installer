@@ -1,50 +1,29 @@
 {
-	"Plots": {
-		"testinstall": [ "stop", "restorepckgs", "prbuild", "snservices", "snwebpages", "setrepourl:Demo", "createsite", "sethost", "start" ]
-	  },
-  "Demo": {
-	"Hosts": 				[ "Default_Site:project" ],
-	"SnAdminFilePath": 		"..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe"
+  "Source": {
+  "DbBackupFilePath": 	"..\\Databases\\project-services.bak",
+  "TemplateWebFolderPath":"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+  "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication.sln",
+  "SnWebFolderFilePath": 	"..\\Archives\\project-services.zip"
   },
   "Project": {
 	"DataSource": 			"MySenseNetContentRepositoryDatasource",
-    "InitialCatalog": 		"project",
-	"WebAppName": 			"project",
-    "AppPoolName": 			"project",
-	"Hosts": 				[ "project", "sn7.sn.hu" ],
+    "InitialCatalog": 		"projectservices",
+	"WebAppName": 			"projectservices",
+    "AppPoolName": 			"projectservices",
+	"Hosts": 				[ "projectservices" ],
     "DotNetVersion": 		"v4.0",
     "SourceFolderPath": 	"..\\..\\",
-    "WebFolderPath": 		"..\\..\\WebSite",
-	"AsmFolderPath": 		"..\\..\\WebSite\\bin",
-	"WebConfigFilePath": 	"..\\..\\WebSite\\web.config",
-	"SnAdminFilePath": 		"..\\..\\WebSite\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": 		"..\\..\\WebSite\\Tools",
-	"SnAdminRCFilePath": 	"..\\..\\WebSite\\Tools\\SnAdminRuntime.exe.config",
-	"IndexerPath": 			"..\\..\\WebSite\\Tools\\indexpopulator.exe",
-	"ImporterPath": 		"..\\..\\WebSite\\Tools\\import.exe",
-	"ExporterPath": 		"..\\..\\WebSite\\Tools\\export.exe",														
-	"RepoFsFolderPath": 	"..\\..\\WebSite\\Root",
-	"DeployFolderPath": 	"..\\..\\WebSite\\deploy",
+    "WebFolderPath": 		"..\\..\\WebSitWithServices",
+	"AsmFolderPath": 		"..\\..\\WebSitWithServices\\bin",
+	"WebConfigFilePath": 	"..\\..\\WebSitWithServices\\web.config",
+	"SnAdminFilePath": 		"..\\..\\WebSitWithServices\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\..\\WebSitWithServices\\Tools",
+	"SnAdminRCFilePath": 	"..\\..\\WebSitWithServices\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\..\\WebSitWithServices\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\..\\WebSitWithServices\\Tools\\import.exe",
+	"ExporterPath": 		"..\\..\\WebSitWithServices\\Tools\\export.exe",														
+	"RepoFsFolderPath": 	"..\\..\\WebSitWithServices\\Root",
+	"DeployFolderPath": 	"..\\..\\WebSitWithServices\\deploy",
     "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication.sln"
-  },
-  "Production": {
-	"DataSource": 			"MySenseNetContentRepositoryDatasource",
-    "InitialCatalog": 		"projectlive",
-	"WebAppName": 			"projectlive",
-    "AppPoolName": 			"projectlive",
-	"Hosts": 				[ "projectlive" ],
-    "DotNetVersion": 		"v4.0",
-	"MachineName": 			"remotemachine",																		
-    "WebFolderPath": 		"\\\\remotemachine\\web\\projectlivewebfolder",
-	"AsmFolderPath": 		"\\\\remotemachine\\web\\projectlivewebfolder\\bin",
-	"WebConfigFilePath": 	"\\\\remotemachine\\web\\projectlivewebfolder\\web.config",
-	"SnAdminFilePath": 		"\\\\remotemachine\\web\\projectlivewebfolder\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": 		"\\\\remotemachine\\web\\projectlivewebfolder\\Tools",
-	"SnAdminRCFilePath": 	"\\\\remotemachine\\web\\projectlivewebfolder\\Tools\\SnAdminRuntime.exe.config",
-	"IndexerPath": 			"\\\\remotemachine\\Web\\projectlivewebfolder\\Tools\\indexpopulator.exe",
-    "ImporterPath": 		"\\\\remotemachine\\Web\\projectlivewebfolder\\Tools\\import.exe",
-    "ExporterPath": 		"\\\\remotemachine\\Web\\projectlivewebfolder\\Tools\\export.exe",
-    "RepoFsFolderPath": 	"\\\\remotemachine\\Web\\projectlivewebfolder\\Root",
-    "DeployFolderPath": 	"\\\\remotemachine\\Web\\projectlivewebfolder\\deploy"
- }
+  }
 }
