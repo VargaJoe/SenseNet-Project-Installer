@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package type="Tool">
+  <Id>SenseNet.Demo.SetAllowedOrigins</Id>
+  <Description>A tool for setting allowed cors origins.</Description>
+  <ReleaseDate>2017-08-01</ReleaseDate>
+  <Version>7.0.0</Version>
+  <Dependencies>
+    <Dependency id='SenseNet.Services' minVersion='7.0.0' />
+  </Dependencies>
+  <Steps>    
+	<StartRepository/>
+	<EditJson Path="/Root/System/Settings/Portal.settings">
+	{ 
+		AllowedOriginDomains: [ "localhost", "*.sensenet.com", "*.netlify.com", "sn-dms-demo-dev.netlify.com", "dms.demo.sensenet.com" ]
+	}
+	</EditJson>
+  </Steps>
+</Package>

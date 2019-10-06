@@ -1,0 +1,29 @@
+{
+  "Source": {
+	  "DbBackupFilePath": 	"..\\Databases\\project-services.bak",
+	  "TemplateWebFolderPath":"..\\..\\Templates\\src\\SnWebApplicationAllComponents\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+	  "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplicationAllComponents\\SnWebApplication.sln",
+	  "SnWebFolderFilePath": 	"..\\Archives\\project-services.zip"
+  },
+  "Project": {
+	"DataSource": 			"MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": 		"projectwithallcomponents",
+	"WebAppName": 			"projectwithallcomponents",
+    "AppPoolName": 			"projectwithallcomponents",
+	"Hosts": 				[ "projectwithallcomponents" ],
+    "DotNetVersion": 		"v4.0",
+    "SourceFolderPath": 	"..\\..\\",
+    "WebFolderPath": 		"..\\..\\WebSitWithAllComponents",
+	"AsmFolderPath": 		"..\\..\\WebSitWithAllComponents\\bin",
+	"WebConfigFilePath": 	"..\\..\\WebSitWithAllComponents\\web.config",
+	"SnAdminFilePath": 		"..\\..\\WebSitWithAllComponents\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\..\\WebSitWithAllComponents\\Tools",
+	"SnAdminRCFilePath": 	"..\\..\\WebSitWithAllComponents\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\..\\WebSitWithAllComponents\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\..\\WebSitWithAllComponents\\Tools\\import.exe",
+	"ExporterPath": 		"..\\..\\WebSitWithAllComponents\\Tools\\export.exe",														
+	"RepoFsFolderPath": 	"..\\..\\WebSitWithAllComponents\\Root",
+	"DeployFolderPath": 	"..\\..\\WebSitWithAllComponents\\deploy",
+    "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplicationAllComponents\\SnWebApplication.sln"
+  }
+}

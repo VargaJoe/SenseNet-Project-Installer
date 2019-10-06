@@ -81,6 +81,10 @@ Function Run-Steps {
 			Write-Log "Exit code: $Result" -foregroundcolor "green"
 			Write-Verbose "Exit code: $Result" 
 			Write-Log 
+			if (!($Result -eq 0)) {
+				Write-Verbose "Step failed, exiting.." 
+				exit $Result
+			}
 		}
 		Write-Log 
 		Write-Log "--------------------------------------------------"
@@ -405,30 +409,33 @@ function Get-MSBuild([switch]$xcopy = $false) {
 # Merge two json object
 Function Merge-Settings {
 	Param(
-		[Parameter(Mandatory=$True)]
-        [Object]$prior,
-		[Parameter(Mandatory=$True)]
-        [Object]$fallback
-		)
+		[Parameter(Mandatory = $True)]
+		[Object]$prior,
+		[Parameter(Mandatory = $True)]
+		[Object]$fallback
+	)
 	
+	# Iterate through default setting properties
 	foreach ($property in $fallback.psobject.Properties) {
+		# If property is found in project setting too, use the latter
 		if ($prior.PSObject.Properties.Match($property.Name).Count) {
-				# should be use with settings instead of hardcoded
-				$mergePropName = "Plots"   
-				# if prop exists and mergePropName we merge subproperties 
-				if ($property.Name -eq $mergePropName) {
-					$subobj = $prior."$mergePropName"
-					foreach ($subproperty in $property.Value.psobject.Properties) {
-						if (-Not $subobj.PSObject.Properties.Match($subproperty.Name).Count) {
-							$prior.Plots | Add-Member -MemberType NoteProperty -Name $subproperty.Name -Value $subproperty.Value
-						}
-					}
+			# should be use with settings instead of hardcoded
+			$mergePropName = $($property.Name)
+			# if prop exists and mergePropName we merge subproperties 
+			$subobj = $prior."$($mergePropName)"
+			# Iterate through default setting property's subproperties
+			foreach ($subproperty in $property.Value.psobject.Properties) {
+				# If found a missing subproperty in project setting then add to it 
+				if (-Not $subobj.PSObject.Properties.Match($subproperty.Name).Count) {
+					$prior."$($mergePropName)" | Add-Member -MemberType NoteProperty -Name $subproperty.Name -Value $subproperty.Value
 				}
-		} else {
-				$prior | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
+			}
+		}
+		else {
+			# If project setting not contains default property at all, add to it
+			$prior | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
 		}
 	}
-	
 	return $prior
 }
 
