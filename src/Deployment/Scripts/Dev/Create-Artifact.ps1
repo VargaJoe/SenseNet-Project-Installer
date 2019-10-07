@@ -12,8 +12,14 @@ $LASTEXITCODE = 0
 # $Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 
 if (!$msbuildPath) {
-	$vsWhere = "D:\development\work\SnInstallClientTest\Deployment\Tools\vswhere\vswhere.exe"
-	$msbuildPath = & "$vsWhere" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
+	$vsWhereFilePath = "..\Tools\vswhere\vswhere.exe"
+	Write-Verbose "The msbuild.exe path is missing, we try to locate it with $vsWhereFilePath"
+	if (Test-Path $vsWhereFilePath) {
+		$vsWhere = "..\Tools\vswhere\vswhere.exe"
+		$msbuildPath = & "$vsWhere" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
+	} else {
+		Write-Verbose "$vsWhereFilePath is missing too, please copy this file to the tools folder or fill out msbuild path in the settings"
+	}
 }
 
 Write-Verbose "================================================"
