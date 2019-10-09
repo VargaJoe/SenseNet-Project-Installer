@@ -258,13 +258,81 @@ Function Step-SnWebPages {
 	
 	try {
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
-		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-webpages" 
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-webpages" -ToolParameters "importdemo:true"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
 		$script:Result = 1
 	}
+}
+
+Function Step-SnWorkspaces {
+<#
+	.SYNOPSIS
+	Sensenet install workspaces
+	.DESCRIPTION
 	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
+	try {
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-workspaces" -ToolParameters "importdemo:true"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Step-SnWorkflow {
+<#
+	.SYNOPSIS
+	Sensenet install workflow
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
+	try {
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-workflow" -ToolParameters "importdemo:true"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Step-SnNotification {
+<#
+	.SYNOPSIS
+	Sensenet install notification
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
+	try {
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-notification" -ToolParameters "importdemo:true"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
 }
 
 Function Step-RemoveDemo {
@@ -446,7 +514,6 @@ Function Step-Import {
 	catch {
 		$script:Result = 1
 	}
-	
 }
 
 
