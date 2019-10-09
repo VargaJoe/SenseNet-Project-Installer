@@ -1,4 +1,7 @@
 {
+  "Plots": {
+	"fullinstall": [ "getlatestvstemplates", "restorepckgs", "crartifact", "deploywebFolder", "dropdb", "snservices", "snwebpages", "snworkspaces", "snworkflow", "snnotification", "snoauthgoogle", "snpreview", "snpreviewaspose", "setrepourl", "setcors", "createsite", "sethost", "start" ]
+  },
   "Source": {
 	  "DbBackupFilePath": 	"..\\Databases\\project-services.bak",
 	  "TemplateWebFolderPath":"..\\..\\Templates\\src\\SnWebApplicationAllComponents\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
@@ -10,7 +13,7 @@
     "InitialCatalog": 		"projectwithallcomponents",
 	"WebAppName": 			"projectwithallcomponents",
     "AppPoolName": 			"projectwithallcomponents",
-	"Hosts": 				[ "projectwithallcomponents" ],
+	"Hosts": 				[ "Default_Site:projectwithallcomponents" ],
     "DotNetVersion": 		"v4.0",
     "SourceFolderPath": 	"..\\..\\",
     "WebFolderPath": 		"..\\..\\WebSitWithAllComponents",
