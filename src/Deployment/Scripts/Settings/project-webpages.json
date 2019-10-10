@@ -1,0 +1,32 @@
+{
+  "Plots": {
+	"fullinstall": [ "getlatestvstemplates", "restorepckgs", "crartifact", "deploywebFolder", "dropdb", "snservices", "snwebpages", "setrepourl", "setcors", "createsite", "sethost", "start" ]
+  },
+  "Source": {
+  "DbBackupFilePath": 	"..\\Databases\\project-webpages.bak",
+  "TemplateWebFolderPath":"..\\..\\Templates\\src\\SnWebApplicationWithWebPages\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+  "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplicationWithWebPages\\SnWebApplication.sln",
+  "SnWebFolderFilePath": 	"..\\Archives\\project-webpages.zip"
+  },
+  "Project": {
+	"DataSource": 			"MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": 		"projectwithwebpages",
+	"WebAppName": 			"projectwithwebpages",
+    "AppPoolName": 			"projectwithwebpages",
+	"Hosts": 				[ "Default_Site:projectwithwebpages" ],
+    "DotNetVersion": 		"v4.0",
+    "SourceFolderPath": 	"..\\..\\",
+    "WebFolderPath": 		"..\\..\\WebSitWithWebpages",
+	"AsmFolderPath": 		"..\\..\\WebSitWithWebpages\\bin",
+	"WebConfigFilePath": 	"..\\..\\WebSitWithWebpages\\web.config",
+	"SnAdminFilePath": 		"..\\..\\WebSitWithWebpages\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\..\\WebSitWithWebpages\\Tools",
+	"SnAdminRCFilePath": 	"..\\..\\WebSitWithWebpages\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\..\\WebSitWithWebpages\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\..\\WebSitWithWebpages\\Tools\\import.exe",
+	"ExporterPath": 		"..\\..\\WebSitWithWebpages\\Tools\\export.exe",														
+	"RepoFsFolderPath": 	"..\\..\\WebSitWithWebpages\\Root",
+	"DeployFolderPath": 	"..\\..\\WebSitWithWebpages\\deploy",
+    "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplicationWithWebPages\\SnWebApplication.sln"
+  }
+}
