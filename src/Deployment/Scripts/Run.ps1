@@ -46,37 +46,60 @@ foreach ($file in $AutoLoadExtensionFiles) {
 	. "$file"
 }
 
+# Load default settings
+$defaultsettingspath = set-settingspath -settingname "default"
+Write-Log "default setting path: $defaultsettingspath"
+$DefaultSettings = load-settings -settingspath $defaultsettingspath
+
+# Load Project settings
+$projectsettingspath = set-settingspath $settings
+Write-Log "project setting path: $projectsettingspath"
+$ProjectSettings = load-settings -settingspath $projectsettingspath
+
+# Extend project settings with default
+$GlobalSettings = Merge-Settings -prior $ProjectSettings -fallback $DefaultSettings
+
+# Add steps section to settings
+$GlobalSettings = Steps-Settings -setting $GlobalSettings
+
 if ($help -eq "steps") {
 	Write-Output "You can call steps* by the following syntaxt:"
 	Write-Output "`t.\Run.ps1 <stepname>"
 	Write-Output "`n*Please note that if there is a plot with similar name, it will triggered instead."
 	Write-Output "`nAvailable steps:"
-	foreach ($stepName in (Get-ChildItem function:\Step-*).Name.Substring(5)) {
-		Write-Output "`t$stepName"
-	}
-	exit
+
+	# Set output field separator for this logic
+	$OFS = "`r`n`t- "
+
+	$GlobalSettings.Steps | ForEach-Object {
+		Write-Output "`t- $_"
+	}	
+
+	# Set back output field separator back to default
+	$OFS = " "
+
+	exit 0
+}
+
+if ($help -eq "plots") {
+	Write-Output "You can call plots by the following syntaxt:"
+	Write-Output "`t.\Run.ps1 <plotname>"
+	Write-Output "`nAvailable plots:"
+	# Set output field separator for this logic
+	$OFS = "`r`n`t- "
+	$GlobalSettings.Plots | ForEach-Object {
+		Write-Output "`t- $($_.psobject.properties.name)"		
+	}	
+	# Set back output field separator back to default
+	$OFS = " "
+
+	exit 0
 }
 
 if (!$plot) {
 	exit
 } 
 elseif (Is-Administrator) {
-	# Load default settings
-	$defaultsettingspath = set-settingspath -settingname "default"
-	Write-Log "default setting path: $defaultsettingspath"
-	$DefaultSettings = load-settings -settingspath $defaultsettingspath
-
-	# Load Project settings
-	$projectsettingspath = set-settingspath $settings
-	Write-Log "project setting path: $projectsettingspath"
-	$ProjectSettings = load-settings -settingspath $projectsettingspath
-
-	# Extend project settings with default
-	$GlobalSettings = Merge-Settings -prior $ProjectSettings -fallback $DefaultSettings
-	
-	# Add steps section to settings
-	$GlobalSettings = Steps-Settings -setting $GlobalSettings
-	
 	# Run given process
 	Run-Steps "$Plot"  	  
 
