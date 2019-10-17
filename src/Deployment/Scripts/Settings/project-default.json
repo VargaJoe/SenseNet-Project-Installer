@@ -16,9 +16,9 @@
   "DbBackupFileUrl": 		"",
 	"DatabasesPath": 		"..\\Databases\\",
 	"VsTemplatesRepo": 		"https://github.com/SenseNet/sn-vs-projecttemplates",
-	"TemplatesClonePath": 	"..\\..\\Templates",
-	"TemplateWebFolderPath":"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
-  "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication.sln",
+	"TemplatesClonePath": 	"..\\..\\deploytest\\Templates",
+	"TemplateWebFolderPath":"..\\..\\deploytest\\Templates\\src\\SnWebApplication\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+  "SolutionFilePath": 		"..\\..\\deploytest\\Templates\\src\\SnWebApplication\\SnWebApplication.sln",
   "SnWebFolderFilePath": 	"..\\Archives\\project-Web710.zip",
   "SnWebFolderFileUrl": 	"",
   "SnWebFolderPath": 		""
