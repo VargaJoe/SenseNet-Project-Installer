@@ -20,6 +20,7 @@ if (!$msbuildPath) {
 		Write-Verbose "Get update info from $vswhereSourceJsonUrl"
 		try {
 			# Get latest release information
+			[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 			$vswhereSourceJson = (Invoke-WebRequest $vswhereSourceJsonUrl | ConvertFrom-Json)
 
 			# technical Debt: array should be filtered

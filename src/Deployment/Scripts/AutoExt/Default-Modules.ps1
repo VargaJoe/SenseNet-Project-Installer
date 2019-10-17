@@ -1,35 +1,6 @@
 
 
 # ******************************************************************  Steps ******************************************************************
-Function Step-Test {
-	<#
-	.SYNOPSIS
-	Stop site
-	.DESCRIPTION
-	Stop IIS site and application pool
-	#>
-	try{
-		$ProjectSiteName = $GlobalSettings.IIS.WebAppName
-		& "$ScriptBaseFolderPath\Ops\Stop-IISSite.ps1" $ProjectSiteName
-		$script:ResultJson = @"
-			{
-				 "ExitCode": "$LASTEXITCODE"
-			}
-"@
-	}
-	catch {
-		$script:ResultJson = @"
-			{
-				 "ExitCode": 1,
-				"ErrorCode": "$ERRORLEVEL",
-				"ErrorMessage": "$_.Exception.Message"
-			   }
-"@
-	}
-	Json
-}
-
-
 Function Step-Stop {	
 	<#
 	.SYNOPSIS
