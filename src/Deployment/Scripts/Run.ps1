@@ -71,7 +71,7 @@ if ($help -eq "steps") {
 	# Set output field separator for this logic
 	$OFS = "`r`n`t- "
 
-	$GlobalSettings.Steps | ForEach-Object {
+	$GlobalSettings.Steps | Sort-Object | ForEach-Object {
 		Write-Output "`t- $_"
 	}	
 
@@ -85,13 +85,10 @@ if ($help -eq "plots") {
 	Write-Output "You can call plots by the following syntaxt:"
 	Write-Output "`t.\Run.ps1 <plotname>"
 	Write-Output "`nAvailable plots:"
-	# Set output field separator for this logic
-	$OFS = "`r`n`t- "
-	$GlobalSettings.Plots | ForEach-Object {
-		Write-Output "`t- $($_.psobject.properties.name)"		
-	}	
-	# Set back output field separator back to default
-	$OFS = " "
+
+	Get-Member -Type NoteProperty -InputObject $GlobalSettings.Plots | 
+		Sort-Object Name | 
+		% { Write-Output "`t- $($_.Name)" }
 
 	exit 0
 }
