@@ -8,7 +8,7 @@
     "prodexport": [ "stop:Production", "export:Production", "start:Production" ]
   },
   "Source": {
-  "PackagesPath": 		"..\\Packages\\",
+  "PackagesPath": 		"..\\Packages",
   "PackageFolderPath": 	"",
   "PackageName": 			"",
   "SourceFolderPath": 	"",

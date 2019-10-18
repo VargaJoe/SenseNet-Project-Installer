@@ -12,7 +12,7 @@ $LASTEXITCODE = 0
 # $Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 
 if (!$msbuildPath) {
-	$vsWhereFilePath = "..\Tools\vswhere\vswhere.exe"
+	$vsWhereFilePath = Get-FullPath "..\Tools\vswhere\vswhere.exe"
 	Write-Verbose "The msbuild.exe path is missing, we try to locate it with $vsWhereFilePath"
 	if (!(Test-Path $vsWhereFilePath)) {
 		Write-Verbose "$vsWhereFilePath is missing too, we will try to retrieve it from github..."

@@ -504,7 +504,6 @@ Function Step-Export {
 	try {
 		# & iisreset
 
-		$GETDate = Get-Date
 		$CurrentDateTime = Get-Date -format [yyyy-MM-dd-HH-mm-ss]
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
