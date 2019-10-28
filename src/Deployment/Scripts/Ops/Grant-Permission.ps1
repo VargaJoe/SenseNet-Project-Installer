@@ -34,3 +34,11 @@ Write-Verbose "Database: $Catalog"
 Write-Verbose "Rolename: $DBRole"
 Write-Verbose "Membername: $User"
 Invoke-Sqlcmd -ServerInstance "$DataSource" -Database "$Catalog" -Query "$ARS"
+
+$listOwnersQuery = "SELECT  members.name as 'members_name', roles.name as 'roles_name',roles.type_desc as 'roles_desc',members.type_desc a
+s 'members_desc' FROM sys.database_role_members rolemem INNER JOIN sys.database_principals roles ON rolemem.role_princip
+al_id = roles.principal_id INNER JOIN sys.database_principals members ON rolemem.member_principal_id = members.principal
+_id where roles.name = 'db_owner' ORDER BY members.name"
+
+Invoke-Sqlcmd -ServerInstance "$DataSource" -Database "$Catalog" -Query "$listOwnersQuery"
+ 

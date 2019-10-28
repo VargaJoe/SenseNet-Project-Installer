@@ -203,7 +203,7 @@ Function Step-SnServices {
 			}
 			
 			write-output "Username: $Username"
-			$params = $params,"username:$UserName","password:$UserPsw","dbusername:$DbUserName","dbpassword:$DbUserPsw" 
+			$params = $params + "username:$UserName","password:$UserPsw","dbusername:$DbUserName","dbpassword:$DbUserPsw" 
 		}
 		
 		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-services" -ToolParameters $params
