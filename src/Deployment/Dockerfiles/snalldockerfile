@@ -1,0 +1,14 @@
+FROM mcr.microsoft.com/dotnet/framework/aspnet:4.8 AS runtime
+
+# WORKDIR /inetpub/wwwroot
+# COPY ./ /inetpub/wwwroot/
+
+RUN New-Item c:\SNAPP -type directory
+COPY ./ /SNAPP/
+
+RUN Remove-WebSite -Name 'Default Web Site'
+RUN New-Website -Name 'SNDOCKER' -Port 80 -PhysicalPath 'c:\SNAPP' -ApplicationPool '.NET v4.5'
+
+RUN New-WebBinding -Name 'SNDOCKER' -IPAddress '*' -Port 80 -HostHeader 'projectwithwebpages'
+#CMD New-WebBinding -Name 'SNDOCKER' -IPAddress '*' -Port 80 -HostHeader $env:hostname
+

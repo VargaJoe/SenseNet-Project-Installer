@@ -1,0 +1,37 @@
+{
+  "Plots": {
+	"fullinstall": [ "getlatestvstemplates", "restorepckgs", "crartifact", "deploywebFolder", "dropdb", "snservices", "snwebpages", "setrepourl", "setcors", "createsite", "sethost", "start" ],
+	"dockinstall": [ "stop", "snservices", "snwebpages", "setrepourl", "setcors", "createsite", "sethost", "start" ]
+  },
+  "Source": {
+  "DbBackupFilePath": 		"..\\Databases\\project-webpages.bak",
+  "TemplateWebFolderPath":	"..\\..\\deploytest\\Templates\\src\\SnWebApplicationWithWebPagesDocker\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+  "SolutionFilePath": 		"..\\..\\deploytest\\Templates\\src\\SnWebApplicationWithWebPagesDocker\\SnWebApplication.sln",
+  "SnWebFolderFilePath": 	"..\\Archives\\project-webpages.zip"
+  },
+  "Project": {
+	"DataSource": 			"172.22.134.148",
+	"UserName": 			"sa",
+	"UserPsw": 				"QWEasd123%",
+	"DbUserName": 			"sa",
+	"DbUserPsw": 			"QWEasd123%",	
+    "InitialCatalog": 		"projectwithwebpagesdocker",
+	"WebAppName": 			"projectwithwebpagesdocker",
+    "AppPoolName": 			"projectwithwebpagesdocker",
+	"Hosts": 				[ "Default_Site:projectwithwebpagesdocker" ],
+    "DotNetVersion": 		"v4.0",
+    "SourceFolderPath": 	"..\\..\\deploytest\\",
+    "WebFolderPath": 		"..\\..\\deploytest\\WebSitWithWebpagesDocker",
+	"AsmFolderPath": 		"..\\..\\deploytest\\WebSitWithWebpagesDocker\\bin",
+	"WebConfigFilePath": 	"..\\..\\deploytest\\WebSitWithWebpagesDocker\\web.config",
+	"SnAdminFilePath": 		"..\\..\\deploytest\\WebSitWithWebpagesDocker\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\..\\deploytest\\WebSitWithWebpagesDocker\\Tools",
+	"SnAdminRCFilePath": 	"..\\..\\deploytest\\WebSitWithWebpagesDocker\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\..\\deploytest\\WebSitWithWebpagesDocker\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\..\\deploytest\\WebSitWithWebpagesDocker\\Tools\\import.exe",
+	"ExporterPath": 		"..\\..\\deploytest\\WebSitWithWebpagesDocker\\Tools\\export.exe",												
+	"RepoFsFolderPath": 	"..\\..\\deploytest\\WebSitWithWebpagesDocker\\Root",
+	"DeployFolderPath": 	"..\\..\\deploytest\\WebSitWithWebpagesDocker\\deploy",
+    "SolutionFilePath": 	"..\\..\\deploytest\\Templates\\src\\SnWebApplicationWithWebPagesDocker\\SnWebApplication.sln"
+  }
+}

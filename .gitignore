@@ -8,3 +8,4 @@ src/WebSitWithWebpages/
 src/WebSite/
 test*
 .vs/
+src/deploytest/
