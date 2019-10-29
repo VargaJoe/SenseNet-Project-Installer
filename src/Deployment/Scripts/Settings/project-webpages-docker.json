@@ -5,12 +5,12 @@
   },
   "Source": {
   "DbBackupFilePath": 		"..\\Databases\\project-webpages.bak",
-  "TemplateWebFolderPath":	"..\\..\\deploytest\\Templates\\src\\SnWebApplicationWithWebPagesDocker\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
-  "SolutionFilePath": 		"..\\..\\deploytest\\Templates\\src\\SnWebApplicationWithWebPagesDocker\\SnWebApplication.sln",
+  "TemplateWebFolderPath":	"..\\..\\deploytest\\Templates\\src\\SnWebApplicationWithWebPages\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+  "SolutionFilePath": 		"..\\..\\deploytest\\Templates\\src\\SnWebApplicationWithWebPages\\SnWebApplication.sln",
   "SnWebFolderFilePath": 	"..\\Archives\\project-webpages.zip"
   },
   "Project": {
-	"DataSource": 			"172.22.134.148",
+	"DataSource": 			"172.21.237.87",
 	"UserName": 			"sa",
 	"UserPsw": 				"QWEasd123%",
 	"DbUserName": 			"sa",
@@ -32,6 +32,29 @@
 	"ExporterPath": 		"..\\..\\deploytest\\WebSitWithWebpagesDocker\\Tools\\export.exe",												
 	"RepoFsFolderPath": 	"..\\..\\deploytest\\WebSitWithWebpagesDocker\\Root",
 	"DeployFolderPath": 	"..\\..\\deploytest\\WebSitWithWebpagesDocker\\deploy",
-    "SolutionFilePath": 	"..\\..\\deploytest\\Templates\\src\\SnWebApplicationWithWebPagesDocker\\SnWebApplication.sln"
+    "SolutionFilePath": 	"..\\..\\deploytest\\Templates\\src\\SnWebApplicationWithWebPages\\SnWebApplication.sln"
+  },
+  "container": {
+  	"DataSource": 			"172.21.237.87",
+	"UserName": 			"sa",
+	"UserPsw": 				"QWEasd123%",
+	"DbUserName": 			"sa",
+	"DbUserPsw": 			"QWEasd123%",
+    "InitialCatalog": 		"projectwithwebpagesdocker",
+	"WebAppName": 			"projectwithwebpagesdocker",
+    "AppPoolName": 			"projectwithwebpagesdocker",
+	"Hosts": 				[ "Default_Site:projectwithwebpagesdocker" ],
+    "DotNetVersion": 		"v4.0",
+    "WebFolderPath": 		"..\\..\\snapp",
+	"AsmFolderPath": 		"..\\..\\snapp\\bin",
+	"WebConfigFilePath": 	"..\\..\\snapp\\web.config",
+	"SnAdminFilePath": 		"..\\..\\snapp\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\..\\snapp\\Tools",
+	"SnAdminRCFilePath": 	"..\\..\\snapp\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\..\\snapp\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\..\\snapp\\Tools\\import.exe",
+	"ExporterPath": 		"..\\..\\snapp\\Tools\\export.exe",												
+	"RepoFsFolderPath": 	"..\\..\\snapp\\Root",
+	"DeployFolderPath": 	"..\\..\\snapp\\deploy"
   }
 }

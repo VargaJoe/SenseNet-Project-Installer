@@ -874,13 +874,20 @@ function Step-WebAppOff {
 		[string]$Section="Project"
 		)
 	
+	$LASTEXITCODE = 0
 	try {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
 		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
-		if ([System.IO.File]::Exists($AppOnlineFilePath)){
+		if ([System.IO.File]::Exists($AppOfflineFilePath)){
+			Write-Output "Appoffline already activated"			
+		} elseif ([System.IO.File]::Exists($AppOnlineFilePath)){
 			Rename-Item $AppOnlineFilePath app_offline.htm
-		}
+		} else {
+			Write-Output "Appoffline file does not exists, let's create one at $AppOfflineFilePath"
+			& echo "<p>We&#39;re currently undergoing scheduled maintenance. We will come back very shortly. Please check back in fifteen minutes. Thank you for your patience.</p>" > $AppOfflineFilePath
+		}		
+		
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -901,6 +908,7 @@ function Step-WebAppOn {
 		[string]$Section="Project"
 		)
 	
+	$LASTEXITCODE = 0
 	try {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
