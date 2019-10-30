@@ -1,4 +1,5 @@
 src/Source/
+src/deploytest/
 src/Deployment/Tools/CTT/ctt.exe.config
 src/Deployment/Tools/7zip/license.txt
 src/Deployment/Tools/7zip/history.txt
