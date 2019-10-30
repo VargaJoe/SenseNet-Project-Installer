@@ -733,7 +733,7 @@ Function Step-GetSettings {
 	}
 }
 
-Function Step-SetConnection {
+Function Step-SetConnectionOld {
 <#
 	.SYNOPSIS
 	Set project configurations
@@ -753,6 +753,40 @@ Function Step-SetConnection {
 		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
 		& $ScriptBaseFolderPath\Deploy\Set-Connection.ps1 -ConfigFilePath "$aConfigFilePath" -DataSource "$DataSource" -InitialCatalog "$InitialCatalog" 
 		& $ScriptBaseFolderPath\Deploy\Set-Connection.ps1 -ConfigFilePath "$wConfigFilePath" -DataSource "$DataSource" -InitialCatalog "$InitialCatalog" 
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Step-SetConnection {
+<#
+	.SYNOPSIS
+	Set connection strings
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
+	try {
+		$PackagesPath = Get-FullPath $GlobalSettings.Source.PackagesPath
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		$PackagePath = Get-FullPath "$PackagesPath\SetConnection"
+
+		$DataSource=$GlobalSettings."$Section".DataSource
+		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
+	
+		$UserName = $GlobalSettings."$Section".UserName
+		$UserPsw = $GlobalSettings."$Section".UserPsw
+		
+		$params = "datasource:$DataSource","initialcatalog:$InitialCatalog","username:$UserName","password:$UserPsw"
+
+		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath "$SnAdminPath" -PackagePath "$PackagePath" -Parameters $params
 		$script:Result = $LASTEXITCODE
 	}
 	catch {

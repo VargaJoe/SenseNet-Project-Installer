@@ -3,12 +3,24 @@ FROM mcr.microsoft.com/dotnet/framework/aspnet:4.8 AS runtime
 # WORKDIR /inetpub/wwwroot
 # COPY ./ /inetpub/wwwroot/
 
-RUN New-Item c:\SNAPP -type directory
-COPY ./ /SNAPP/
+# Create webapp custom folder
+RUN New-Item c:\web\SNAPP -type directory
 
+# Deploy webfolder 
+COPY ./ /web/SNAPP/
+
+# Add permission to users
+RUN ICACLS c:\web\SNAPP /grant 'IIS AppPool\DefaultAppPool:F' /T
+RUN ICACLS c:\web\SNAPP /grant 'NT AUTHORITY\NETWORK SERVICE:F' /T
+RUN ICACLS c:\web\SNAPP /grant 'NT AUTHORITY\iusr:F' /T
+
+# Remove default website
 RUN Remove-WebSite -Name 'Default Web Site'
-RUN New-Website -Name 'SNDOCKER' -Port 80 -PhysicalPath 'c:\SNAPP' -ApplicationPool '.NET v4.5'
 
+# Create custom website
+RUN New-Website -Name 'SNDOCKER' -Port 80 -PhysicalPath 'c:\web\SNAPP' -ApplicationPool '.NET v4.5'
+
+# add binding
 RUN New-WebBinding -Name 'SNDOCKER' -IPAddress '*' -Port 80 -HostHeader 'projectwithwebpages'
 #CMD New-WebBinding -Name 'SNDOCKER' -IPAddress '*' -Port 80 -HostHeader $env:hostname
 

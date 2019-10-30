@@ -10,7 +10,7 @@
   "SnWebFolderFilePath": 	"..\\Archives\\project-webpages.zip"
   },
   "Project": {
-	"DataSource": 			"172.21.237.87",
+	"DataSource": 			"172.21.232.240",
 	"UserName": 			"sa",
 	"UserPsw": 				"QWEasd123%",
 	"DbUserName": 			"sa",
@@ -35,7 +35,7 @@
     "SolutionFilePath": 	"..\\..\\deploytest\\Templates\\src\\SnWebApplicationWithWebPages\\SnWebApplication.sln"
   },
   "container": {
-  	"DataSource": 			"172.21.237.87",
+  	"DataSource": 			"172.21.232.240",
 	"UserName": 			"sa",
 	"UserPsw": 				"QWEasd123%",
 	"DbUserName": 			"sa",
@@ -45,16 +45,16 @@
     "AppPoolName": 			"projectwithwebpagesdocker",
 	"Hosts": 				[ "Default_Site:projectwithwebpagesdocker" ],
     "DotNetVersion": 		"v4.0",
-    "WebFolderPath": 		"..\\..\\snapp",
-	"AsmFolderPath": 		"..\\..\\snapp\\bin",
-	"WebConfigFilePath": 	"..\\..\\snapp\\web.config",
-	"SnAdminFilePath": 		"..\\..\\snapp\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": 		"..\\..\\snapp\\Tools",
-	"SnAdminRCFilePath": 	"..\\..\\snapp\\Tools\\SnAdminRuntime.exe.config",
-	"IndexerPath": 			"..\\..\\snapp\\Tools\\indexpopulator.exe",
-	"ImporterPath": 		"..\\..\\snapp\\Tools\\import.exe",
-	"ExporterPath": 		"..\\..\\snapp\\Tools\\export.exe",												
-	"RepoFsFolderPath": 	"..\\..\\snapp\\Root",
-	"DeployFolderPath": 	"..\\..\\snapp\\deploy"
+    "WebFolderPath": 		"..\\..\\web\\snapp",
+	"AsmFolderPath": 		"..\\..\\web\\snapp\\bin",
+	"WebConfigFilePath": 	"..\\..\\web\\snapp\\web.config",
+	"SnAdminFilePath": 		"..\\..\\web\\snapp\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\..\\web\\snapp\\Tools",
+	"SnAdminRCFilePath": 	"..\\..\\web\\snapp\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\..\\web\\snapp\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\..\\web\\snapp\\Tools\\import.exe",
+	"ExporterPath": 		"..\\..\\web\\snapp\\Tools\\export.exe",												
+	"RepoFsFolderPath": 	"..\\..\\web\\snapp\\Root",
+	"DeployFolderPath": 	"..\\..\\web\\snapp\\deploy"
   }
 }
