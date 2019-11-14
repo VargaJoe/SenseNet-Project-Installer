@@ -84,10 +84,14 @@ Function Step-GetLatestVsTemplates {
 	try {
 		$VsTemplatesRepo = $GlobalSettings.Source.VsTemplatesRepo
 		$TemplatesClonePath = $GlobalSettings.Source.TemplatesClonePath
-		Write-Output "Use github repo as source: $VsTemplatesRepo"
-		Write-Output "Repository will be cloned here: $TemplatesClonePath"
+		$TemplatesBranch = $GlobalSettings.Source.TemplatesBranch
+		if (-Not($TemplatesBranch)) {
+			$TemplatesBranch = "master"
+		}
+		#Write-Output "Use github repo as source: $VsTemplatesRepo"
+		#Write-Output "Repository will be cloned here: $TemplatesClonePath"
 		# $GitExePath = Get-FullPath $GlobalSettings.Tools.Git
-		& $ScriptBaseFolderPath\Dev\Download-VsTemplates.ps1 -Url "$VsTemplatesRepo" -TargetPath "$TemplatesClonePath" 
+		& $ScriptBaseFolderPath\Dev\Download-VsTemplates.ps1 -Url "$VsTemplatesRepo" -TargetPath "$TemplatesClonePath" -BranchName "$TemplatesBranch"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -203,7 +207,7 @@ Function Step-SnServices {
 			}
 			
 			write-output "Username: $Username"
-			$params = $params + "username:$UserName","password:$UserPsw","dbusername:$DbUserName","dbpassword:$DbUserPsw" 
+			$params = $params,"username:$UserName","password:$UserPsw","dbusername:$DbUserName","dbpassword:$DbUserPsw" 
 		}
 		
 		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-services" -ToolParameters $params
@@ -879,7 +883,12 @@ function Step-WebAppOff {
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
 		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
 		if ([System.IO.File]::Exists($AppOnlineFilePath)){
-			Rename-Item $AppOnlineFilePath app_offline.htm
+			Rename-Item $AppOnlineFilePath $AppOfflineFilePath
+		} elseif (-Not([System.IO.File]::Exists($AppOfflineFilePath))) { 
+			Write-Output "App_offline file cannot be found, so create one..."
+			Write-Output "<p>We&#39;re currently undergoing scheduled maintenance. We will come back very shortly. Please check back in fifteen minutes. Thank you for your patience.</p>" > $AppOfflineFilePath
+		} else {
+			Write-Output "Site already offline"
 		}
 		$script:Result = $LASTEXITCODE
 	}
@@ -905,8 +914,8 @@ function Step-WebAppOn {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
 		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
-		if ([System.IO.File]::Exists($AppOfflineFilePath)){
-			Rename-Item $AppOfflineFilePath app_offline1.htm
+		if ([System.IO.File]::Exists($AppOfflineFilePath)) { 
+			Rename-Item $AppOfflineFilePath $AppOnlineFilePath
 		}
 		$script:Result = $LASTEXITCODE
 	}
