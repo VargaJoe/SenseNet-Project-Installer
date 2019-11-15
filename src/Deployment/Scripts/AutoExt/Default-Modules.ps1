@@ -878,6 +878,7 @@ function Step-WebAppOff {
 		[string]$Section="Project"
 		)
 	
+	$LASTEXITCODE = 0
 	try {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
