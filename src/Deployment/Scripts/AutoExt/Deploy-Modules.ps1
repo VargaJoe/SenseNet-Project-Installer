@@ -268,3 +268,30 @@ Function Step-SetHostPermissionOnDb {
 			$script:Result = 1
 		}	
 	}
+
+# Placeholder, zet to be made
+Function Step-RemoveFileBlock {
+	<#
+		.SYNOPSIS
+		Remove block form files
+		.DESCRIPTION
+
+		#>
+		[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+			[Parameter(Mandatory=$false)]
+			[string]$Section="Project"
+		)
+		
+		try {
+			$folderPath = $GlobalSettings."$Section".MachineName
+			
+			Write-Verbose "Remove block from files"
+			& Get-ChildItem .\*.* -r | Unblock-File 
+
+			$script:Result = $LASTEXITCODE
+		}
+		catch {
+			$script:Result = 1
+		}	
+	}	
