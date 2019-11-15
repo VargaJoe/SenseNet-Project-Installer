@@ -1,21 +1,21 @@
-[CmdletBinding(SupportsShouldProcess=$True)]
+[CmdletBinding(SupportsShouldProcess = $True)]
 Param(
-[Parameter(Mandatory=$false)]
-[string]$Plot,
-[Parameter(Mandatory=$false)] 
-[string]$Settings = "local",
-[Parameter(Mandatory=$false)] 
-[string]$Params,
-[Parameter(Mandatory=$false)] 
-[string]$Step,
-[Parameter(Mandatory=$false)] 
-[string]$ExportFilter,
-[Parameter(Mandatory=$false)] 
-[string]$ShowOutput = $True,
-[Parameter(Mandatory=$false)] 
-[string]$OutputMode = "Host",
-[Parameter(Mandatory=$false)] 
-[string]$Help
+	[Parameter(Mandatory = $false)]
+	[string]$Plot,
+	[Parameter(Mandatory = $false)] 
+	[string]$Settings = "local",
+	[Parameter(Mandatory = $false)] 
+	[string]$Params,
+	[Parameter(Mandatory = $false)] 
+	[string]$Step,
+	[Parameter(Mandatory = $false)] 
+	[string]$ExportFilter,
+	[Parameter(Mandatory = $false)] 
+	[string]$ShowOutput = $True,
+	[Parameter(Mandatory = $false)] 
+	[string]$OutputMode = "Host",
+	[Parameter(Mandatory = $false)] 
+	[string]$Help
 )
 
 $ErrorActionPreference = "Stop"
@@ -34,7 +34,7 @@ $Global:OutputMode = $OutputMode
 $Global:ShowOutput = $ShowOutput
 
 $Global:GlobalSettings = $null
-$Global:JsonResult=$Null
+$Global:JsonResult = $Null
 
 $AutoLoadExtensions = [IO.Path]::GetFullPath([IO.Path]::Combine($ScriptBaseFolderPath, "AutoExt"))
 
@@ -48,7 +48,7 @@ foreach ($file in $AutoLoadExtensionFiles) {
 	. "$file"
 }
 
- if (Is-Administrator) {
+if (Is-Administrator) {
 	# Load default settings
 	$defaultsettingspath = set-settingspath -settingname "default"
 	Write-Log "default setting path: $defaultsettingspath"
@@ -90,22 +90,26 @@ foreach ($file in $AutoLoadExtensionFiles) {
 		Write-Output "`nAvailable plots:"
 	
 		Get-Member -Type NoteProperty -InputObject $GlobalSettings.Plots | 
-			Sort-Object Name | 
-			% { Write-Output "`t- $($_.Name)" }
+		Sort-Object Name | 
+		% { Write-Output "`t- $($_.Name)" }
 	
 		exit 0
 	}
 	
-	if (!$plot) {
+	if (!$Plot -and !$Step) {
 		exit
 	} 
-	elseif (Is-Administrator) {
-	# Run given process
-	Run-Steps -Plot "$Plot" -Step "$Step"
 
-	$Global:JsonResult=$JsonResult
-} else {
-	Write-Verbose you have to run this script in administrator mode!
+	elseif (Is-Administrator) {
+		# Run given process
+		Run-Steps -Plot "$Plot" -Step "$Step"
+
+		$Global:JsonResult = $JsonResult
+	}
 }
+else {
+		Write-Verbose you have to run this script in administrator mode!
+}
+
 
 exit $Result
