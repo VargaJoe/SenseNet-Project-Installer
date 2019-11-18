@@ -20,8 +20,7 @@ Function Step-CallConsoleInstaller {
 		$appName = $InstallerPath | split-path -leaf	
 		Write-Output "working directory: $parentPath"
 		Write-Output "console app: $appName"
-		#Start-Process -FilePath $InstallerPath -WorkingDirectory $parentPath -NoNewWindow 
-		& $InstallerPath
+		Start-Process -FilePath $InstallerPath -WorkingDirectory $parentPath -NoNewWindow 
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
