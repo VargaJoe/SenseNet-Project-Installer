@@ -4,8 +4,8 @@
   },
   "Source": {
 	  "DbBackupFilePath": 		"..\\Databases\\project-services.bak",
-	  "TemplateWebFolderPath":	"..\\..\\deploytest\\Templates\\src\\SnWebApplicationAllComponents\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
-	  "SolutionFilePath": 		"..\\..\\deploytest\\Templates\\src\\SnWebApplicationAllComponents\\SnWebApplication.sln",
+	  "TemplateWebFolderPath":	"..\\temp\\Templates\\src\\SnWebApplicationAllComponents\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+	  "SolutionFilePath": 		"..\\temp\\Templates\\src\\SnWebApplicationAllComponents\\SnWebApplication.sln",
 	  "SnWebFolderFilePath": 	"..\\Archives\\project-services.zip"
   },
   "Project": {
@@ -15,18 +15,18 @@
     "AppPoolName": 			"projectwithallcomponents",
 	"Hosts": 				[ "Default_Site:projectwithallcomponents" ],
     "DotNetVersion": 		"v4.0",
-    "SourceFolderPath": 	"..\\..\\",
-    "WebFolderPath": 		"..\\..\\deploytest\\WebSitWithAllComponents",
-	"AsmFolderPath": 		"..\\..\\deploytest\\WebSitWithAllComponents\\bin",
-	"WebConfigFilePath": 	"..\\..\\deploytest\\WebSitWithAllComponents\\web.config",
-	"SnAdminFilePath": 		"..\\..\\deploytest\\WebSitWithAllComponents\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": 		"..\\..\\deploytest\\WebSitWithAllComponents\\Tools",
-	"SnAdminRCFilePath": 	"..\\..\\deploytest\\WebSitWithAllComponents\\Tools\\SnAdminRuntime.exe.config",
-	"IndexerPath": 			"..\\..\\deploytest\\WebSitWithAllComponents\\Tools\\indexpopulator.exe",
-	"ImporterPath": 		"..\\..\\deploytest\\WebSitWithAllComponents\\Tools\\import.exe",
-	"ExporterPath": 		"..\\..\\deploytest\\WebSitWithAllComponents\\Tools\\export.exe",														
-	"RepoFsFolderPath": 	"..\\..\\deploytest\\WebSitWithAllComponents\\Root",
-	"DeployFolderPath": 	"..\\..\\deploytest\\WebSitWithAllComponents\\deploy",
-    "SolutionFilePath": 	"..\\..\\deploytest\\Templates\\src\\SnWebApplicationAllComponents\\SnWebApplication.sln"
+    "SourceFolderPath": 	"..\\temp\\",
+    "WebFolderPath": 		"..\\temp\\WebSitWithAllComponents",
+	"AsmFolderPath": 		"..\\temp\\WebSitWithAllComponents\\bin",
+	"WebConfigFilePath": 	"..\\temp\\WebSitWithAllComponents\\web.config",
+	"SnAdminFilePath": 		"..\\temp\\WebSitWithAllComponents\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\temp\\WebSitWithAllComponents\\Tools",
+	"SnAdminRCFilePath": 	"..\\temp\\WebSitWithAllComponents\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\temp\\WebSitWithAllComponents\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\temp\\WebSitWithAllComponents\\Tools\\import.exe",
+	"ExporterPath": 		"..\\temp\\WebSitWithAllComponents\\Tools\\export.exe",														
+	"RepoFsFolderPath": 	"..\\temp\\WebSitWithAllComponents\\Root",
+	"DeployFolderPath": 	"..\\temp\\WebSitWithAllComponents\\deploy",
+    "SolutionFilePath": 	"..\\temp\\Templates\\src\\SnWebApplicationAllComponents\\SnWebApplication.sln"
   }
 }
