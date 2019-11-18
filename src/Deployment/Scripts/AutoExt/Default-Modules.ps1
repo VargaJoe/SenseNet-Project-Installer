@@ -691,6 +691,30 @@ Function Step-DropDb {
 	
 }
 
+Function Step-CreateEmptyDb {
+	<#
+		.SYNOPSIS
+		Create empty sql database
+		.DESCRIPTION
+		
+		#>
+		[CmdletBinding(SupportsShouldProcess=$True)]
+			Param(
+			[Parameter(Mandatory=$false)]
+			[string]$Section="Project"
+			)
+			
+		try {
+			$DataSource=$GlobalSettings."$Section".DataSource
+			$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
+			& $ScriptBaseFolderPath\Ops\Create-EmptyDb.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" 
+			$script:Result = $LASTEXITCODE
+		}
+		catch {
+			$script:Result = 1
+		}
+		
+	}
 
 Function Step-SetConfigs {
 <#
