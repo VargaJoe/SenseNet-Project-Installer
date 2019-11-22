@@ -3,7 +3,8 @@ $msSqlUser = "sa"
 $msSqlPsw = "QWEasd123%"
 
 # Start mssql container
-#docker run --rm -it -e ACCEPT_EULA=Y -e sa_password=$($msSqlPsw) -p 1433:1433 -d --name sql1 microsoft/mssql-server-windows-developer:2017-latest
+docker run --rm -it -e ACCEPT_EULA=Y -e sa_password=$($msSqlPsw) -p 1433:1433 -d --name sql1 microsoft/mssql-server-windows-developer:2017-latest
+#docker run --rm -it -e ACCEPT_EULA=Y -e sa_password=QWEasd123% -p 1433:1433 -d --name sql1 microsoft/mssql-server-windows-developer:2017-latest
 
 # get mssql ip
 $msSqlIp = docker inspect --format '{{ .NetworkSettings.Networks.nat.IPAddress }}' sql1

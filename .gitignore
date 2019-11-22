@@ -9,3 +9,4 @@ src/WebSite/
 test*
 .vs/
 src/deploytest/
+src/Deployment/temp/
