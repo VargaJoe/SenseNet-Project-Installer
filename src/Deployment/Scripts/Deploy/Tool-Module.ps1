@@ -1,12 +1,14 @@
 [CmdletBinding(SupportsShouldProcess=$True)]
 Param(
 [Parameter(Mandatory=$true)]
+[string]$SnAdminPath,
+[Parameter(Mandatory=$true)]
 [string]$ToolName,
 [Parameter(Mandatory=$false)]
 [string[]]$ToolParameters
 )
 
-$ProjectSnAdminFilePath = Get-FullPath $ProjectSettings.Project.SnAdminFilePath
+$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 
-Write-Host $ProjectSnAdminFilePath $ToolName $ToolParameters
-& $ProjectSnAdminFilePath $ToolName $ToolParameters
+Write-Verbose "$SnAdminPath $ToolName $ToolParameters"
+& $SnAdminPath $ToolName $ToolParameters | & $Output

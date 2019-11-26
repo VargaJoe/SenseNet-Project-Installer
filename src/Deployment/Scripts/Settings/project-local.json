@@ -1,35 +1,42 @@
 {
-  "DataBase": {
-    "DataSource": "MySenseNetContentRepositoryDatasource",
-    "InitialCatalog": "Project"
+  "Plots": {
+    "getexampleprojects": ["getlatestvstemplates", "restorepckgs", "prbuild"],
+    "fullinstall": [
+      "webappoff",
+      "prbuild",
+      "dropdb",
+      "snservices",
+      "setcors",
+      "createsite",
+      "sethost",
+      "webappon"
+    ]
   },
-  "IIS": {
-    "WebAppName": "Project",
-    "AppPoolName": "Project",
-	"Hosts": [ "project", "testproject" ],
-    "DotNetVersion": "v4.0"
+  "Source": {
+    "DbBackupFilePath": "..\\Databases\\project-services.bak",
+    "TemplateWebFolderPath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+    "SolutionFilePath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication.sln",
+    "SnWebFolderFilePath": "..\\Archives\\project-services.zip"
   },
-  "Platform": {
-    "PackageFolderPath": "",
-    "PackageName": "",
-    "SourceFolderPath": "",
-    "SolutionFilePath": ""
-  }, 
   "Project": {
-    "SourceFolderPath": "..\\..\\",
-    "WebFolderPath": "..\\..\\Source\\WebSite",
-	"WebConfigFilePath": "..\\..\\Source\\WebSite\\web.config",
-	"SnAdminFilePath": "..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": "..\\..\\Source\\WebSite\\Tools",
-	"DeployFolderPath": "..\\..\\Source\\WebSite\\deploy",
-    "SolutionFilePath": "..\\..\\Source\\Project.sln"
-  },
-  "Tools": {
-    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe",
-    "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
-    "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
-    "NuGetFolderPath": "..\\Tools\\nuget",
-    "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
+    "DataSource": "MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": "projectsolution",
+    "WebAppName": "projectsolution",
+    "AppPoolName": "projectsolution",
+    "Hosts": ["projectsolution"],
+    "DotNetVersion": "v4.0",
+    "WebFolderPath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication",
+    "AsmFolderPath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\bin",
+    "WebConfigFilePath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\web.config",
+    "SnAdminFilePath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\Admin\\bin\\snadmin.exe",
+    "ToolsFolderPath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\Tools",
+    "SnAdminRCFilePath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\Tools\\SnAdminRuntime.exe.config",
+    "IndexerPath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\Tools\\indexpopulator.exe",
+    "ImporterPath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\Tools\\import.exe",
+    "ExporterPath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\Tools\\export.exe",
+    "RepoFsFolderPath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\Root",
+    "DeployFolderPath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\deploy",
+    "SourceFolderPath": "..\\temp\\Templates\\src\\SnWebApplication",
+    "SolutionFilePath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication.sln"
   }
-
 }

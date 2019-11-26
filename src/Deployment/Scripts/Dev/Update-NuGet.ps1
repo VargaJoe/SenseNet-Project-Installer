@@ -15,16 +15,15 @@ $NuGetFolderPath = [IO.Path]::GetFullPath($ProjectConfig.Tools.NuGetFolderPath)
 $NuGetFilePath = [IO.Path]::Combine($NuGetFolderPath, "NuGet.exe")
 #}
 
-Write-Host ================================================ -foregroundcolor "green"
-Write-Host UPGRADE NUGET IF NECESSARY -foregroundcolor "green"
-Write-Host ================================================ -foregroundcolor "green"
-
-Write-Host NuGet command-line tool parent folder path: $NuGetFolderPath
-Write-Host NuGet command-line tool file path: $NuGetFilePath
+Write-Verbose "================================================"
+Write-Verbose "UPGRADE NUGET IF NECESSARY"
+Write-Verbose "================================================"
+Write-Verbose "NuGet command-line tool parent folder path: $NuGetFolderPath"
+Write-Verbose "NuGet command-line tool file path: $NuGetFilePath"
 
 try {
-	Write-Host Helper functions initialization from $Initfunctions
-	. ".\init-functions.ps1"
+	Write-Verbose "Helper functions initialization from $Initfunctions"
+	# . ".\init-functions.ps1"
 
     $tempdownloadDirectoryPath = "nuget"
     $tempFile = Join-Path $tempdownloadDirectoryPath "NuGet.exe"
@@ -39,12 +38,12 @@ try {
         $scratchHash = (Get-FileHash $tempFile -algorithm MD5).Hash
         $scratchVersion = Get-Content $versionFile
         if (($destHash -eq $scratchHash) -and ($scratchVersion -eq $nugetVersion)) {
-            Write-Host "Using existing NuGet.exe at version $nuGetVersion"
+            Write-Verbose "Using existing NuGet.exe at version $nuGetVersion"
             exit 0
         }
     }
 
-    Write-Host "Downloading NuGet $nugetVersion..."
+    Write-Verbose "Downloading NuGet $nugetVersion..."
     $webClient = New-Object -TypeName "System.Net.WebClient"
     $webClient.DownloadFile("https://dist.nuget.org/win-x86-commandline/v$nugetVersion/NuGet.exe", $tempFile)
     $nugetVersion | Out-File $versionFile
@@ -52,7 +51,7 @@ try {
     exit 0
 }
 catch [exception] {
-    Write-Host $_.Exception
+    Write-Verbose "$_.Exception"
     exit 1
 }
 

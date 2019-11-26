@@ -1,12 +1,15 @@
 [CmdletBinding(SupportsShouldProcess=$True)]
 Param(
 [Parameter(Mandatory=$true)]
-[string]$PackagePath
+[string]$SnAdminPath,
+[Parameter(Mandatory=$true)]
+[string]$PackagePath, 
+[Parameter(Mandatory=$false)]
+[string[]]$Parameters
 )
 
-#mode: export, import, stb
-# schema???
-$ProjectSnAdminFilePath = Get-FullPath $ProjectSettings.Project.SnAdminFilePath
+$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"} 
+Write-Verbose "Starting: $SnAdminPath $PackagePath $Parameters"
+& $SnAdminPath $PackagePath $Parameters | & $Output
+Write-Verbose "Completed: $SnAdminPath $PackagePath $Parameters"
 
-Write-Host $ProjectSnAdminFilePath "$PackagePath"
-& $ProjectSnAdminFilePath "$PackagePath"

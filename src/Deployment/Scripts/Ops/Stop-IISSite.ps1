@@ -8,25 +8,18 @@ Param(
 
 $Computer = $env:computername
 
-#================================================
-#====== STOP WEBSITE AND APPLICATION POOL =======
-#================================================
-# CALL: .\StopWebsiteAppPool.ps1 "SiteName"
-
 # ========= CONFIG ===================
 $waitsecond = 3 # seconds
 $timeout = 10 
 # ====================================
 
-Write-Host ================================================ -foregroundcolor "green"
-Write-Host STOP WEBSITE AND APPLICATION POOL ">>" $WebsiteName -foregroundcolor "green"
-Write-Host ================================================ -foregroundcolor "green"
-Write-Host Computer: $Computer 
+Write-Verbose "================================================"
+Write-Verbose "STOP WEBSITE AND APPLICATION POOL >> $WebsiteName"
+Write-Verbose "================================================" 
+Write-Verbose "Computer: $Computer" 
+# CALL: .\StopWebsiteAppPool.ps1 "SiteName"
 
-#Set-ExecutionPolicy Unrestricted  
-# Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass 
-import-module WebAdministration
-
+import-module WebAdministration -Verbose:$false
 
 # IIS website stop function
 Function fnStopWebsite([string]$WebsiteName)
@@ -35,7 +28,7 @@ Function fnStopWebsite([string]$WebsiteName)
 		if((Get-Website -Name $WebsiteName).Name -eq $null)
 		{
 			# The website is not exist
-			exit 10
+			exit 0
 		}
 		else
 		{
@@ -49,9 +42,9 @@ Function fnStopWebsite([string]$WebsiteName)
 	}
 	catch
 	{
-		$ErrorMessage = $_.Exception.Message
+		$ErrorMessage = $MaximumErrorCount
 		$functionname = $MyInvocation.MyCommand.Name
-		Write-Host "[Error][$modulename : $functionname] => "$ErrorMessage
+		Write-Verbose "[Error][$modulename : $functionname] => $ErrorMessage"
 		exit 6
 	}
 }
@@ -62,8 +55,8 @@ Function fnStopApplicationPool([string]$AppPoolName)
 	try{
 		if((Get-WebAppPoolState -Name $AppPoolName).Name -eq $null)
 		{
-			# The website is not exist
-			exit 10
+			# The application pool is not exist
+			exit 0
 		}
 		else
 		{
@@ -77,7 +70,7 @@ Function fnStopApplicationPool([string]$AppPoolName)
 	catch{
 		$ErrorMessage = $_.Exception.Message
 		$functionname = $MyInvocation.MyCommand.Name
-		Write-Host "[Error][$modulename : $functionname] => "$ErrorMessage
+		Write-Verbose "[Error][$modulename : $functionname] => $ErrorMessage"
 		exit 7
 	}
 }
@@ -90,7 +83,7 @@ $currentRetry = 0
 do
 {
 	if ($statusSite.State -eq "Stopped"){
-		Write-Host "The '$WebsiteName' website has been stopped..."
+		Write-Verbose "The '$WebsiteName' website has been stopped..."
 		$Websitesuccess = $true;
 	}
 	else{
@@ -101,7 +94,7 @@ do
 while (!$Websitesuccess -and $currentRetry -le $timeout)
 if($currentRetry -gt $timeout)
 {
-	Write-Host "The '$WebsiteName' website can't be stopped"
+	Write-Error "The '$WebsiteName' website can't be stopped"
 	exit 8
 }
 
@@ -112,7 +105,7 @@ $currentRetry = 0
 do
 {
 	if ($statusPool.Value -eq "Stopped"){
-		Write-Host "The '$AppPoolName' application pool has been stopped..."
+		Write-Verbose "The '$AppPoolName' application pool has been stopped..."
 		$Poolsuccess = $true;
 	}
 	else{
@@ -123,7 +116,7 @@ do
 while (!$Poolsuccess -and $currentRetry -le $timeout)
 if($currentRetry -gt $timeout)
 {
-	Write-Host "The '$AppPoolName' application pool can't bee stopped"
+	Write-Verbose "The '$AppPoolName' application pool can't bee stopped"
 	exit 9
 }
 

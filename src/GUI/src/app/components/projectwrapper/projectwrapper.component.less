@@ -1,0 +1,114 @@
+@process-bg: #36404a;
+@process-hoverbg: #1e2141;
+@process-selectedbg: #921f1f;
+
+.flexContainer{
+    justify-content: center;
+}
+
+.flexItem{
+    flex-grow: 0;
+}
+
+.stepsList{
+    margin-bottom: 10px;
+}
+
+.stepsList li{
+    cursor: pointer;
+}
+
+.stepsList li:hover{
+    background-color: antiquewhite;
+}
+
+.list-group-item:first-child{
+    border-top-left-radius:0;
+    border-top-right-radius:0;
+}
+
+.list-group-item:last-child{
+    border-bottom-left-radius:0;
+    border-bottom-right-radius:0;
+}
+
+.fa-spin{
+    font-size:13px
+}
+
+span.badge-success{
+    background-color: #78cc17;
+}
+span.badge-danger{
+    background-color: #cc1a1a;
+}
+
+/* BOXes */
+.widget-user {
+    min-height: 100px;
+    color: #98a6ad;
+    cursor: pointer;
+}
+
+.card-box {
+    padding: 15px;
+    border: 1px solid rgba(54, 64, 74, 0.08);
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    background-clip: padding-box;
+    margin-bottom: 5px;
+    background-color: @process-bg;
+    min-width: 200px;
+}
+.card-box:hover{
+    background-color: @process-hoverbg; 
+}
+.widget-user img {
+    height: 72px;
+    float: left;
+}
+.rounded-circle {
+    border-radius: 50%;
+}
+img {
+    vertical-align: middle;
+    border-style: none;
+}
+.widget-user .wid-u-info {
+    margin-left: 0;
+}
+.widget-user .wid-u-info p {
+    white-space: nowrap;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.text-warning {
+    color: #ffaa00 !important;
+}
+
+.processElementSelected{
+    background-color: @process-selectedbg;
+    -webkit-transform: translateY(-5px);
+    transform: translateY(-5px);
+}
+
+.processElementSelected:hover{
+    background-color: @process-selectedbg;
+}
+
+.processinfo{
+    margin-bottom: 0;
+    margin-top: 15px;
+    font-size: 13px;
+    overflow-wrap: break-word;
+    max-width: 200px;
+    white-space: nowrap;
+}
+
+/* The animation code */
+@keyframes moveTo {
+    0% {margin-left: 0}
+    100% {margin-left: 75px}
+}

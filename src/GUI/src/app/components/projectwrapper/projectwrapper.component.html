@@ -1,0 +1,66 @@
+<div id="project">
+    <div class="row">
+        <div class="col">
+            <h1 class="mt-3">Default steps and plots</h1>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col">
+            <h5>Plots</h5>
+        </div>
+    </div>
+    <div class="row flexContainer">
+        <div class="col flexItem" *ngFor="let plot of plots">
+            <div class="card-box widget-user hvr-float-shadow processElement" (click)="selectPlot2(plot)">
+                <div class="wid-u-info">
+                    <div class="row">
+                        <div class="col-8">
+                            <h5 class="mt-0 m-b-5 font-16">{{plot.name}}</h5>
+                        </div>
+                        <div class="col-4">
+                            <i *ngIf="plot.isRunning" class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="plot.isRunning">
+                        <div class="col">
+                            <p>Current step: {{plot.status}}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button *ngIf="plot.isRunning" class="btn btn-sm btn-alert processcancelbtn">Stop</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <p class="text-warning processinfo">{{plot.msg}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h5>Steps</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul class="list-group stepsList">
+                <li class="list-group-item d-flex justify-content-between lh-condensed" *ngFor="let step of steps" [attr.busy]="stepBusy"
+                    (click)="selectStep(step,$event)">
+                    <div>
+                        <h6 class="my-0 font-weight-bold">{{step.name}}</h6>
+                        <small class="text-muted">{{step?.description}}</small>
+                    </div>
+                    <span class="text-muted status">
+                        <i *ngIf="step.busy" class="fa fa-circle-o-notch fa-spin"></i>
+                        <span class='badge' [ngClass]="{'badge-danger':step.status==='error','badge-success':step.status==='ok'}" *ngIf="!step.busy">{{step.result}}</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

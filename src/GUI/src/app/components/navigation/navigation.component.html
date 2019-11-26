@@ -1,0 +1,26 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light" id="navigation">
+  <a class="navbar-brand" href="#">Remote SN Installer <i class="fa fa-cubes"></i><i *ngIf="!isOnline" class="fa fa-exclamation" aria-hidden="true"></i></a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+    aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <!-- <li class="nav-item dropdown projectlinks">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true"
+          aria-expanded="false">
+          Projects
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" *ngFor="let p of allproject" [routerLink]="['/project',p.name]">{{p.displayname}}</a>
+        </div>
+      </li> -->
+      <li class="nav-item hidden">
+        <a class="nav-link" [routerLink]="['/settings']">Settings
+          <span class="sr-only">(current)</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>

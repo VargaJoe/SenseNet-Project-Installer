@@ -1,0 +1,58 @@
+{
+  "Plots": {
+	"fullinstall": [ "stop", "restorepckgs", "prbuild", "dropdb", "snservices", "snwebpages", "removedemo", "adminusers", "prinstall", "setrepourl", "index", "createsite", "sethost", "start" ],
+	"restore": [ "stop", "restoredb", "index", "setrepourl", "createsite", "sethost", "start" ],
+	"fulldeploy": [ "stop:Production", "restorepckgs", "prbuild", "prasmdeploy:Production", "dropdb:Production", "snservices:Production", "snwebpages:Production", "removedemo:Production", "adminusers:Production", "prinstall:Production", "setrepourl:Production", "index:Production", "start:Production" ]
+  },
+  "Source": {
+    "DbBackupFilePath": 	"..\\Databases\\project-custom.bak",
+    "TemplateWebFolderPath":"..\\..\\Source\\WebSite\\obj\\Release\\Package\\PackageTmp",
+    "SolutionFilePath": 	"..\\..\\Source\\Project.sln",
+    "SnWebFolderFilePath": 	"..\\Archives\\project-custom.zip"
+  },
+  "Demo": {
+	"Hosts": 				[ "Default_Site:project" ],
+	"SnAdminFilePath": 		"..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe"
+  },
+  "Project": {
+	"DataSource": 			"MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": 		"project",
+	"WebAppName": 			"project",
+    "AppPoolName": 			"project",
+	"Hosts": 				[ "project", "sn7.sn.hu" ],
+    "DotNetVersion": 		"v4.0",
+    "SourceFolderPath": 	"..\\..\\",
+    "WebFolderPath": 		"..\\..\\Source\\WebSite",
+	"AsmFolderPath": 		"..\\..\\Source\\WebSite\\bin",
+	"WebConfigFilePath": 	"..\\..\\Source\\WebSite\\web.config",
+	"SnAdminFilePath": 		"..\\..\\Source\\WebSite\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\..\\Source\\WebSite\\Tools",
+	"SnAdminRCFilePath": 	"..\\..\\Source\\WebSite\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\..\\Source\\WebSite\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\..\\Source\\WebSite\\Tools\\import.exe",
+	"ExporterPath": 		"..\\..\\Source\\WebSite\\Tools\\export.exe",														
+	"RepoFsFolderPath": 	"..\\..\\Source\\WebSite\\Root",
+	"DeployFolderPath": 	"..\\..\\Source\\WebSite\\deploy",
+    "SolutionFilePath": 	"..\\..\\Source\\Project.sln"
+  },
+  "Production": {
+	"DataSource": 			"MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": 		"projectlive",
+	"WebAppName": 			"projectlive",
+    "AppPoolName": 			"projectlive",
+	"Hosts": 				[ "projectlive" ],
+    "DotNetVersion": 		"v4.0",
+	"MachineName": 			"remotemachine",																		
+    "WebFolderPath": 		"\\\\remotemachine\\web\\projectlivewebfolder",
+	"AsmFolderPath": 		"\\\\remotemachine\\web\\projectlivewebfolder\\bin",
+	"WebConfigFilePath": 	"\\\\remotemachine\\web\\projectlivewebfolder\\web.config",
+	"SnAdminFilePath": 		"\\\\remotemachine\\web\\projectlivewebfolder\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"\\\\remotemachine\\web\\projectlivewebfolder\\Tools",
+	"SnAdminRCFilePath": 	"\\\\remotemachine\\web\\projectlivewebfolder\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"\\\\remotemachine\\Web\\projectlivewebfolder\\Tools\\indexpopulator.exe",
+    "ImporterPath": 		"\\\\remotemachine\\Web\\projectlivewebfolder\\Tools\\import.exe",
+    "ExporterPath": 		"\\\\remotemachine\\Web\\projectlivewebfolder\\Tools\\export.exe",
+    "RepoFsFolderPath": 	"\\\\remotemachine\\Web\\projectlivewebfolder\\Root",
+    "DeployFolderPath": 	"\\\\remotemachine\\Web\\projectlivewebfolder\\deploy"
+ }
+}

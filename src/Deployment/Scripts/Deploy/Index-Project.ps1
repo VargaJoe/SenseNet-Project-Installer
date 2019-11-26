@@ -1,8 +1,8 @@
-Write-Host ================================================ -foregroundcolor "green"
-Write-Host INDEXPOPULATION -foregroundcolor "green"
-Write-Host ================================================ -foregroundcolor "green"
+[CmdletBinding(SupportsShouldProcess=$True)]
+Param(
+[Parameter(Mandatory=$true)]
+[string]$SnAdminPath
+)
 
-$ProjectSnAdminFilePath = Get-FullPath $ProjectSettings.Project.SnAdminFilePath
-
-Write-Host $ProjectSnAdminFilePath index
-& $ProjectSnAdminFilePath index
+Write-Verbose "$SnAdminPath index"
+& $SnAdminPath index

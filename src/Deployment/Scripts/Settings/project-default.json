@@ -1,14 +1,76 @@
 {
-  "Modes": {
-    "fullinstall": ["stop", "getlatest", "restorepckgs", "prbuild", "sninstall", "removedemo",  "prinstall", "createsite", "sethost", "start"],
-	"deploy" : [ "initwebfolder", "deploywebfolder", "sninstall","createsite", "sethost", "start"]
+  "Plots": {
+    "fullinstall": [
+      "getlatestvstemplates",
+      "restorepckgs",
+      "crartifact",
+      "deploywebFolder",
+      "dropdb",
+      "snservices",
+      "setcors",
+      "createsite",
+      "sethost",
+      "start"
+    ],
+    "fulldeploy": [
+      "stop:Production",
+      "restorepckgs",
+      "crartifact",
+      "deploywebFolder:Production",
+      "dropdb:Production",
+      "snservices:Production",
+      "start:Production"
+    ],
+    "backup": [
+      "stop",
+      "backupdb",
+      "start"
+    ],
+    "restore": [
+      "stop",
+      "restoredb",
+      "index",
+      "start"
+    ],
+    "export": [
+      "webappoff",
+      "export",
+      "webappon"
+    ],
+    "prodexport": [
+      "stop:Production",
+      "export:Production",
+      "start:Production"
+    ],
+    "cleanup": [
+      "stop",
+      "dropdb",
+      "removewebFolder"
+    ]
+  },
+  "Source": {
+    "PackagesPath": "..\\Packages",
+    "PackageFolderPath": "",
+    "PackageName": "",
+    "DbBackupFilePath": "..\\Databases\\project-latest.bak",
+    "DbBackupFileUrl": "",
+    "DatabasesPath": "..\\Databases\\",
+    "VsTemplatesRepo": "https://github.com/SenseNet/sn-vs-projecttemplates",
+    "TemplatesBranch": "master",
+    "TemplatesClonePath": "..\\temp\\Templates",
+    "SourceFolderPath": "..\\temp\\Templates\\src\\SnWebApplication",
+    "TemplateWebFolderPath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+    "SolutionFilePath": "..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication.sln",
+    "SnWebFolderFilePath": "..\\Archives\\project-Web710.zip",
+    "SnWebFolderFileUrl": "",
+    "SnWebFolderPath": ""
   },
   "Tools": {
-    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\tf.exe",
-    "UnZipperFilePath": "..\\Tools\\7zip\\7za.exe",
+    "VisualStudio": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer\\tf.exe",
+    "UnZipperFilePath": "C:\\Program Files\\7-Zip\\7z.exe",
     "ConfigTransformationTool": "..\\Tools\\CTT\\ctt.exe",
+    "NuGetSourceUrl": "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe",
     "NuGetFolderPath": "..\\Tools\\nuget",
     "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
   }
-
 }

@@ -1,0 +1,12 @@
+src/Source/
+src/Deployment/temp/
+src/deploytest/
+src/Deployment/Tools/CTT/ctt.exe.config
+src/Deployment/Tools/7zip/license.txt
+src/Deployment/Tools/7zip/history.txt
+src/Deployment/Scripts/test.json
+src/WebSitWithServices/
+src/WebSitWithWebpages/
+src/WebSite/
+test*
+.vs/

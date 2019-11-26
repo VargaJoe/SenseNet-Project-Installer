@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentMetaData>
+  <ContentType>User</ContentType>
+  <ContentName>cadmin</ContentName>
+  <Fields>
+    <DisplayName><![CDATA[cadmin]]></DisplayName>
+    <Enabled>true</Enabled>
+    <Email><![CDATA[admin@example.test]]></Email>
+    <FullName><![CDATA[cadmin]]></FullName>
+	<Password>
+      <Text>testpass</Text>
+    </Password>
+    <ImageData attachment="cadmin.ImageData" />
+    <CreatedBy>
+      <Path>/Root/IMS/BuiltIn/Portal/admin</Path>
+    </CreatedBy>
+    <CreationDate>2014-09-18T19:55:21.72</CreationDate>
+  </Fields>
+  <Permissions>
+    <Clear />
+  </Permissions>
+</ContentMetaData>
