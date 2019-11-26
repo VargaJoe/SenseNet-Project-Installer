@@ -84,10 +84,15 @@ Function Step-GetLatestVsTemplates {
 	try {
 		$VsTemplatesRepo = $GlobalSettings.Source.VsTemplatesRepo
 		$TemplatesClonePath = $GlobalSettings.Source.TemplatesClonePath
-		Write-Output "Use github repo as source: $VsTemplatesRepo"
-		Write-Output "Repository will be cloned here: $TemplatesClonePath"
+
+		$TemplatesBranch = $GlobalSettings.Source.TemplatesBranch
+		if (-Not($TemplatesBranch)) {
+			$TemplatesBranch = "master"
+		}
+		#Write-Output "Use github repo as source: $VsTemplatesRepo"
+		#Write-Output "Repository will be cloned here: $TemplatesClonePath"
 		# $GitExePath = Get-FullPath $GlobalSettings.Tools.Git
-		& $ScriptBaseFolderPath\Dev\Download-VsTemplates.ps1 -Url "$VsTemplatesRepo" -TargetPath "$TemplatesClonePath" 
+		& $ScriptBaseFolderPath\Dev\Download-VsTemplates.ps1 -Url "$VsTemplatesRepo" -TargetPath "$TemplatesClonePath" -BranchName "$TemplatesBranch"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -687,6 +692,30 @@ Function Step-DropDb {
 	
 }
 
+Function Step-CreateEmptyDb {
+	<#
+		.SYNOPSIS
+		Create empty sql database
+		.DESCRIPTION
+		
+		#>
+		[CmdletBinding(SupportsShouldProcess=$True)]
+			Param(
+			[Parameter(Mandatory=$false)]
+			[string]$Section="Project"
+			)
+			
+		try {
+			$DataSource=$GlobalSettings."$Section".DataSource
+			$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
+			& $ScriptBaseFolderPath\Ops\Create-EmptyDb.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" 
+			$script:Result = $LASTEXITCODE
+		}
+		catch {
+			$script:Result = 1
+		}
+		
+	}
 
 Function Step-SetConfigs {
 <#
@@ -920,7 +949,7 @@ function Step-WebAppOff {
 		} else {
 			Write-Output "Appoffline file does not exists, let's create one at $AppOfflineFilePath"
 			& echo "<p>We&#39;re currently undergoing scheduled maintenance. We will come back very shortly. Please check back in fifteen minutes. Thank you for your patience.</p>" > $AppOfflineFilePath
-		}		
+		}
 		
 		$script:Result = $LASTEXITCODE
 	}
@@ -947,8 +976,9 @@ function Step-WebAppOn {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
 		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
-		if ([System.IO.File]::Exists($AppOfflineFilePath)){
-			Rename-Item $AppOfflineFilePath app_offline1.htm
+
+		if ([System.IO.File]::Exists($AppOfflineFilePath)) { 
+			Rename-Item $AppOfflineFilePath $AppOnlineFilePath
 		}
 		$script:Result = $LASTEXITCODE
 	}

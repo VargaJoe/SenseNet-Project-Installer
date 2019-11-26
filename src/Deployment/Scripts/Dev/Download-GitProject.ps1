@@ -1,8 +1,8 @@
 Param (
 	[Parameter(Mandatory=$False)]
-	[string]$Url = "https://github.com/SenseNet/sn-vs-projecttemplates",
+	[string]$Url,
 	[Parameter(Mandatory=$False)]
-	[string]$TargetPath = "..\..\Templates",
+	[string]$TargetPath,
 	[Parameter(Mandatory=$False)]
 	[string]$BranchName = "master"
 )
@@ -26,7 +26,6 @@ if (Test-Path $TargetPath\.git) {
 else 
 {
 	write-host "Git reposiotry downloading started..."
-	#& git clone --single-branch --branch "$BranchName" "$Url" "$TargetPath"
 	& git clone --branch $BranchName "$Url" "$TargetPath" 	
 }
 

@@ -52,8 +52,8 @@ Function Step-PrImport {
 	}
 	catch {
 		$script:Result = 1
-	}
-	
+	}	
+
 }
 
 Function Step-PrAsmDeploy {
@@ -108,6 +108,102 @@ Function Step-PrLucDeploy {
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
+		$script:Result = 1
+	}	
+}
+
+Function Step-CleanWebFolder {
+	<#
+	.SYNOPSIS
+	Clean webfolder
+	.DESCRIPTION
+	Removel all folders and files under webfolder, except app_offline.htm
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$LASTEXITCODE = 0
+		Write-Output "`r`nCleanup web folder"
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		Write-Output "Target: $ProjectWebFolderPath"		
+		
+		if ($ProjectWebFolderPath -and -not($ProjectWebFolderPath -eq "")) { 
+			Remove-Item "$($ProjectWebFolderPath)\*" -Recurse -Exclude "app_offline*.htm" -Force -ErrorAction "SilentlyContinue"
+		}
+		$script:Result = $LASTEXITCODE		
+	}
+	catch {
+		Write-Output "`tSomething went wrong: $_"
+		$script:Result = 1
+	}	
+}
+
+Function Step-RemoveWebFolder {
+	<#
+	.SYNOPSIS
+	Remove webfolder completely
+	.DESCRIPTION
+	Removel all folders and files along with webfolder
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$LASTEXITCODE = 0
+		Write-Output "`r`nCleanup web folder"
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		Write-Output "Target: $ProjectWebFolderPath"		
+		
+		if ($ProjectWebFolderPath -and -not($ProjectWebFolderPath -eq "")) { 
+			Remove-Item "$($ProjectWebFolderPath)" -Recurse
+		}
+		$script:Result = $LASTEXITCODE		
+	}
+	catch {
+		Write-Output "`tSomething went wrong: $_"
+		$script:Result = 1
+	}	
+}
+
+Function Step-CreateWebFolder {
+	<#
+	.SYNOPSIS
+	Create webfolder on destination if not exists
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$LASTEXITCODE = 0
+		Write-Output "`r`nCopy webfolder files from package to destination"
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		Write-Output "Target: $ProjectWebFolderPath"		
+		
+		if (-not(Test-Path $ProjectWebFolderPath)) {
+			$parentPath = $ProjectWebFolderPath | split-path -parent
+			$folderName = $ProjectWebFolderPath | split-path -leaf		
+			Write-Output "Create target webfolder"
+			Write-Output "`twith name: $folderName"
+			Write-Output "`tunder: $parentPath"
+			New-Item -Path "$parentPath" -Name "$folderName" -ItemType "directory"
+		}	
+		
+		$script:Result = $LASTEXITCODE		
+	}
+	catch {
+		Write-Output "`tSomething went wrong: $_"
 		$script:Result = 1
 	}	
 }
@@ -177,3 +273,32 @@ Function Step-DeployWebFolderFromZip {
 		$script:Result = 1
 	}	
 }
+
+Function Step-SetHostPermissionOnDb {
+	<#
+		.SYNOPSIS
+		Set host permission on DB
+		.DESCRIPTION
+		Sites running with host machine user as application pool identity have to have permission to site database. This step will grant it.
+
+		#>
+		[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+			[Parameter(Mandatory=$false)]
+			[string]$Section="Project"
+		)
+		
+		try {
+			$DataSource = $GlobalSettings."$Section".DataSource
+			$InitialCatalog = $GlobalSettings."$Section".InitialCatalog 
+			$WebServer = $GlobalSettings."$Section".MachineName
+			
+			Write-Verbose "Start import script with the path: $ProjectRepoFsFolderPath"		
+			& $ScriptBaseFolderPath\Ops\Grant-Permission.ps1 -DataSource "$DataSource" -Catalog "$InitialCatalog" -User "SN\$($WebServer)$"  -Verbose
+			$script:Result = $LASTEXITCODE
+		}
+		catch {
+			$script:Result = 1
+		}	
+	}
+
