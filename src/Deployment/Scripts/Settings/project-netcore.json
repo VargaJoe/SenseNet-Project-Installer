@@ -1,33 +1,47 @@
 {
   "Plots": {
-    "fullinstall": [ "getlatestvstemplates", "restorepckgs", "crartifact", "dropdb", "createemptydb", "setjsonconnection", "callconsoleinstaller", "deploywebfolder", "createsite", "sethost", "start" ]
+    "fullinstall": [
+      "getlatestvstemplates",
+      "restorepckgs",
+      "crartifact",
+      "dropdb",
+      "createemptydb",
+      "setjsonconnection",
+      "callconsoleinstaller",
+      "deploywebfolder",
+      "createsite",
+      "sethost",
+      "start"
+    ]
   },
   "Source": {
-  "DbBackupFilePath": 		"..\\Databases\\project-services.bak",
-  "TemplateWebFolderPath":	"..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnWebApplication\\obj\\Release\\netcoreapp3.0\\PubTmp\\Out",
-  "SolutionFilePath": 	"..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnWebApplication.sln",
-  "SnWebFolderFilePath": 	"..\\Archives\\project-services.zip",
-  "TemplatesBranch":  "feature/netcore-webapp"
+    "DbBackupFilePath": "..\\Databases\\project-services.bak",
+    "TemplateWebFolderPath": "..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnWebApplication\\obj\\Release\\netcoreapp3.0\\PubTmp\\Out",
+    "SolutionFilePath": "..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnWebApplication.sln",
+    "SnWebFolderFilePath": "..\\Archives\\project-services.zip",
+    "TemplatesBranch": "feature/netcore-webapp"
   },
   "Project": {
-	"DataSource": 			"SNPC013\\SQL2016",
-    "InitialCatalog": 		"netcoretest",
-	"WebAppName": 			"netcoretest",
-    "AppPoolName": 			"netcoretest",
-	"Hosts": 				[ "netcoretest" ],
-    "DotNetVersion": 		"v4.0",
-    "SourceFolderPath": 	"..\\temp\\",
-    "WebFolderPath": 		"..\\temp\\netcoretest",
-	"AsmFolderPath": 		"..\\temp\\netcoretest\\bin",	
-	"ToolsFolderPath": 		"..\\temp\\netcoretest\\Tools",	
-	"IndexerPath": 			"..\\temp\\netcoretest\\Tools\\indexpopulator.exe",
-	"ImporterPath": 		"..\\temp\\netcoretest\\Tools\\import.exe",
-	"ExporterPath": 		"..\\temp\\netcoretest\\Tools\\export.exe",														
-	"RepoFsFolderPath": 	"..\\temp\\netcoretest\\Root",
-  "DeployFolderPath": 	"..\\temp\\netcoretest\\deploy",
-  "InstallerFilePath": 	"..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnConsoleInstaller\\bin\\Release\\netcoreapp3.0\\SnConsoleInstaller.exe",
-  "InstallerCfgFilePath": 	"..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnConsoleInstaller\\bin\\Release\\netcoreapp3.0\\appsettings.json",
-  "AppConfigFilePath": 	"..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnWebApplication\\appsettings.json",
-  "SolutionFilePath": 	"..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnWebApplication.sln"
+    "DataSource": "SNPC013\\SQL2016",
+    "InitialCatalog": "netcoretest",
+    "WebAppName": "netcoretest",
+    "AppPoolName": "netcoretest",
+    "Hosts": [
+      "netcoretest"
+    ],
+    "DotNetVersion": "v4.0",
+    "SourceFolderPath": "..\\temp\\",
+    "WebFolderPath": "..\\temp\\netcoretest",
+    "AsmFolderPath": "..\\temp\\netcoretest\\bin",
+    "ToolsFolderPath": "..\\temp\\netcoretest\\Tools",
+    "IndexerPath": "..\\temp\\netcoretest\\Tools\\indexpopulator.exe",
+    "ImporterPath": "..\\temp\\netcoretest\\Tools\\import.exe",
+    "ExporterPath": "..\\temp\\netcoretest\\Tools\\export.exe",
+    "RepoFsFolderPath": "..\\temp\\netcoretest\\Root",
+    "DeployFolderPath": "..\\temp\\netcoretest\\deploy",
+    "InstallerFilePath": "..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnConsoleInstaller\\bin\\Release\\netcoreapp3.0\\SnConsoleInstaller.exe",
+    "InstallerCfgFilePath": "..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnConsoleInstaller\\bin\\Release\\netcoreapp3.0\\appsettings.json",
+    "AppConfigFilePath": "..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnWebApplication\\appsettings.json",
+    "SolutionFilePath": "..\\temp\\Templates\\src\\netcore\\SnWebApplication\\SnWebApplication.sln"
   }
 }
