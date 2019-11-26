@@ -130,7 +130,39 @@ Function Step-CleanWebFolder {
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		Write-Output "Target: $ProjectWebFolderPath"		
 		
-		Remove-Item "$($ProjectWebFolderPath)\*" -Recurse -Exclude "app_offline*.htm" -Force -ErrorAction "SilentlyContinue"
+		if ($ProjectWebFolderPath -and -not($ProjectWebFolderPath -eq "")) { 
+			Remove-Item "$($ProjectWebFolderPath)\*" -Recurse -Exclude "app_offline*.htm" -Force -ErrorAction "SilentlyContinue"
+		}
+		$script:Result = $LASTEXITCODE		
+	}
+	catch {
+		Write-Output "`tSomething went wrong: $_"
+		$script:Result = 1
+	}	
+}
+
+Function Step-RemoveWebFolder {
+	<#
+	.SYNOPSIS
+	Remove webfolder completely
+	.DESCRIPTION
+	Removel all folders and files along with webfolder
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$LASTEXITCODE = 0
+		Write-Output "`r`nCleanup web folder"
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		Write-Output "Target: $ProjectWebFolderPath"		
+		
+		if ($ProjectWebFolderPath -and -not($ProjectWebFolderPath -eq "")) { 
+			Remove-Item "$($ProjectWebFolderPath)" -Recurse
+		}
 		$script:Result = $LASTEXITCODE		
 	}
 	catch {
