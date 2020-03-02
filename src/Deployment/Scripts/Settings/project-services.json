@@ -1,8 +1,8 @@
 {
   "Source": {
-  "DbBackupFilePath": 	"..\\Databases\\project-services.bak",
-  "TemplateWebFolderPath":"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
-  "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication.sln",
+  "DbBackupFilePath": 		"..\\Databases\\project-services.bak",
+  "TemplateWebFolderPath":	"..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+  "SolutionFilePath": 		"..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication.sln",
   "SnWebFolderFilePath": 	"..\\Archives\\project-services.zip"
   },
   "Project": {
@@ -12,18 +12,18 @@
     "AppPoolName": 			"projectservices",
 	"Hosts": 				[ "projectservices" ],
     "DotNetVersion": 		"v4.0",
-    "SourceFolderPath": 	"..\\..\\",
-    "WebFolderPath": 		"..\\..\\WebSitWithServices",
-	"AsmFolderPath": 		"..\\..\\WebSitWithServices\\bin",
-	"WebConfigFilePath": 	"..\\..\\WebSitWithServices\\web.config",
-	"SnAdminFilePath": 		"..\\..\\WebSitWithServices\\Admin\\bin\\snadmin.exe",
-	"ToolsFolderPath": 		"..\\..\\WebSitWithServices\\Tools",
-	"SnAdminRCFilePath": 	"..\\..\\WebSitWithServices\\Tools\\SnAdminRuntime.exe.config",
-	"IndexerPath": 			"..\\..\\WebSitWithServices\\Tools\\indexpopulator.exe",
-	"ImporterPath": 		"..\\..\\WebSitWithServices\\Tools\\import.exe",
-	"ExporterPath": 		"..\\..\\WebSitWithServices\\Tools\\export.exe",														
-	"RepoFsFolderPath": 	"..\\..\\WebSitWithServices\\Root",
-	"DeployFolderPath": 	"..\\..\\WebSitWithServices\\deploy",
-    "SolutionFilePath": 	"..\\..\\Templates\\src\\SnWebApplication\\SnWebApplication.sln"
+    "SourceFolderPath": 	"..\\temp\\",
+    "WebFolderPath": 		"..\\temp\\WebSitWithServices",
+	"AsmFolderPath": 		"..\\temp\\WebSitWithServices\\bin",
+	"WebConfigFilePath": 	"..\\temp\\WebSitWithServices\\web.config",
+	"SnAdminFilePath": 		"..\\temp\\WebSitWithServices\\Admin\\bin\\snadmin.exe",
+	"ToolsFolderPath": 		"..\\temp\\WebSitWithServices\\Tools",
+	"SnAdminRCFilePath": 	"..\\temp\\WebSitWithServices\\Tools\\SnAdminRuntime.exe.config",
+	"IndexerPath": 			"..\\temp\\WebSitWithServices\\Tools\\indexpopulator.exe",
+	"ImporterPath": 		"..\\temp\\WebSitWithServices\\Tools\\import.exe",
+	"ExporterPath": 		"..\\temp\\WebSitWithServices\\Tools\\export.exe",														
+	"RepoFsFolderPath": 	"..\\temp\\WebSitWithServices\\Root",
+	"DeployFolderPath": 	"..\\temp\\WebSitWithServices\\deploy",
+    "SolutionFilePath": 	"..\\temp\\Templates\\src\\SnWebApplication\\SnWebApplication.sln"
   }
 }
