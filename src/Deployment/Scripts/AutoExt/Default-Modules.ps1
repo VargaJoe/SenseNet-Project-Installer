@@ -1,35 +1,6 @@
 
 
 # ******************************************************************  Steps ******************************************************************
-Function Step-Test {
-	<#
-	.SYNOPSIS
-	Stop site
-	.DESCRIPTION
-	Stop IIS site and application pool
-	#>
-	try{
-		$ProjectSiteName = $GlobalSettings.IIS.WebAppName
-		& "$ScriptBaseFolderPath\Ops\Stop-IISSite.ps1" $ProjectSiteName
-		$script:ResultJson = @"
-			{
-				 "ExitCode": "$LASTEXITCODE"
-			}
-"@
-	}
-	catch {
-		$script:ResultJson = @"
-			{
-				 "ExitCode": 1,
-				"ErrorCode": "$ERRORLEVEL",
-				"ErrorMessage": "$_.Exception.Message"
-			   }
-"@
-	}
-	Json
-}
-
-
 Function Step-Stop {	
 	<#
 	.SYNOPSIS
@@ -113,10 +84,14 @@ Function Step-GetLatestVsTemplates {
 	try {
 		$VsTemplatesRepo = $GlobalSettings.Source.VsTemplatesRepo
 		$TemplatesClonePath = $GlobalSettings.Source.TemplatesClonePath
-		Write-Output "Use github repo as source: $VsTemplatesRepo"
-		Write-Output "Repository will be cloned here: $TemplatesClonePath"
+		$TemplatesBranch = $GlobalSettings.Source.TemplatesBranch
+		if (-Not($TemplatesBranch)) {
+			$TemplatesBranch = "master"
+		}
+		#Write-Output "Use github repo as source: $VsTemplatesRepo"
+		#Write-Output "Repository will be cloned here: $TemplatesClonePath"
 		# $GitExePath = Get-FullPath $GlobalSettings.Tools.Git
-		& $ScriptBaseFolderPath\Dev\Download-VsTemplates.ps1 -Url "$VsTemplatesRepo" -TargetPath "$TemplatesClonePath" 
+		& $ScriptBaseFolderPath\Dev\Download-VsTemplates.ps1 -Url "$VsTemplatesRepo" -TargetPath "$TemplatesClonePath" -BranchName "$TemplatesBranch"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -258,13 +233,81 @@ Function Step-SnWebPages {
 	
 	try {
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
-		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-webpages" 
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-webpages" -ToolParameters "importdemo:true"
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
 		$script:Result = 1
 	}
+}
+
+Function Step-SnWorkspaces {
+<#
+	.SYNOPSIS
+	Sensenet install workspaces
+	.DESCRIPTION
 	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
+	try {
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-workspaces" -ToolParameters "importdemo:true"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Step-SnWorkflow {
+<#
+	.SYNOPSIS
+	Sensenet install workflow
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
+	try {
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-workflow" -ToolParameters "importdemo:true"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Step-SnNotification {
+<#
+	.SYNOPSIS
+	Sensenet install notification
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
+	try {
+		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
+		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-notification" -ToolParameters "importdemo:true"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
 }
 
 Function Step-RemoveDemo {
@@ -446,7 +489,6 @@ Function Step-Import {
 	catch {
 		$script:Result = 1
 	}
-	
 }
 
 
@@ -466,7 +508,6 @@ Function Step-Export {
 	try {
 		# & iisreset
 
-		$GETDate = Get-Date
 		$CurrentDateTime = Get-Date -format [yyyy-MM-dd-HH-mm-ss]
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
@@ -650,6 +691,30 @@ Function Step-DropDb {
 	
 }
 
+Function Step-CreateEmptyDb {
+	<#
+		.SYNOPSIS
+		Create empty sql database
+		.DESCRIPTION
+		
+		#>
+		[CmdletBinding(SupportsShouldProcess=$True)]
+			Param(
+			[Parameter(Mandatory=$false)]
+			[string]$Section="Project"
+			)
+			
+		try {
+			$DataSource=$GlobalSettings."$Section".DataSource
+			$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
+			& $ScriptBaseFolderPath\Ops\Create-EmptyDb.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" 
+			$script:Result = $LASTEXITCODE
+		}
+		catch {
+			$script:Result = 1
+		}
+		
+	}
 
 Function Step-SetConfigs {
 <#
@@ -837,12 +902,18 @@ function Step-WebAppOff {
 		[string]$Section="Project"
 		)
 	
+	$LASTEXITCODE = 0
 	try {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
 		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
 		if ([System.IO.File]::Exists($AppOnlineFilePath)){
-			Rename-Item $AppOnlineFilePath app_offline.htm
+			Rename-Item $AppOnlineFilePath $AppOfflineFilePath
+		} elseif (-Not([System.IO.File]::Exists($AppOfflineFilePath))) { 
+			Write-Output "App_offline file cannot be found, so create one..."
+			Write-Output "<p>We&#39;re currently undergoing scheduled maintenance. We will come back very shortly. Please check back in fifteen minutes. Thank you for your patience.</p>" > $AppOfflineFilePath
+		} else {
+			Write-Output "Site already offline"
 		}
 		$script:Result = $LASTEXITCODE
 	}
@@ -868,8 +939,8 @@ function Step-WebAppOn {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
 		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
-		if ([System.IO.File]::Exists($AppOfflineFilePath)){
-			Rename-Item $AppOfflineFilePath app_offline1.htm
+		if ([System.IO.File]::Exists($AppOfflineFilePath)) { 
+			Rename-Item $AppOfflineFilePath $AppOnlineFilePath
 		}
 		$script:Result = $LASTEXITCODE
 	}

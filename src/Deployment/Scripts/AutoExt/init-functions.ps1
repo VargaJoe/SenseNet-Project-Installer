@@ -37,12 +37,14 @@ Function Get-FullPath {
 
 Function Run-Steps {
 	Param(
-		[Parameter(Mandatory=$True)]
-        [String]$Plot
+		[Parameter(Mandatory=$false)]
+		[String]$Plot,
+		[Parameter(Mandatory=$false)]
+        [String]$Step
 		)
 	$Output = if ($show) {'Out-Default'} else {'Out-Null'}
 	$ProcessSteps = $GlobalSettings.plots."$Plot".Length
-	$Step = 0
+	$StepCount = 0
 	if (!($GlobalSettings.plots."$Plot" -eq $Null)) {
 		foreach ($StepNameSt in $GlobalSettings.plots."$Plot") {
 			# Temporary solution for set setting section
@@ -57,9 +59,9 @@ Function Run-Steps {
 			# end
 		
 			$script:Result = 0
-			$Step += 1
+			$StepCount += 1
 			$Synopsis = Get-Help Step-"$StepName" |  foreach { $_.Synopsis  }
-			$Progress=(($Step/($ProcessSteps))*100)
+			$Progress=(($StepCount/($ProcessSteps))*100)
 			
 			Write-Log "================================================" -foregroundcolor "green"
 			Write-Log "============= $Plot/$StepName =============" -foregroundcolor "green"
@@ -67,7 +69,7 @@ Function Run-Steps {
 			Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"			
 			Write-Log "Progress: $Progress/100" -foregroundcolor "green"
 			
-			# write-progress -id 1 -activity "$Plot" -status "$Synopsis" -percentComplete (($Step/($ProcessSteps))*100);
+			# write-progress -id 1 -activity "$Plot" -status "$Synopsis" -percentComplete (($StepCount/($ProcessSteps))*100);
 			
 			try {
 				# Invoke-Expression "Step-$StepName" 
@@ -91,7 +93,18 @@ Function Run-Steps {
 		Write-Log "-------------------- FINISH ----------------------"
 		Write-Log "--------------------------------------------------"
 	} else {
-		$StepNameArr = $Plot.Split(":")
+		write-host "$Step"
+		write-host "$Plot"
+		if (-Not($Step)) {
+			if ($Plot) {
+				$Step = $Plot
+			} else {
+				Write-Output "Nor valid Plot or Step are given!"
+				exit 1
+			}
+		}
+
+		$StepNameArr = $Step.Split(":")
 		$StepName = $StepNameArr[0]
 		if (-not ($StepNameArr[1] -eq $Null)){
 			$stepParameters = @{
@@ -101,13 +114,13 @@ Function Run-Steps {
 			
 		$Synopsis = Get-Help Step-"$StepName" |  foreach { $_.Synopsis  }
 		Write-Log "================================================" -foregroundcolor "green"
-		Write-Log "============= $Plot/$Plot =============" -foregroundcolor "green"
+		Write-Log "============= Step/$Step =============" -foregroundcolor "green"
 		Write-Log "================================================" -foregroundcolor "green"
 		Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"			
 		Write-Log "Progress: 100/100" -foregroundcolor "green"
 		
 		try {
-			# Invoke-Expression "Step-$Plot" 
+			# Invoke-Expression "Step-$Step" 
 			& "Step-$StepName" @stepParameters
 		}
 		catch {

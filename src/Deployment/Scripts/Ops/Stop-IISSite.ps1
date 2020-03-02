@@ -28,7 +28,7 @@ Function fnStopWebsite([string]$WebsiteName)
 		if((Get-Website -Name $WebsiteName).Name -eq $null)
 		{
 			# The website is not exist
-			exit 10
+			exit 0
 		}
 		else
 		{
@@ -55,8 +55,8 @@ Function fnStopApplicationPool([string]$AppPoolName)
 	try{
 		if((Get-WebAppPoolState -Name $AppPoolName).Name -eq $null)
 		{
-			# The website is not exist
-			exit 10
+			# The application pool is not exist
+			exit 0
 		}
 		else
 		{

@@ -1,0 +1,50 @@
+{
+	"Plots": {
+		"fullinstall": [
+			"getlatestvstemplates",
+			"restorepckgs",			
+			"crartifact",
+			"createwebFolder",
+			"webappoff",
+			"cleanwebFolder",
+			"deploywebFolder",
+			"dropdb",
+			"snservices",
+			"snworkspaces",
+			"setcors",
+			"createsite",
+			"sethost",
+			"webappon"
+		]
+	},
+	"Source": {		
+		"DbBackupFilePath": "..\\Databases\\project-services.bak",
+		"TemplatesClonePath": "\\temp\\Templates",
+		"TemplateWebFolderPath": "\\temp\\Templates\\src\\SnWebApplicationWithWorkspaces\\SnWebApplication\\obj\\Release\\Package\\PackageTmp",
+		"SolutionFilePath": "\\temp\\Templates\\src\\SnWebApplicationWithWorkspaces\\SnWebApplication.sln",
+		"SnWebFolderFilePath": "..\\Archives\\project-services.zip"
+	},
+	"Project": {
+		"DataSource": "MySenseNetContentRepositoryDatasource",
+		"InitialCatalog": "projectwithworkspaces",
+		"WebAppName": "projectwithworkspaces",
+		"AppPoolName": "projectwithworkspaces",
+		"Hosts": [
+			"Default_Site:projectwithworkspaces"
+		],
+		"DotNetVersion": "v4.0",
+		"SourceFolderPath": "\\temp\\",
+		"WebFolderPath": "\\temp\\SnWebApplicationWithWorkspaces",
+		"AsmFolderPath": "\\temp\\SnWebApplicationWithWorkspaces\\bin",
+		"WebConfigFilePath": "\\temp\\SnWebApplicationWithWorkspaces\\web.config",
+		"SnAdminFilePath": "\\temp\\SnWebApplicationWithWorkspaces\\Admin\\bin\\snadmin.exe",
+		"ToolsFolderPath": "\\temp\\SnWebApplicationWithWorkspaces\\Tools",
+		"SnAdminRCFilePath": "\\temp\\SnWebApplicationWithWorkspaces\\Tools\\SnAdminRuntime.exe.config",
+		"IndexerPath": "\\temp\\SnWebApplicationWithWorkspaces\\Tools\\indexpopulator.exe",
+		"ImporterPath": "\\temp\\SnWebApplicationWithWorkspaces\\Tools\\import.exe",
+		"ExporterPath": "\\temp\\SnWebApplicationWithWorkspaces\\Tools\\export.exe",
+		"RepoFsFolderPath": "\\temp\\SnWebApplicationWithWorkspaces\\Root",
+		"DeployFolderPath": "\\temp\\SnWebApplicationWithWorkspaces\\deploy",
+		"SolutionFilePath": "\\temp\\Templates\\src\\SnWebApplicationWithWorkspaces\\SnWebApplication.sln"
+	}
+}
