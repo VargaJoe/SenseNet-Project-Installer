@@ -42,7 +42,6 @@ Function Step-PrOldExport {
 	try {
 		# & iisreset
 
-		$GETDate = Get-Date
 		$CurrentDateTime = Get-Date -format [yyyy-MM-dd-HH-mm-ss]
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$ProjectRepoFsFolderPath = Get-FullPath $GlobalSettings.Project.RepoFsFolderPath
