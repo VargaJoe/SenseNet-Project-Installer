@@ -53,7 +53,6 @@ Function Step-PrImport {
 	catch {
 		$script:Result = 1
 	}	
-
 }
 
 Function Step-PrAsmDeploy {
@@ -301,4 +300,3 @@ Function Step-SetHostPermissionOnDb {
 			$script:Result = 1
 		}	
 	}
-

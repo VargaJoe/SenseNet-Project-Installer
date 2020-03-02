@@ -84,7 +84,6 @@ Function Step-GetLatestVsTemplates {
 	try {
 		$VsTemplatesRepo = $GlobalSettings.Source.VsTemplatesRepo
 		$TemplatesClonePath = $GlobalSettings.Source.TemplatesClonePath
-
 		$TemplatesBranch = $GlobalSettings.Source.TemplatesBranch
 		if (-Not($TemplatesBranch)) {
 			$TemplatesBranch = "master"
@@ -208,7 +207,7 @@ Function Step-SnServices {
 			}
 			
 			write-output "Username: $Username"
-			$params = $params + "username:$UserName","password:$UserPsw","dbusername:$DbUserName","dbpassword:$DbUserPsw" 
+			$params = $params,"username:$UserName","password:$UserPsw","dbusername:$DbUserName","dbpassword:$DbUserPsw" 
 		}
 		
 		& $ScriptBaseFolderPath\Deploy\Tool-Module.ps1 -SnAdminPath $SnAdminPath -ToolName "install-services" -ToolParameters $params
@@ -762,7 +761,7 @@ Function Step-GetSettings {
 	}
 }
 
-Function Step-SetConnectionOld {
+Function Step-SetConnection {
 <#
 	.SYNOPSIS
 	Set project configurations
@@ -782,40 +781,6 @@ Function Step-SetConnectionOld {
 		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
 		& $ScriptBaseFolderPath\Deploy\Set-Connection.ps1 -ConfigFilePath "$aConfigFilePath" -DataSource "$DataSource" -InitialCatalog "$InitialCatalog" 
 		& $ScriptBaseFolderPath\Deploy\Set-Connection.ps1 -ConfigFilePath "$wConfigFilePath" -DataSource "$DataSource" -InitialCatalog "$InitialCatalog" 
-		$script:Result = $LASTEXITCODE
-	}
-	catch {
-		$script:Result = 1
-	}
-}
-
-Function Step-SetConnection {
-<#
-	.SYNOPSIS
-	Set connection strings
-	.DESCRIPTION
-	
-	#>
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	Param(
-		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
-	)
-	
-	try {
-		$PackagesPath = Get-FullPath $GlobalSettings.Source.PackagesPath
-		$SnAdminPath = Get-FullPath $GlobalSettings."$Section".SnAdminFilePath
-		$PackagePath = Get-FullPath "$PackagesPath\SetConnection"
-
-		$DataSource=$GlobalSettings."$Section".DataSource
-		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
-	
-		$UserName = $GlobalSettings."$Section".UserName
-		$UserPsw = $GlobalSettings."$Section".UserPsw
-		
-		$params = "datasource:$DataSource","initialcatalog:$InitialCatalog","username:$UserName","password:$UserPsw"
-
-		& $ScriptBaseFolderPath\Deploy\Package-Module.ps1 -SnAdminPath "$SnAdminPath" -PackagePath "$PackagePath" -Parameters $params
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -942,15 +907,14 @@ function Step-WebAppOff {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
 		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
-		if ([System.IO.File]::Exists($AppOfflineFilePath)){
-			Write-Output "Appoffline already activated"			
-		} elseif ([System.IO.File]::Exists($AppOnlineFilePath)){
-			Rename-Item $AppOnlineFilePath app_offline.htm
+		if ([System.IO.File]::Exists($AppOnlineFilePath)){
+			Rename-Item $AppOnlineFilePath $AppOfflineFilePath
+		} elseif (-Not([System.IO.File]::Exists($AppOfflineFilePath))) { 
+			Write-Output "App_offline file cannot be found, so create one..."
+			Write-Output "<p>We&#39;re currently undergoing scheduled maintenance. We will come back very shortly. Please check back in fifteen minutes. Thank you for your patience.</p>" > $AppOfflineFilePath
 		} else {
-			Write-Output "Appoffline file does not exists, let's create one at $AppOfflineFilePath"
-			& echo "<p>We&#39;re currently undergoing scheduled maintenance. We will come back very shortly. Please check back in fifteen minutes. Thank you for your patience.</p>" > $AppOfflineFilePath
+			Write-Output "Site already offline"
 		}
-		
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
@@ -971,12 +935,10 @@ function Step-WebAppOn {
 		[string]$Section="Project"
 		)
 	
-	$LASTEXITCODE = 0
 	try {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
 		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
-
 		if ([System.IO.File]::Exists($AppOfflineFilePath)) { 
 			Rename-Item $AppOfflineFilePath $AppOnlineFilePath
 		}
