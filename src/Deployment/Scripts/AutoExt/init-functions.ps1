@@ -43,32 +43,59 @@ Function Run-Steps {
         [String]$Step
 		)
 	$Output = if ($show) {'Out-Default'} else {'Out-Null'}
-	$ProcessSteps = $GlobalSettings.plots."$Plot".Length
+	
+	$PlotNameArr = $Plot.Split(":")
+	$PlotName = $PlotNameArr[0]
+
+	if ($PlotNameArr[1]) {
+		$DefaultSection = $PlotNameArr[1]
+	} else {
+		$DefaultSection = $GlobalSettings.DefaultSection
+	}
+	
+	if ($DefaultSection) {
+		Write-Output "Default section is set to $DefaultSection"
+	} else {
+		Write-Output "Section is determined by step scripts."
+	}
+	
+	$ProcessSteps = $GlobalSettings.plots."$PlotName".Length
+
 	$StepCount = 0
-	if (!($GlobalSettings.plots."$Plot" -eq $Null)) {
-		foreach ($StepNameSt in $GlobalSettings.plots."$Plot") {
+	if (!($Null -eq $GlobalSettings.plots."$PlotName")) {
+
+		# Overwrite default section settings with environments
+		$GlobalSettings = Set-Environments -prior $GlobalSettings -sctn $DefaultSection
+
+		foreach ($StepNameSt in $GlobalSettings.plots."$PlotName") {
 			# Temporary solution for set setting section
 			$StepNameArr = $StepNameSt.Split(":")
 			$StepName = $StepNameArr[0]
-			
+
 			if (-not ($StepNameArr[1] -eq $Null)){
 				$stepParameters = @{
 					Section = $StepNameArr[1]
-				}	
-			} else {$stepParameters = @{}}
+				}
+			} elseif ($DefaultSection) {
+				$stepParameters = @{
+					Section = $DefaultSection
+				}
+			}
+			else {$stepParameters = @{}}
 			# end
 		
 			$script:Result = 0
 			$StepCount += 1
-			$Synopsis = Get-Help Step-"$StepName" |  foreach { $_.Synopsis  }
+			$Synopsis = Get-Help Step-"$StepName" |  ForEach-Object { $_.Synopsis  }
 			$Progress=(($StepCount/($ProcessSteps))*100)
 			
 			Write-Log "================================================" -foregroundcolor "green"
-			Write-Log "============= $Plot/$StepName =============" -foregroundcolor "green"
+			Write-Log "============= $PlotName/$StepName =============" -foregroundcolor "green"
 			Write-Log "================================================" -foregroundcolor "green"
 			Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"			
 			Write-Log "Progress: $Progress/100" -foregroundcolor "green"
-			# write-progress -id 1 -activity "$Plot" -status "$Synopsis" -percentComplete (($StepCount/($ProcessSteps))*100);
+			
+			# write-progress -id 1 -activity "$PlotName" -status "$Synopsis" -percentComplete (($StepCount/($ProcessSteps))*100);
 			
 			try {
 				# Invoke-Expression "Step-$StepName" 
@@ -105,21 +132,28 @@ Function Run-Steps {
 
 		$StepNameArr = $Step.Split(":")
 		$StepName = $StepNameArr[0]
-		if (-not ($StepNameArr[1] -eq $Null)){
+		if (-not ($Null -eq $StepNameArr[1])){
+			$DefaultSection = $StepNameArr[1]
+		} 
+		
+		if ($DefaultSection) {
 			$stepParameters = @{
-				Section = $StepNameArr[1]
-			}			
+				Section = $DefaultSection
+			}
 		} else {$stepParameters = @{}}
+		
+		# Overwrite default section settings with environments
+		$GlobalSettings = Set-Environments -prior $GlobalSettings -sctn $DefaultSection
 			
 		$Synopsis = Get-Help Step-"$StepName" |  foreach { $_.Synopsis  }
 		Write-Log "================================================" -foregroundcolor "green"
-		Write-Log "============= Step/$Step =============" -foregroundcolor "green"
+		Write-Log "============= Step/$StepName =============" -foregroundcolor "green"
 		Write-Log "================================================" -foregroundcolor "green"
 		Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"			
 		Write-Log "Progress: 100/100" -foregroundcolor "green"
 		
 		try {
-			# Invoke-Expression "Step-$Step" 
+			# Invoke-Expression "Step-$StepName" 
 			& "Step-$StepName" @stepParameters
 		}
 		catch {
@@ -181,20 +215,21 @@ Function List-Packages {
 	return $Result
 }
 
-function Set-ConnectionString {
-	Param(
-            [Parameter(Mandatory=$True)]
-            [String]$ConfigPath,
-			[Parameter(Mandatory=$True)]
-            [String]$ConnectionString
-         )
+# moved to script file to be a standalone logic
+# function Set-ConnectionString {
+# 	Param(
+#             [Parameter(Mandatory=$True)]
+#             [String]$ConfigPath,
+# 			[Parameter(Mandatory=$True)]
+#             [String]$ConnectionString
+#          )
 	
-	Set-ItemProperty $ConfigPath -name IsReadOnly -value $false
-	$doc = [xml](get-content $ConfigPath)
-	$root = $doc.get_DocumentElement();
-	$root.connectionStrings.add.ConnectionString = $ConnectionString
-	$doc.Save($ConfigPath)
-}
+# 	Set-ItemProperty $ConfigPath -name IsReadOnly -value $false
+# 	$doc = [xml](get-content $ConfigPath)
+# 	$root = $doc.get_DocumentElement();
+# 	$root.connectionStrings.add.ConnectionString = $ConnectionString
+# 	$doc.Save($ConfigPath)
+# }
 
 function Set-AppSetting {
 	Param(
@@ -418,6 +453,34 @@ function Get-MSBuild([switch]$xcopy = $false) {
 
 # if ($subproperty.Value.GetType().FullName -eq "System.Object[]") 
 
+# Merge settings with environment variables
+Function Set-Environments {
+	Param(
+		[Parameter(Mandatory = $True)]
+		[Object]$prior,
+		[Parameter(Mandatory = $True)]
+		[Object]$sctn
+	)
+	
+	$pmenvlist = Get-ChildItem env:PLOTMANAGER_*
+	
+	foreach ($pmenv in $pmenvlist) { 
+		$settingName=$pmenv.Name.Substring(12)
+		$settingValue=$pmenv.Value
+		
+		Write-Verbose "Process $($settingName)... " 
+		if ($prior."$sctn"."$settingName") {
+			Write-Verbose "Original value: $($prior."$sctn"."$settingName")"
+			$prior."$sctn"."$settingName"=$settingValue
+			Write-Verbose "Changed value: $($prior."$sctn"."$settingName")"
+		} else {
+			Write-Verbose "setting does not exists"
+		}
+	}
+	
+	return $prior
+}
+
 # Merge two json object
 Function Merge-Settings {
 	Param(
@@ -447,6 +510,66 @@ Function Merge-Settings {
 			# If project setting not contains default property at all, add to it
 			$prior | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
 		}
+	}
+	return $prior
+}
+
+# Merge two json object
+Function Merge-Json {
+	Param(
+		[Parameter(Mandatory = $True)]
+		[Object]$prior,
+		[Parameter(Mandatory = $True)]
+		[Object]$fallback,
+		[Parameter(Mandatory = $False)]
+		[Int]$deep = 0
+	)
+
+	write-host "====================="
+	write-host "START FUNCTION: $deep"
+
+	# Iterate through default setting properties
+	foreach ($property in $fallback.psobject.Properties) {
+		$doProcess = $($property.MemberType -eq "NoteProperty")
+		write-host $doProcess
+		
+		if (-not $doProcess) {
+			write-host "skipelj!!!"
+			continue 
+		}
+
+		# should be use with settings instead of hardcoded
+		$mergePropName = $($property.Name)
+		write-host $property.TypeNameOfValue
+
+		write-host "fallback property: $mergePropName"
+
+		# If property is found in project setting too, use the latter
+		if ($prior.PSObject.Properties.Match($property.Name).Count) {
+			write-host "prior found: $mergePropName"
+
+			# if prop exists and mergePropName we merge subproperties 
+			$priorSub = $prior."$($mergePropName)" 
+			$fallbackSub = $fallback."$($mergePropName)" 
+			
+			if ($property.TypeNameOfValue -eq "System.Management.Automation.PSCustomObject" -and $property.Value.psobject.Properties.Count) {
+				# Iterate through default setting property's subproperties
+				write-host "step in"
+				write-host "prior sub object: $priorSub"
+				write-host "fallback sub object: $fallbackSub"
+				#$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+				$prior."$($mergePropName)" = Merge-Json -prior $priorSub -fallback $fallbackSub -deep $($deep + 1)
+			} 
+		}
+		else {
+			write-host "prior not found"
+			$mergePropName = $($property.Name)
+			write-host $property.TypeNameOfValue
+
+			# If project setting not contains default property at all, add to it
+			$prior | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value -TypeName $property.TypeNameOfValue
+		}
+		write-host "exit recursion"
 	}
 	return $prior
 }

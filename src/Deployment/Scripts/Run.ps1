@@ -61,7 +61,9 @@ if (Is-Administrator) {
 
 	# Extend project settings with default
 	$GlobalSettings = Merge-Settings -prior $ProjectSettings -fallback $DefaultSettings
-	
+
+	# Settings overwrite may happen at Run-Steps
+
 	# Add steps section to settings
 	$GlobalSettings = Steps-Settings -setting $GlobalSettings
 	
@@ -99,7 +101,6 @@ if (Is-Administrator) {
 	if (!$Plot -and !$Step) {
 		exit
 	} 
-
 	elseif (Is-Administrator) {
 		# Run given process
 		Run-Steps -Plot "$Plot" -Step "$Step"
