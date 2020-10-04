@@ -27,6 +27,10 @@ Prerequisits are mostly come from the scripts that are made for managing Sense/N
 3. Visual Studio: some scripts based on visual studio tools, so if we want to use these steps we will need a VS in our environment
 4. Microsoft SQL Server: some steps will create database, for these steps we will need MsSql server on target machine
 a.       SQL Server Configuration Manager: we usually use a default server alias, if use default settings we have to set up this first
+b.       SqlServer powershell module
+          ```powershell
+          Install-Module -Name SqlServer -Force –AllowClobber
+          ```
 5. IIS: there are step to create an IIS site and it naturally needs IIS on target machine
 6. Environment settings
 - because it is for manage our development environment so to get SenseNet install we basically use a VS solution, and this project has an example for this. It can be replaced as long it has all the folders and tools to execute predefined steps
