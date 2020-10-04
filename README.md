@@ -2,6 +2,8 @@
 
 > The description is under construction but I hope it's still better than a description of an obsolate solution. if you're looking for the older version of the script, it's in the 'installer-6.5' branch.
 
+> sensenet product is being modified to be a cloud service so this installer project will be on hold until there is a public solution for on premise sensenet
+
 ## How it works
 
 The latest version of this project is basically a plot manager with package of various scripts used by my team creating and managing custom project installations. With this we have created automated steps and can run them in predefined order. With a little powershell script knowledge these steps can be broaden.
