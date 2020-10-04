@@ -1,9 +1,7 @@
 [CmdletBinding(SupportsShouldProcess=$True)]
 Param(
-	[Parameter(Mandatory=$true)]
-	[string[]]$SiteHosts,
-	[Parameter(Mandatory=$false)]
-	[string]$SiteIp = "127.0.0.1"
+[Parameter(Mandatory=$true)]
+[string[]]$SiteHosts 
 )
 
 Write-Verbose "================================================"
@@ -136,7 +134,7 @@ try{
 		Write-Verbose "Check for $HostnameToLower"
 		if (!$IsExists)
 		{
-			Add-Host -IP $SiteIp -DNS $HostnameToLower
+			Add-Host -IP "127.0.0.1" -DNS $HostnameToLower
 		}
 		else{
 			Write-Verbose "$HostnameToLower is already exist in hosts file!" 

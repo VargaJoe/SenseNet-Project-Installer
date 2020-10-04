@@ -9,10 +9,12 @@ Param (
 	[string]$Password
 )
 
-$LASTEXITCODE = 0
+$exitCode = 0
 
 [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SMO') | out-null 
 [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SmoExtended') | out-null 
+
+Import-Module SQLServer -DisableNameChecking
 
 #Set variables 
 $dbServer = new-object ('Microsoft.SqlServer.Management.Smo.Server') $ServerName 
@@ -32,17 +34,27 @@ if ($UserName) {
 
 $databases = $dbServer.Databases 
 $dbname = $CatalogName 
+
+Write-Verbose "server: $dbServer"
+Write-Verbose "dbname: $dbname"
+
 $db = $databases[$dbname]
 
 if ($db) {
 	Write-Verbose "$dbname already exists!"
 } else {
 	Write-Verbose "$dbname doesn't exists!"
-	$db = New-Object Microsoft.SqlServer.Management.Smo.Database($dbServer, $dbname)
-	$db.Create()
-	Write-Verbose "$dbname has been created on $db.CreateDate"
+	try {
+		$db = New-Object Microsoft.SqlServer.Management.Smo.Database($dbServer, $dbname)
+		$db.Create()
+		Write-Verbose "$dbname has been created"
+	} 
+	catch {
+		Write-Output "$_.Exception"
+		$exitCode = 1
+	}	
 }
 
-exit $LASTEXITCODE
+exit $exitCode
 
 

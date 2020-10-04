@@ -12,24 +12,24 @@ $DBrole = "'db_owner'"
 $ARS = "exec sp_addrolemember @rolename = $DBRole, @membername = '$User'"
 $exitcode = 0
 
-function Import-Module-SQLPS {
-    #pushd and popd to avoid import from changing the current directory (ref: http://stackoverflow.com/questions/12915299/sql-server-2012-sqlps-module-changing-current-location-automatically)
+function Import-Module-SQLServer {
+    #pushd and popd to avoid import from changing the current directory (ref: http://stackoverflow.com/questions/12915299/sql-server-2012-SQLServer-module-changing-current-location-automatically)
     #3>&1 puts warning stream to standard output stream (see https://connect.microsoft.com/PowerShell/feedback/details/297055/capture-warning-verbose-debug-and-host-output-via-alternate-streams)
-    #out-null blocks that output, so we don't see the annoying warnings described here: https://www.codykonior.com/2015/05/30/whats-wrong-with-sqlps/
+    #out-null blocks that output, so we don't see the annoying warnings described here: https://www.codykonior.com/2015/05/30/whats-wrong-with-SQLServer/
     push-location
-    import-module sqlps 3>&1 | out-null
+    import-module SQLServer 3>&1 | out-null
     pop-location
 }
 
 try {
 
-    "Is SQLPS Loaded?"
-    if(get-module sqlps){"yes"}else{"no"}
+    "Is SQLServer Loaded?"
+    if(get-module SQLServer){"yes"}else{"no"}
     
-    Import-Module-SQLPS
+    Import-Module-SQLServer
     
-    "Is SQLPS Loaded Now?"
-    if(get-module sqlps){"yes"}else{"no"}
+    "Is SQLServer Loaded Now?"
+    if(get-module SQLServer){"yes"}else{"no"}
     
     #Grant Owner role
     Write-Verbose "ServerInstance: $DataSource"
