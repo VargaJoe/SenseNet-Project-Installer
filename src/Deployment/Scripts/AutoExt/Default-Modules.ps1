@@ -84,7 +84,12 @@ Function Step-GetLatestVsTemplates {
 	try {
 		$VsTemplatesRepo = $GlobalSettings.Source.VsTemplatesRepo
 		$TemplatesClonePath = $GlobalSettings.Source.TemplatesClonePath
-		$TemplatesBranch = $GlobalSettings.Source.TemplatesBranch
+		$TemplatesBranch = $GlobalSettings."$Section".TemplatesBranch
+		
+		if (-Not($TemplatesBranch)) {
+			$TemplatesBranch = $GlobalSettings.Source.TemplatesBranch
+		}		
+
 		if (-Not($TemplatesBranch)) {
 			$TemplatesBranch = "master"
 		}
@@ -106,6 +111,12 @@ Function Step-RestorePckgs {
 	.DESCRIPTION
 	
 	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+
 	try {
 		$Output = if ($ShowOutput -eq $True) {"Out-Default"} else {"Out-Null"}
 		Write-Verbose "RESTORE PACKAGES REFERENCED BY SOLUTION" 
@@ -113,7 +124,12 @@ Function Step-RestorePckgs {
 		$NuGetFilePath = Get-FullPath $GlobalSettings.Tools.NuGetFilePath
 		Write-Verbose "Check if $NuGetFilePath exists..."
 		& $ScriptBaseFolderPath\Dev\Download-File.ps1 -Url $NuGetSourcePath -Output $NuGetFilePath
-		$ProjectSolutionFilePath = Get-FullPath $GlobalSettings.Project.SolutionFilePath
+		
+		if ($GlobalSettings."$Section".SolutionFilePath) {
+			$ProjectSolutionFilePath = Get-FullPath $GlobalSettings."$Section".SolutionFilePath 
+		} else {
+			$ProjectSolutionFilePath = Get-FullPath $GlobalSettings.Source.SolutionFilePath
+		}
 		Write-Verbose "$NuGetFilePath restore $ProjectSolutionFilePath" 
 		& "$NuGetFilePath" restore "$ProjectSolutionFilePath" | & $Output
 		$script:Result = $LASTEXITCODE
@@ -149,12 +165,84 @@ Function Step-CrArtifact {
 	.DESCRIPTION
 	
 	#>	
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
 	try {
-		$ProjectSolutionFilePath = Get-FullPath $GlobalSettings.Project.SolutionFilePath
-		& $ScriptBaseFolderPath\Dev\Create-Artifact.ps1 -slnPath $ProjectSolutionFilePath 
+		if ($GlobalSettings."$Section".SolutionFilePath) {
+			$SolutionFilePath = Get-FullPath $GlobalSettings."$Section".SolutionFilePath 
+		} else {
+			$SolutionFilePath = Get-FullPath $GlobalSettings.Source.SolutionFilePath
+		}
+
+		& $ScriptBaseFolderPath\Dev\Create-Artifact.ps1 -slnPath $SolutionFilePath 
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
+		$script:Result = 1
+	}	
+}
+
+Function Step-Publish {
+	<#
+	.SYNOPSIS
+	Build Solution and publish 
+	.DESCRIPTION
+	
+	#>	
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+	)
+	
+	try {
+		
+		if ($GlobalSettings."$Section".ProjectFilePath) {
+			$ProjectFilePath = Get-FullPath $GlobalSettings."$Section".ProjectFilePath 
+		} else {
+			$ProjectFilePath = Get-FullPath $GlobalSettings.Source.ProjectFilePath
+		} 
+		
+
+		# $ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
+		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".PublishFolderPath
+
+		Write-Output "Source: $ProjectFilePath"
+		Write-Output "Target: $ProjectWebFolderPath"	
+
+		& dotnet publish $ProjectFilePath -c Release -o $ProjectWebFolderPath --runtime ubuntu.16.04-x64
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}	
+}
+
+Function Step-CleanPublishFolder {
+	<#
+	.SYNOPSIS
+	Clean publish folder
+	.DESCRIPTION
+	Remove all folders and files under publish folder, except app_offline.htm
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+		Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		Write-Output "`r`nCleanup web folder"
+		$PublishFolderPath = Get-FullPath $GlobalSettings."$Section".PublishFolderPath
+		Write-Output "Target: $PublishFolderPath"		
+		
+		Remove-Item "$($PublishFolderPath)\*" -Recurse -Force -ErrorAction "SilentlyContinue"
+		$script:Result = $LASTEXITCODE		
+	}
+	catch {
+		Write-Output "`tSomething went wrong: $_"
 		$script:Result = 1
 	}	
 }
@@ -682,11 +770,14 @@ Function Step-DropDb {
 	try {
 		$DataSource=$GlobalSettings."$Section".DataSource
 		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
-		& $ScriptBaseFolderPath\Ops\Drop-Db.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" 
+		$UserName=$GlobalSettings."$Section".UserName 
+		$Password=$GlobalSettings."$Section".UserPsw 
+		& $ScriptBaseFolderPath\Ops\Drop-Db.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" -UserName $UserName -UserPsw $Password
 		$script:Result = $LASTEXITCODE
 	}
 	catch {
 		$script:Result = 1
+		Write-Output "$_"
 	}
 	
 }
@@ -707,7 +798,9 @@ Function Step-CreateEmptyDb {
 		try {
 			$DataSource=$GlobalSettings."$Section".DataSource
 			$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
-			& $ScriptBaseFolderPath\Ops\Create-EmptyDb.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" 
+			$UserName=$GlobalSettings."$Section".UserName 
+			$Password=$GlobalSettings."$Section".UserPsw 
+			& $ScriptBaseFolderPath\Ops\Create-EmptyDb.ps1 -ServerName "$DataSource" -CatalogName "$InitialCatalog" -UserName $UserName -Password $Password
 			$script:Result = $LASTEXITCODE
 		}
 		catch {
@@ -754,6 +847,28 @@ Function Step-GetSettings {
 	try {
 		$script:JsonResult = $GlobalSettings 
 		# | ConvertTo-Json
+		$script:Result = 0
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Step-ListSettings {
+	<#
+	.SYNOPSIS
+	List merged settings json
+	.DESCRIPTION
+
+	#>
+	try {
+		$filteredSettings = $GlobalSettings
+		# $filteredSettings.Plots = "removed for this list"
+		# $filteredSettings.Steps = "removed for this list"
+		Write-Output "Use settings: $Settings"
+		Write-Output "Settings:"
+		Write-Output $filteredSettings  | ConvertTo-Json
+
 		$script:Result = 0
 	}
 	catch {
@@ -902,20 +1017,23 @@ function Step-WebAppOff {
 		[string]$Section="Project"
 		)
 	
-	$LASTEXITCODE = 0
+		$exitCode = 0
 	try {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
 		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
+		Write-Output "Target file: $($AppOfflineFilePath)" 
 		if ([System.IO.File]::Exists($AppOnlineFilePath)){
 			Rename-Item $AppOnlineFilePath $AppOfflineFilePath
+			$exitCode = $LASTEXITCODE
+			Write-Output "Offline has been set."
 		} elseif (-Not([System.IO.File]::Exists($AppOfflineFilePath))) { 
 			Write-Output "App_offline file cannot be found, so create one..."
 			Write-Output "<p>We&#39;re currently undergoing scheduled maintenance. We will come back very shortly. Please check back in fifteen minutes. Thank you for your patience.</p>" > $AppOfflineFilePath
 		} else {
-			Write-Output "Site already offline"
+			Write-Output "Site already offline."
 		}
-		$script:Result = $LASTEXITCODE
+		$script:Result = $exitCode 
 	}
 	catch {
 		$script:Result = 1
@@ -939,8 +1057,12 @@ function Step-WebAppOn {
 		$WebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		$AppOfflineFilePath = $WebFolderPath+"\app_offline.htm"
 		$AppOnlineFilePath = $WebFolderPath+"\app_offline1.htm"
+		Write-Output "Target file: $($AppOfflineFilePath)" 
 		if ([System.IO.File]::Exists($AppOfflineFilePath)) { 
 			Rename-Item $AppOfflineFilePath $AppOnlineFilePath
+			Write-Output "Offline has been removed."
+		} else {
+			Write-Output "Site is not in offline mode."
 		}
 		$script:Result = $LASTEXITCODE
 	}
@@ -957,15 +1079,18 @@ Function Step-WarmApp {
 
 	#>
 	[CmdletBinding(SupportsShouldProcess=$True)]
-		Param(
+	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
-		)
-	$LASTEXITCODE = 0
+	)
+	
+	$exitCode = 0
 	try {
 		$siteName=$GlobalSettings."$Section".WebAppName
 		& $ScriptBaseFolderPath\Ops\warmup-Site.ps1 -siteName "$siteName"
-		$script:Result = $LASTEXITCODE
+		$exitCode = $LASTEXITCODE
+
+		$script:Result = $exitCode 
 	}
 	catch {
 		$script:Result = 1
@@ -981,13 +1106,16 @@ Function Step-TestWebfolder {
 	.DESCRIPTION
 	
 	#>
+	$exitCode = 0
 	try {
 		$SnWebFolderFilePath = Get-FullPath $GlobalSettings.Platform.SnWebFolderFilePath
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings.Project.WebFolderPath
 		Write-Verbose "SnWebfolderPackPath: $SnWebFolderFilePath"
 		Write-Verbose "SnWebfolderDestName: $ProjectWebFolderPath"
 		& $ScriptBaseFolderPath\Tools\Unzip-File.ps1 -filename "$SnWebFolderFilePath" -destname "$ProjectWebFolderPath"
-		$script:Result = $LASTEXITCODE
+		$exitCode = $LASTEXITCODE
+
+		$script:Result = $exitCode 
 	}
 	catch {
 		$script:Result = 1

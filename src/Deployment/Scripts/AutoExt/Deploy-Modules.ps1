@@ -5,6 +5,7 @@
 # - admin tools deploy 
 # - tools deploy + config
 
+#============================================ snadmin operations ==================================================
 Function Step-PrInstall {
 <#
 	.SYNOPSIS
@@ -55,6 +56,89 @@ Function Step-PrImport {
 	}	
 }
 
+#============================================ configurations ==================================================
+
+Function Step-SetInstallerConnection {
+	<#
+	.SYNOPSIS
+	temp Set installer json configurations
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+	
+	try {
+		$instConfigFilePath = Get-FullPath $GlobalSettings."$Section".InstallerCfgFilePath
+		$DataSource=$GlobalSettings."$Section".DataSource
+		$InitialCatalog=$GlobalSettings."$Section".InitialCatalog 
+		$UserName = $GlobalSettings."$Section".UserName
+		$UserPsw = $GlobalSettings."$Section".UserPsw		
+		
+		Write-Verbose "installer config: $instConfigFilePath"
+		& $ScriptBaseFolderPath\Deploy\Set-JsonConnection.ps1 -ConfigFilePath "$instConfigFilePath" -DataSource "$DataSource" -InitialCatalog "$InitialCatalog" -UserName $UserName -UserPsw $UserPsw
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Step-SetJsonPackages {
+	<#
+	.SYNOPSIS
+	Set isntall packages with installer json configurations
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+
+	try {
+		$instConfigFilePath = Get-FullPath $GlobalSettings."$Section".InstallerCfgFilePath
+		[string[]]$Packages=$GlobalSettings."$Section".InstallPackages
+		
+		Write-Verbose "installer config: $instConfigFilePath"
+		& $ScriptBaseFolderPath\Deploy\Set-Packages-Json.ps1 -ConfigFilePath "$instConfigFilePath" -Packages $Packages -nodeName "packages"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+Function Step-SetJsonImports {
+	<#
+	.SYNOPSIS
+	Set import packages with installer json configurations
+	.DESCRIPTION
+	
+	#>
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	Param(
+		[Parameter(Mandatory=$false)]
+		[string]$Section="Project"
+		)
+
+	try {
+		$instConfigFilePath = Get-FullPath $GlobalSettings."$Section".InstallerCfgFilePath
+		[string[]]$Packages=$GlobalSettings."$Section".ImportPackages
+		Write-Output "importer config: $instConfigFilePath"
+		& $ScriptBaseFolderPath\Deploy\Set-Packages-Json.ps1 -ConfigFilePath "$instConfigFilePath" -Packages $Packages -nodeName "import"
+		$script:Result = $LASTEXITCODE
+	}
+	catch {
+		$script:Result = 1
+	}
+}
+
+#============================================ file operations ==================================================
 Function Step-PrAsmDeploy {
 <#
 	.SYNOPSIS
@@ -116,7 +200,7 @@ Function Step-CleanWebFolder {
 	.SYNOPSIS
 	Clean webfolder
 	.DESCRIPTION
-	Removel all folders and files under webfolder, except app_offline.htm
+	Remove all folders and files under webfolder, except app_offline.htm
 	#>
 	[CmdletBinding(SupportsShouldProcess=$True)]
 		Param(
@@ -125,14 +209,11 @@ Function Step-CleanWebFolder {
 		)
 	
 	try {
-		$LASTEXITCODE = 0
 		Write-Output "`r`nCleanup web folder"
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		Write-Output "Target: $ProjectWebFolderPath"		
 		
-		if ($ProjectWebFolderPath -and -not($ProjectWebFolderPath -eq "")) { 
-			Remove-Item "$($ProjectWebFolderPath)\*" -Recurse -Exclude "app_offline*.htm" -Force -ErrorAction "SilentlyContinue"
-		}
+		Remove-Item "$($ProjectWebFolderPath)\*" -Recurse -Exclude "app_offline*.htm" -Force -ErrorAction "SilentlyContinue"
 		$script:Result = $LASTEXITCODE		
 	}
 	catch {
@@ -141,12 +222,12 @@ Function Step-CleanWebFolder {
 	}	
 }
 
-Function Step-RemoveWebFolder {
+Function Step-CleanWebFolderWOIndex {
 	<#
 	.SYNOPSIS
-	Remove webfolder completely
+	Clean webfolder without index
 	.DESCRIPTION
-	Removel all folders and files along with webfolder
+	Remove all folders and files under webfolder, except app_offline.htm
 	#>
 	[CmdletBinding(SupportsShouldProcess=$True)]
 		Param(
@@ -155,14 +236,11 @@ Function Step-RemoveWebFolder {
 		)
 	
 	try {
-		$LASTEXITCODE = 0
 		Write-Output "`r`nCleanup web folder"
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		Write-Output "Target: $ProjectWebFolderPath"		
 		
-		if ($ProjectWebFolderPath -and -not($ProjectWebFolderPath -eq "")) { 
-			Remove-Item "$($ProjectWebFolderPath)" -Recurse
-		}
+		Remove-Item "$($ProjectWebFolderPath)\*" -Recurse -Exclude "app_offline*.htm","LocalIndex" -Force -ErrorAction "SilentlyContinue"
 		$script:Result = $LASTEXITCODE		
 	}
 	catch {
@@ -185,7 +263,6 @@ Function Step-CreateWebFolder {
 		)
 	
 	try {
-		$LASTEXITCODE = 0
 		Write-Output "`r`nCopy webfolder files from package to destination"
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		Write-Output "Target: $ProjectWebFolderPath"		
@@ -199,7 +276,7 @@ Function Step-CreateWebFolder {
 			New-Item -Path "$parentPath" -Name "$folderName" -ItemType "directory"
 		}	
 		
-		$script:Result = $LASTEXITCODE		
+		$script:Result = 0
 	}
 	catch {
 		Write-Output "`tSomething went wrong: $_"
@@ -221,9 +298,13 @@ Function Step-DeployWebFolder {
 		)
 	
 	try {
-		$LASTEXITCODE = 0
 		Write-Output "`r`nCopy webfolder files from package to destination"
-		$TemplateWebfolderPath = Get-FullPath $GlobalSettings.Source.TemplateWebFolderPath
+		
+		if ($GlobalSettings."$Section".TemplateWebFolderPath) {
+			$TemplateWebfolderPath = Get-FullPath $GlobalSettings."$Section".TemplateWebFolderPath
+		} else {
+			$TemplateWebfolderPath = Get-FullPath $GlobalSettings.Source.TemplateWebFolderPath
+		}
 		$ProjectWebFolderPath = Get-FullPath $GlobalSettings."$Section".WebFolderPath
 		Write-Output "Source: $TemplateWebfolderPath"
 		Write-Output "Target: $ProjectWebFolderPath"		
@@ -238,7 +319,7 @@ Function Step-DeployWebFolder {
 		}	
 		
 		Copy-Item -Path "$TemplateWebfolderPath/*" -Destination "$ProjectWebFolderPath" -recurse -Force
-		$script:Result = $LASTEXITCODE		
+		$script:Result = 0
 	}
 	catch {
 		Write-Output "`tSomething went wrong: $_"
@@ -273,6 +354,7 @@ Function Step-DeployWebFolderFromZip {
 	}	
 }
 
+#============================================ database operations ==================================================
 Function Step-SetHostPermissionOnDb {
 	<#
 		.SYNOPSIS
@@ -300,3 +382,4 @@ Function Step-SetHostPermissionOnDb {
 			$script:Result = 1
 		}	
 	}
+
