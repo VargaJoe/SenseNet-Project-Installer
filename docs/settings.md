@@ -1,58 +1,171 @@
-# Settings
-Now it's time to speak about how the settings file is built up. It should be created once when the project starts than you do not have to bother about it later, since you want to improve automatization and expand the range of configurations like additional enviroments, integration, etc.
+# Configuration Settings
 
-There're two settings file by default, one responsible for project configurations is mentioned above. It names project-local, settings but can be renamed of course, for example can have multiple different name when you're working on multiple projects. In this case you have to modifify the name of the default settings is the Run.ps1, or call the -Settings parameter with this name.
+Configuration in Plot Manager is handled through JSON settings files that define environment-specific parameters, plot definitions, and operational settings. The framework uses a layered configuration approach where project-specific settings override default configurations.
 
-The other settings file names project-default.settings, which means you cant have a project file names default. This settings file is responsible for project-independent configurations, that is useful when we have multiple projects with commong configurations. When you execute Run.ps1 the installer merges the settings stored in the two files and puts the project configs in advance.
+## Settings File Structure
 
-The two files contain the following sections:
-- **Plots**: Responsible for
-- Source:
-- 
+### Default Configuration Files
+- **`project-default.json`**: Contains base settings and common plot definitions
+- **`project-local.json`**: Local development environment overrides
+- **Environment-specific files**: Custom configurations for different deployment targets
 
-A két file az alábbi beállítási szekciókat tartalmazza:
-- Plots : Itt történik a forgatókönyvek deklarálása, általában ez a default beállítások között szerepel, de termkészetesen kiegészíthető vagy felülírható a projekt beállítások között is. Egy forgatókönyv egy lépésekből álló string tömb. A lépéseket névkonvenció szerint vannak létrehozva, itt csak az egyedi részüket kell megadni. 
-Például névkonvenció szerint az indexpopulátor lépés neve "Step-Index", ebben az esetben a settingsben, vagy a "Run" lépés alapú futtatásánál annyit kell megadni "index". Az általunk létrehozott lépések úgy lettek kialakítva, hogy itt lehetőség van kettősponttal elválasztva itt egy beállítási szekció megadására is, pl "index:TestSite" (step: index, szekció: TestSite). Ha nem adunk meg szekciót, a lépés a saját logikájához tartozó default beállítások közül fogja venni a működéséhez szükséges adatokat. Ez legtöbbször a "Project". Ha a kettősponttal megadunk egy ettől eltérő nevet, abban az esetben a működési adatokat a Settings file-ban abból a szekcióból próbálja a kód felolvasni. 
+### Configuration Merging
+When executing plots, the framework merges configurations in this order:
+1. Load default settings from `project-default.json`
+2. Load environment-specific settings (e.g., `project-local.json`)
+3. Project settings override default settings where conflicts exist
+4. Environment variables with `PLOTMANAGER_` prefix override any setting
 
-- Source : az olyan beállítások kerülnek ide, amik valamilyen forrásul szolgálnak az adott feladat végrehajtásához, függetlenül a projektjez tartozó környezetektől. Például adatbázis backup, vagy snadmin csomagok gyűjtőhelye.
+## Configuration Sections
 
-Jelenleg ezeket használjuk:
-"PackagesPath": snadmin csomagok közös gyűjtőhelyének útvonala
-"DbBackupFileUrl": adatbázis backup file elérése interneten keresztül, egyik script a kitüntetett adatbázis backup útvonalára menti le innen a file-t
-"DbBackupFilePath": kitüntetett adatbázis backup file elérési útja, bizonyos lépések ebbe mentenek és ebből olvasnak vissza
-"DatabasesPath": további adatbázis backupok gyűjtőhelyének útvonala, pl automatizált vagy manuálisan indított scriptek ide hoznak létre dátumozott file-okat
-"SnWebFolderFileUrl": előre elkészített webfolder internetes elérése, az adatbázisos megoldáshoz hasonlóan működik
-"SnWebFolderFilePath": előre elkészített webfolder zip elérése
-
-- Project : Ez a default beállítási szekció a legtöbb lépéshez. Mivel alapvetően lokál fejlesztő környezet kezeléséhez készült a megoldás, itt lokális útvonalak vannak többnyire megadva:
-
-"DataSource": adatbázis szerver elérés, ajánlott beállítás: "MySenseNetContentRepositoryDatasource"
-"InitialCatalog": adatbázis neve
-"WebAppName": IIS site neve
-"AppPoolName": Application Pool neve
-"Hosts": a projekthez használt url-eket tartalmazó string tömb, kettősponttal elválasztva lehet definiálni azt is, hogy a sensnet repositoryban melyik site-hoz tartozik. Ha ez nincs megadva, defaultból a "project" nevű site-ot keresi. (pl: a setrepourl lépés a custom nevű site-hoz felveszi a két url-t, ha így van megadva:
+### Plots Section
+Defines automation scenarios as sequences of steps:
 
 ```json
-[ "custom:custom.hu", "custom:sub.custom.hu" ])
+{
+  "Plots": {
+    "fullinstall": [
+      "stop", 
+      "restorepckgs", 
+      "prbuild", 
+      "dropdb", 
+      "snservices", 
+      "createsite", 
+      "start"
+    ],
+    "backup": [
+      "stop",
+      "backupdb", 
+      "start"
+    ]
+  }
+}
 ```
 
-"DotNetVersion": Application Pool verziója, "v4.0"
-"SourceFolderPath": TFS-t kezelő lépésekhez a forráskönyvtár konténerének elérési útvonala
-"WebFolderPath": webfolder elérési útvonala
-"AsmFolderPath": bin könyvtár elérési útvonala
-"WebConfigFilePath": web.config elérési útvonala
-"SnAdminFilePath": snadmin.exe elérési útvonala, snadmin megoldásokat használó lépések használatához
-"ToolsFolderPath": Tools mappa elérési útvonala, snadminruntime.exe beállításához
-"SnAdminRCFilePath": SnAdminRuntime.config elérési útvonala, snadmin futtatását előkészítő lépés működéséhez
-"IndexerPath": indexpopulator.exe elérési útvonala (sn7-nél régebbi projektekhez)
-"ImporterPath": import.exe elérési útvonala (sn7-nél régebbi projektekhez)
-"ExporterPath": export.exe elérési útvonala (sn7-nél régebbi projektekhez)
-"RepoFsFolderPath": project custom content import útvonala, fejlesztésnél a DiskFsSupport miatt nálunk a project webfolder alatt található Root mappa
-"DeployFolderPath": snadmin futtatásához szükséges manifest file-t tartalmazó mappa útvonala, nálunk ebben van deklarálva a projekt installáláshoz szükséges információ és a project webfolder alatt található.
-"SolutionFilePath": solution file elérési útvonala 
+**Step Syntax**: Steps can include section targeting using colon notation:
+- `"index"`: Execute step with default section
+- `"index:TestSite"`: Execute step using "TestSite" configuration section
 
-- Tetszőleges nevű szekció : tetszőleges számú és nevú új szekció hozható létre a projectben definiált beállításokkal, amik a lépéseknél és forgatókönyveknél említett módzserrel megcímezhetők (azért lehetőleg ékezet és space ne legyen benne). Talán itt még egy említésre méltő beállítás van: 
+### Source Section
+Defines resource locations and shared paths independent of specific environments:
 
-"MachineName": távoli script futtatásánál használt a távoli gép azonosítója
+```json
+{
+  "Source": {
+    "PackagesPath": "..\\Packages",
+    "DbBackupFilePath": "..\\Databases\\project-latest.bak",
+    "DatabasesPath": "..\\Databases\\",
+    "VsTemplatesRepo": "https://github.com/SenseNet/sn-vs-projecttemplates",
+    "TemplatesBranch": "master",
+    "SnWebFolderFilePath": "..\\Archives\\project-Web.zip"
+  }
+}
+```
 
-- Tools : az egyes lépések futtatásához szükséges segédprogramok elérési útvonala szokott leginkább itt szerepelni. Ez projektenként nem szokott változni, így a default beállítások közé szoktuk rakni.
+### Project Section
+The default configuration section for most steps, typically containing local development settings:
+
+```json
+{
+  "Project": {
+    "DataSource": "MySenseNetContentRepositoryDatasource",
+    "InitialCatalog": "sensenetdb",
+    "WebAppName": "sensenetapp",
+    "AppPoolName": "sensenetapp",
+    "Hosts": ["sensenet.local"],
+    "DotNetVersion": "v4.0",
+    "WebFolderPath": "..\\WebApplication",
+    "AsmFolderPath": "..\\WebApplication\\bin",
+    "WebConfigFilePath": "..\\WebApplication\\web.config"
+  }
+}
+```
+
+## Common Configuration Properties
+
+### Database Settings
+- **`DataSource`**: SQL Server instance name or connection string
+- **`InitialCatalog`**: Database name
+- **`UserName`**: SQL Server authentication username (optional)
+- **`UserPsw`**: SQL Server authentication password (optional)
+
+### Application Settings  
+- **`WebAppName`**: IIS site name
+- **`AppPoolName`**: IIS application pool name
+- **`DotNetVersion`**: .NET Framework version (e.g., "v4.0")
+- **`Hosts`**: Array of hostnames for local development
+
+### File System Paths
+- **`WebFolderPath`**: Web application root directory
+- **`AsmFolderPath`**: Binary assemblies directory (typically bin/)
+- **`ToolsFolderPath`**: Utilities and tools directory
+- **`SolutionFilePath`**: Visual Studio solution file path
+
+### SenseNet-Specific Settings
+- **`SnAdminFilePath`**: Path to snadmin.exe utility
+- **`IndexerPath`**: Path to index populator executable
+- **`RepoFsFolderPath`**: Repository content import directory
+- **`DeployFolderPath`**: Deployment manifest directory
+
+## Environment-Specific Sections
+
+Create custom sections for different deployment targets:
+
+```json
+{
+  "Production": {
+    "DataSource": "prod-sql-server",
+    "InitialCatalog": "ProductionDB",
+    "WebAppName": "ProductionSite",
+    "MachineName": "PROD-SERVER-01"
+  },
+  "Staging": {
+    "DataSource": "staging-sql-server", 
+    "InitialCatalog": "StagingDB",
+    "WebAppName": "StagingSite"
+  }
+}
+```
+
+## Tools Section
+Defines paths to external utilities used by various steps:
+
+```json
+{
+  "Tools": {
+    "VisualStudio": "C:\\Program Files\\Microsoft Visual Studio\\2019\\Professional\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer\\tf.exe",
+    "UnZipperFilePath": "C:\\Program Files\\7-Zip\\7z.exe",
+    "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
+  }
+}
+```
+
+## Environment Variable Overrides
+
+Any configuration setting can be overridden using environment variables with the `PLOTMANAGER_` prefix:
+
+```powershell
+# Override database settings
+$env:PLOTMANAGER_DataSource = "new-sql-server"
+$env:PLOTMANAGER_InitialCatalog = "NewDatabase"
+
+# Override application settings  
+$env:PLOTMANAGER_WebAppName = "TestApplication"
+```
+
+## Best Practices
+
+### Security
+- Store sensitive data like passwords in environment variables rather than configuration files
+- Use SQL Server integrated authentication when possible
+- Protect configuration files with appropriate file system permissions
+
+### Organization
+- Keep environment-specific settings separate from shared configurations
+- Use descriptive section names without special characters or spaces
+- Document custom configuration properties and their purpose
+
+### Maintenance
+- Regularly validate configuration paths and ensure tools are accessible
+- Test configurations across all target environments
+- Version control configuration files but exclude sensitive data
