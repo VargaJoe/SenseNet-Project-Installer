@@ -9,3 +9,5 @@ src/Deployment/Scripts/test.json
 src/WebSitWithServices/
 src/WebSitWithWebpages/
 src/WebSite/
+.github/*.md
+.vscode/*

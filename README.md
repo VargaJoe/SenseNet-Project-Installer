@@ -1,103 +1,241 @@
-# SenseNet Project Installer
+# Plot Manager - Automation Framework
 
-> The description is under construction but I hope it's still better than a description of an obsolate solution. if you're looking for the older version of the script, it's in the 'installer-6.5' branch.
+> **A comprehensive PowerShell-based automation framework for operational task management and deployment orchestration.**
 
-> sensenet product is being modified to be a cloud service so this installer project will be on hold until there is a public solution for on premise sensenet
+## Overview
 
-## How it works
+Plot Manager is a sophisticated automation framework that orchestrates complex operational tasks through a flexible plot/step architecture. Originally developed for SenseNet CMS deployments, it has evolved into a general-purpose automation platform capable of managing diverse operational workflows including containerized deployments, cloud automation, and enterprise application lifecycle management.
 
-The latest version of this project is basically a plot manager with package of various scripts used by my team creating and managing custom project installations. With this we have created automated steps and can run them in predefined order. With a little powershell script knowledge these steps can be broaden.
+## Core Concepts
 
-Steps contain the following scripts for now:
-- Create, start and stop IIS sites
-- Setup host file
-- Unzip archives
-- Build solutions
-- Install Sense/Net site from source package
-- Get latest from TFS
-- Import/Export content and index populate Sense/Net site
-- and some other custom scripts
+**Plot Manager** uses a simple but powerful paradigm:
+- **Plots**: Predefined scenarios that execute a sequence of steps
+- **Steps**: Individual PowerShell functions that perform specific tasks  
+- **Settings**: JSON-based configuration supporting multiple environments
+- **Modules**: Auto-loaded PowerShell modules that extend functionality
 
-## Prerequisits
+This architecture enables complex automation workflows to be composed from reusable components, making it easy to create, maintain, and extend operational processes.
 
-Prerequisits are mostly come from the scripts that are made for managing Sense/Net:
+## Key Capabilities
 
-1. PowerShell: first and foremost the whole logic is based on powershell scripts, so naturally it needs to be executeable
-- Enable the powershell script running permission: PS C:\PowerShell-PowerUp> Set-ExecutionPolicy unrestricted
-- Some scripts need administrator privilages so I advice to run the scripts in administrator mode
-2. The user who executes the scripts have to have read and write privilages to the scripts, packages and soltuion folders because some steps will need it, eg. will create temporary files
-3. Visual Studio: some scripts based on visual studio tools, so if we want to use these steps we will need a VS in our environment
-4. Microsoft SQL Server: some steps will create database, for these steps we will need MsSql server on target machine
-a.       SQL Server Configuration Manager: we usually use a default server alias, if use default settings we have to set up this first
-b.       SqlServer powershell module
-          ```powershell
-          Install-Module -Name SqlServer -Force –AllowClobber
-          ```
-5. IIS: there are step to create an IIS site and it naturally needs IIS on target machine
-6. Environment settings
-- because it is for manage our development environment so to get SenseNet install we basically use a VS solution, and this project has an example for this. It can be replaced as long it has all the folders and tools to execute predefined steps
-- Download and install the 7-Zip application from http://www.7-zip.org/.
+### Infrastructure & Deployment
+- **IIS Management**: Complete website and application pool lifecycle
+- **Database Operations**: SQL Server database creation, backup, restore with authentication support
+- **Container Orchestration**: Docker container management and networking
+- **Cloud Deployment**: Azure Web App deployment automation
+- **SSL/TLS Management**: Certificate creation and configuration
 
-[How to execute a "plot"](/docs/how-to-execute-a-plot.md)
-[How to execute steps](/docs/how-to-execute-steps.md)
+### Development & Build Support  
+- **Solution Building**: Visual Studio solution compilation and artifact creation
+- **Package Management**: NuGet package restoration and dependency resolution
+- **Source Control**: TFS/Git integration for code retrieval
+- **.NET Core & Framework**: Support for both modern .NET Core and traditional .NET Framework
 
-**How is it working?**
+### SenseNet CMS Automation
+- **Content Management**: Import/export of content and configurations
+- **Search Indexing**: Lucene index population and management  
+- **Site Provisioning**: Complete SenseNet site setup and configuration
+- **Package Deployment**: SnAdmin package installation and management
 
-The main part of the solution is in the Script folder. The entry point of the solution is the Run.ps1 file in the root of the Script folder. This file accepts the execute parameters required to the automatization, this file loads and prepares the predefined configurations for processing.
+### Environment Management
+- **Configuration**: JSON-based settings with environment variable override
+- **Host Management**: Local host file configuration for development
+- **Network Operations**: Port management and firewall configuration
+- **Multi-Environment**: Support for local, staging, and production deployments
 
-Parameters for run the script:
--Plot: this is the name of the scenario. If it is not existed, the step with the same name will be executed.
--Settings: it is for define the related settings file. The solution is working based on this project-"$Settings".json file. If it is not set, it uses the "local" value by default so it will use the content of the project-local.json.
--ShowOutput = $True
--Verbose: it is not a real parameter, it controls the output information made by "Write-Verbose". It is useful when you are creating unique scripts, so that you can keep the control over the amount of dispayed information,
+## Prerequisites
 
-Let's see how all this are connected.
-- First, when we start the process, we give a scenario name to the Run script.
+### Core Requirements
+1. **PowerShell 5.1+**: The automation engine requires PowerShell with script execution enabled
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
 
+2. **Administrator Privileges**: Many operations require elevated permissions for system configuration
+
+3. **SqlServer PowerShell Module**: Required for database operations
+   ```powershell
+   Install-Module -Name SqlServer -Force -AllowClobber
+   ```
+
+### Optional Components (Based on Usage)
+- **Visual Studio**: Required for solution building and TFS integration
+- **Microsoft SQL Server**: For database-related operations
+- **IIS**: For web application deployment
+- **Docker**: For containerized deployment scenarios  
+- **7-Zip**: For archive extraction operations
+- **Azure CLI**: For Azure deployment automation
+
+### Environment Configuration
+The framework requires proper configuration through JSON settings files that define:
+- Database connection strings and authentication
+- File system paths for applications and tools
+- Environment-specific deployment targets
+- Network and security configurations
+
+## Quick Start
+
+### Basic Usage
+Execute a predefined plot with default settings:
 ```powershell
 .\Run.ps1 fullinstall
 ```
 
-- before we could do anything with this information, the script loads the helper methods and prepares the steps that could be used.
-- then it gets into a adaptor method, which is declared in the init-functions.ps1. (each helper method gets here)
-
+### Advanced Usage
+Specify custom settings and sections:
 ```powershell
-Run-Steps "fullinstall"
+.\Run.ps1 -Plot fullinstall -Settings production -Verbose
 ```
 
-- the helper method checks if one of the configs has a scenario with that name
+### Available Commands
+List available plots:
+```powershell
+.\Run.ps1 -Help plots
+```
 
+List available steps:  
+```powershell
+.\Run.ps1 -Help steps
+```
+
+Execute individual steps:
+```powershell
+.\Run.ps1 -Step createdb:production
+```
+
+## Architecture
+
+### Core Components
+- **`Run.ps1`**: Main entry point and orchestration engine
+- **`AutoExt/`**: Auto-loaded PowerShell modules containing step definitions
+- **`Settings/`**: JSON configuration files for different environments
+- **`Deploy/`, `Dev/`, `Ops/`**: Specialized script collections
+- **`Tools/`**: External utilities and dependencies
+
+### Execution Flow
+1. **Initialization**: Load configuration and modules from `AutoExt/` directory
+2. **Configuration Merge**: Combine default and environment-specific settings
+3. **Plot Resolution**: Resolve plot name to sequence of steps
+4. **Step Execution**: Execute each step with appropriate error handling
+5. **Result Reporting**: Return execution status and optional JSON results
+
+### Extension Model
+Add custom functionality by creating PowerShell modules in the `AutoExt/` directory:
+```powershell
+Function Step-CustomOperation {
+    [CmdletBinding(SupportsShouldProcess=$True)]
+    Param([Parameter(Mandatory=$false)][string]$Section="Project")
+    
+    try {
+        # Your custom logic here
+        $script:Result = 0
+    }
+    catch {
+        $script:Result = 1
+    }
+}
+```
+
+## Example Plots
+
+### SenseNet CMS Deployment
+Complete SenseNet installation from scratch:
+```powershell
+.\Run.ps1 fullinstall
+```
+**Steps**: Get templates → Restore packages → Build → Deploy → Create database → Install services → Configure → Start
+
+### Container Deployment  
+Containerized application deployment:
+```powershell
+.\Run.ps1 netcoredockertest
+```
+**Steps**: Container setup → Database creation → Build images → Deploy containers → Network configuration
+
+### Production Deployment
+Deploy to production environment:
+```powershell
+.\Run.ps1 fulldeploy -Settings production
+```
+**Steps**: Stop services → Build → Deploy → Database update → Restart services
+
+### Backup Operations
+Database backup with site management:
+```powershell
+.\Run.ps1 backup
+```
+**Steps**: Stop site → Backup database → Restart site
+
+## Configuration
+
+### Settings Files
+- **`project-default.json`**: Base configuration and common plots
+- **`project-local.json`**: Local development overrides  
+- **`project-production.json`**: Production environment settings
+- **Custom settings**: Create environment-specific configurations as needed
+
+### Environment Variables
+Override any setting using environment variables with `PLOTMANAGER_` prefix:
+```powershell
+$env:PLOTMANAGER_DataSource = "production-sql-server"
+$env:PLOTMANAGER_InitialCatalog = "ProductionDB"
+```
+
+### JSON Structure
 ```json
-pl. "fullinstall": [ "stop", "restorepckgs", "prbuild", "dropdb", "snservices", "snwebpages", "removedemo", "adminusers", "prinstall", "setrepourl", "index", "createsite", "sethost", "start" ],
+{
+  "Plots": {
+    "myplot": ["step1", "step2:section", "step3"]
+  },
+  "Project": {
+    "DataSource": "localhost",
+    "InitialCatalog": "mydb",
+    "WebAppName": "myapp"
+  },
+  "CustomSection": {
+    "DataSource": "remote-server"
+  }
+}
 ```
 
-- after that it iterates through the steps of the scenario and executes the steps one by one. If there's an error, the error code is returned to the caller script as a value of a variable names Result.
-- finally, when all the steps are executed, the Run script quits with the error code in $Result, or if it is supported in the step, it could be return $JsonResult as a powershell variable.
+## Documentation
 
-Loading of the helper methods and steps happens nearly automatically. The methods are stored in the "init-functions.ps1", the steps are stored in the "Default-Modules.ps1" file. These two file can be found in the "AutoExt" folder inside the Scripts folder. Everything powershell file stored in the "AutoExt" folder will be loaded automatically by the Run script. So if you need unique or project-specific steps do not modify the files mentioned above. Create your own file and put it into this folder, so that you can handle these custom steps separately and updating the common code will be easier.
+### User Guides
+- [How to Execute Plots](/docs/how-to-execute-a-plot.md) - Comprehensive guide to running automation scenarios
+- [Step Execution](/docs/how-to-execute-steps.md) - Running individual automation steps
+- [Configuration Guide](/docs/settings.md) - Setting up environments and configurations
+- [Custom Steps](/docs/custom-steps.md) - Creating custom automation steps
+- [Build Server Integration](/docs/build-server-basic-steps.md) - CI/CD integration patterns
 
-[Settings](/docs/settings.md)
+### API Reference
+- Step functions follow the naming convention `Step-{Name}`
+- All steps accept optional `Section` parameter for configuration targeting
+- Return codes: 0 (success), 1 (failure)
+- JSON results available through `$Global:JsonResult` variable
 
-## Local install 
+## Contributing
 
-If everything've set right, you can call the scripts simply with the following parameter:
-```powershell
-Run.ps1 fullinstall
-```
+### Adding New Steps
+1. Create PowerShell function in `AutoExt/` directory
+2. Follow naming convention: `Step-{YourStepName}`
+3. Include proper error handling and result codes
+4. Add synopsis for help system
+5. Test with multiple environment configurations
 
-[Build server basic steps](/docs/build-server-basic-steps.md)
+### Code Standards
+- Use `[CmdletBinding(SupportsShouldProcess=$True)]` for all steps
+- Implement try/catch with proper `$script:Result` setting
+- Use `Write-Verbose` for detailed logging
+- Follow existing parameter patterns for consistency
 
-[Custom steps](/docs/custom-steps.md)
+## License
 
-## Tfs Build Szerver
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Végezetül egy megjegyzés: mivel a build szerver képes powershell scripteket futtatni és ha a távoli környezetek is megfelelően be vannak állítva a settings file-okban, például belőttük a teszt szerver eléréséhez szükséges beállításokat, akkor minden további nélkül alkalmazhatóak a fent említett futtatási információk build szerver összeállításakor is. Ez esetben nem szükséges a környezeti változókat külön még a build szerveren is beállítani, futtatáskor ugyanúgy a settings file-ból fogja ezeket beolvasni. Hacsak nem feltétlenül szükséges mindenáron külön kezelni, akár lépésenként akor plot futtatásban egyszerűbbé válik a build szerver összeállítása is. Hiszen, ha egy adott forgatókönyv lefut lokál környezetből az adott szerverre, valószínűleg build szerverről is futni fog.
+## Support
 
-## Known issues
+For issues, questions, or contributions, please refer to the project's issue tracking system or contact the development team.
 
-There are some steps we've not fully automated yet. So some manual setups may required, such as:
+---
 
-- The script won't automatically map your Visual Studio version and its location which is needed to get latest tfs and solution build steps. You have to set `tf.exe` path properly in `project-local.json`'s Tools.VisualStudio property
-- Unziping archive script uses 7zip, the location for `7za.exe` file needs to be set in `project-local.json` too
-- If you use sql alias like `MySenseNetContentRepositoryDatasource` in default Sense/Net install, you have to set it manually before using the script or you have to set different Datasource in `project-local.json`
-- Nuget packages and snadmin version in the project should be checked if they're matching the proper sensenet version.
+**Note**: This framework has evolved from SenseNet-specific tooling into a general-purpose operational automation platform. While SenseNet CMS deployment remains a core use case, the framework now supports diverse automation scenarios across different platforms and technologies.
