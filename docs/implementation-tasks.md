@@ -1,76 +1,180 @@
 # Implementation Tasks and Project Analysis
 
 ## Project Overview
-The SenseNet Project Installer is a comprehensive PowerShell-based automation framework designed for managing SenseNet CMS installations and deployments. The project combines backend PowerShell scripts with an Angular frontend to provide both command-line and GUI-based management capabilities.
+Plot Manager is a comprehensive PowerShell-based automation framework designed for operational task management and deployment orchestration. Originally developed for SenseNet CMS deployments, it has evolved into a general-purpose automation platform capable of managing diverse operational workflows including containerized deployments, cloud automation, and enterprise application lifecycle management.
 
-## Current Project State (Analysis completed: 2025-07-02)
+## Story-Driven Development Progress
 
-### Branch Analysis
-**Current Branch**: `develop` (significantly ahead of master)
-**Key Differences**: The develop branch contains substantial improvements including Docker support, Azure deployments, .NET Core compatibility, and enhanced error handling.
+### Completed Stories
 
-### Architecture Analysis
-- **Main Framework**: PowerShell script automation with modular design
-- **Entry Point**: `src/Deployment/Scripts/Run.ps1`
-- **Module System**: Auto-loading from `AutoExt` folder with new specialized modules
-- **Configuration**: JSON-based settings system with environment-specific files and environment variable override
-- **Frontend**: Angular 5-based GUI with REST API communication (unchanged between branches)
+#### Story 01 - Foundation Transformation ✅
+**Goal**: Transform project to general-purpose Plot Manager with proper documentation and licensing
+**Status**: 100% Complete
+- [x] Analyze project structure and architecture
+- [x] Compare develop vs master branches  
+- [x] Create feature branch: feature/foundation-improvements
+- [x] Rewrite README as Plot Manager automation framework
+- [x] Standardize license to MIT across all components
+- [x] Translate and modernize docs/settings.md to English
+- [x] Update GUI package.json branding to "plot-manager-gui"
+- [x] Commit foundation improvements (ddf76c38)
+- [x] Update project overview references to Plot Manager
+- [x] Create story-driven development tracking system
 
-### Core Capabilities (Enhanced in Develop Branch)
-- IIS site lifecycle management (create, start, stop)
-- Database operations (backup, restore, create, drop) with SQL Server authentication
-- SenseNet CMS deployment automation
-- **NEW**: Docker containerization support for SenseNet applications
-- **NEW**: Azure Web App deployment automation
-- **NEW**: .NET Core project support alongside .NET Framework
-- **NEW**: SSL certificate creation and management
-- Visual Studio/TFS integration
-- NuGet package management with Docker scenarios
-- Content import/export
-- Index population and management
-- Host file management for development
-- **NEW**: Network and port management for containerized deployments
+### In Progress Stories
+*None currently - ready to start next story*
 
-### Current Issues Identified
-1. **Documentation**: README mentions "under construction" and project "on hold" - needs comprehensive update
-2. **Technology Stack**: Angular 5 is outdated (current is Angular 15+)
-3. **License Inconsistency**: Main project uses GPL v2, GUI uses MIT
-4. **Internationalization**: Some Hungarian text in documentation
-5. **Project Status**: Marked as "on hold" due to SenseNet transitioning to cloud service
-6. **Code Standards**: Mixed coding patterns and some legacy code structures
+### Planned Stories
 
-## Completed Tasks
-- [x] Analyzed project structure and architecture
-- [x] Reviewed documentation and README
-- [x] Examined PowerShell script modules and configuration
-- [x] Analyzed Angular GUI components
-- [x] Identified license information (GPL v2 for main project, MIT for GUI)
-- [x] Created memory entities for project understanding
-- [x] Compared develop branch with master branch
-- [x] Identified significant improvements in develop branch (Docker, Azure, .NET Core support)
-- [x] Updated project analysis with develop branch enhancements
+#### Story 02 - Angular Frontend Modernization
+**Goal**: Upgrade Angular 5 to latest version (15+) with modern dependencies and security
+**Priority**: High - Critical for security and maintainability
+**Effort**: Large (1-2 weeks)
+- [ ] Audit current Angular 5 codebase and dependencies
+- [ ] Plan migration strategy from Angular 5 to Angular 15+
+- [ ] Update package.json with modern Angular and dependencies
+- [ ] Migrate deprecated @angular/http to HttpClient
+- [ ] Update component syntax and lifecycle hooks
+- [ ] Replace deprecated ng2-toastr with modern notification system
+- [ ] Update Bootstrap from v4 to v5+ with modern grid system
+- [ ] Implement modern Angular routing and lazy loading
+- [ ] Add TypeScript strict mode compliance
+- [ ] Update build and development scripts
+- [ ] Test all GUI functionality after migration
+- [ ] Update documentation for new development setup
 
-## Next Tasks (Foundation Work)
-- [x] Create feature branch for foundation improvements
-- [x] Update README with comprehensive project description reflecting current capabilities
-- [x] Resolve license inconsistency across all components (standardized to GPL v2)
-- [x] Translate Hungarian documentation to English (settings.md updated)
-- [ ] Update project status and roadmap considering SenseNet's cloud transition
-- [ ] Standardize code formatting and remove deprecated patterns
-- [ ] Create comprehensive changelog documenting develop branch improvements
-- [ ] Consider project rename to "Plot Manager" to reflect true purpose
+#### Story 03 - PowerShell Code Standardization  
+**Goal**: Standardize code formatting, modern practices, and error handling
+**Priority**: High - Foundation for reliable automation
+**Effort**: Medium (1 week)
+- [ ] Analyze current PowerShell codebase for inconsistencies
+- [ ] Define PowerShell coding standards document
+- [ ] Implement PSScriptAnalyzer rules and configuration
+- [ ] Standardize function naming conventions (Verb-Noun pattern)
+- [ ] Update all functions with proper [CmdletBinding] attributes
+- [ ] Standardize parameter definitions and validation
+- [ ] Implement consistent error handling patterns
+- [ ] Add comprehensive help documentation to functions
+- [ ] Update variable naming conventions
+- [ ] Remove deprecated PowerShell syntax
+- [ ] Implement structured logging with severity levels
+- [ ] Create code review checklist for future changes
 
-## Future Enhancements (After Foundation)
-- [ ] Modernize Angular frontend to latest version
-- [ ] Add security improvements and role-based access
-- [ ] Implement comprehensive testing suite
-- [ ] Add CI/CD pipeline configuration
-- [ ] Create Docker Compose orchestration
-- [ ] Add monitoring and logging framework
-- [ ] Implement configuration validation
+#### Story 04 - Comprehensive Testing Framework
+**Goal**: Implement automated testing for PowerShell scripts and Angular frontend
+**Priority**: High - Critical for reliability
+**Effort**: Large (1-2 weeks)
+- [ ] Set up Pester testing framework for PowerShell scripts
+- [ ] Create unit tests for core PowerShell functions
+- [ ] Implement mock frameworks for external dependencies
+- [ ] Add Angular unit tests for components and services
+- [ ] Create integration tests for database operations
+- [ ] Develop end-to-end tests for complete plots
+- [ ] Set up test data management and cleanup
+- [ ] Configure GitHub Actions or Azure DevOps pipeline
+- [ ] Implement automated test execution on PR/commit
+- [ ] Add code coverage reporting
+- [ ] Create testing documentation and guidelines
+- [ ] Set up performance testing for large deployments
 
-## Timeline
-Started: 2025-07-02 20:42
-Updated: 2025-07-02 20:45 (Analyzed develop branch differences)
-Status: Analysis phase completed, ready to create foundation feature branch
-Next: Create feature branch for README update and license standardization
+#### Story 05 - Enhanced Security and Authentication
+**Goal**: Implement role-based access, secure credentials, and audit logging
+**Priority**: Medium - Important for enterprise adoption
+**Effort**: Large (2 weeks)
+- [ ] Design user role and permission system
+- [ ] Implement authentication in Angular frontend
+- [ ] Add JWT token-based API authentication
+- [ ] Integrate Windows Credential Manager for secure storage
+- [ ] Add Azure Key Vault support for cloud deployments
+- [ ] Implement comprehensive audit logging
+- [ ] Add security headers and HTTPS enforcement
+- [ ] Create secure configuration file encryption
+- [ ] Implement input validation and sanitization
+- [ ] Add security scanning to CI/CD pipeline
+- [ ] Create security documentation and guidelines
+- [ ] Implement session management and timeout
+
+#### Story 06 - Docker Orchestration and Container Management
+**Goal**: Enhanced Docker support with orchestration and Kubernetes
+**Priority**: Medium - Builds on existing Docker capabilities
+**Effort**: Medium (1 week)
+- [ ] Create Docker Compose files for multi-service scenarios
+- [ ] Develop Kubernetes deployment manifests
+- [ ] Create Helm charts for Kubernetes deployments
+- [ ] Implement container health checks and readiness probes
+- [ ] Add container monitoring with Prometheus/Grafana
+- [ ] Set up automated container image building
+- [ ] Implement container registry integration (Docker Hub/ACR)
+- [ ] Add container networking and service mesh support
+- [ ] Create container security scanning
+- [ ] Implement rolling updates and blue-green deployments
+- [ ] Add container log aggregation and management
+- [ ] Create documentation for container deployment patterns
+
+#### Story 07 - Cloud Platform Integration
+**Goal**: Add AWS, Google Cloud support beyond existing Azure integration
+**Priority**: Medium - Multi-cloud flexibility
+**Effort**: Large (2 weeks)
+- [ ] Implement AWS PowerShell module integration
+- [ ] Create CloudFormation templates for AWS deployments
+- [ ] Add AWS CDK support for infrastructure as code
+- [ ] Implement Google Cloud PowerShell cmdlets
+- [ ] Create Google Cloud Deployment Manager templates
+- [ ] Add Terraform support for multi-cloud infrastructure
+- [ ] Integrate cloud-native database services
+- [ ] Implement cloud storage automation
+- [ ] Add cloud monitoring and alerting setup
+- [ ] Create cloud cost optimization strategies
+- [ ] Implement cloud security best practices
+- [ ] Add multi-cloud failover and disaster recovery
+
+#### Story 08 - Monitoring and Observability Platform
+**Goal**: Comprehensive logging, monitoring, and performance insights
+**Priority**: Medium - Operational excellence
+**Effort**: Medium (1 week)
+- [ ] Set up centralized logging infrastructure (ELK/EFK stack)
+- [ ] Implement structured logging in PowerShell scripts
+- [ ] Add application performance monitoring (APM) integration
+- [ ] Create custom metrics and KPIs for automation workflows
+- [ ] Implement infrastructure monitoring (CPU, memory, disk, network)
+- [ ] Set up alerting rules and notification channels
+- [ ] Create monitoring dashboards with Grafana or similar
+- [ ] Implement distributed tracing for complex deployments
+- [ ] Add log correlation and analysis capabilities
+- [ ] Create automated incident response workflows
+- [ ] Implement monitoring as code with version control
+- [ ] Add capacity planning and trend analysis
+
+#### Story 09 - Plugin Architecture and Extensibility
+**Goal**: Enable third-party extensions without core code modifications
+**Priority**: Low - Long-term ecosystem growth
+**Effort**: Large (2 weeks)
+- [ ] Design plugin architecture and interfaces
+- [ ] Create plugin base classes and contracts
+- [ ] Implement plugin discovery and loading system
+- [ ] Add plugin lifecycle management (install, enable, disable, remove)
+- [ ] Create plugin development SDK and tools
+- [ ] Implement plugin versioning and dependency resolution
+- [ ] Add plugin security validation and sandboxing
+- [ ] Create plugin templates for common scenarios
+- [ ] Develop plugin documentation and tutorials
+- [ ] Implement plugin marketplace or registry
+- [ ] Add plugin testing and validation framework
+- [ ] Create sample plugins for demonstration
+
+#### Story 10 - Configuration Management Enhancement
+**Goal**: Advanced config validation, templating, and drift detection
+**Priority**: Low - Quality of life improvements
+**Effort**: Medium (1 week)
+- [ ] Create JSON schemas for configuration validation
+- [ ] Implement configuration validation in startup process
+- [ ] Design configuration templating system
+- [ ] Add support for configuration variables and substitution
+- [ ] Implement configuration inheritance hierarchies
+- [ ] Create environment promotion workflows
+- [ ] Add configuration diff and comparison tools
+- [ ] Implement configuration drift detection
+- [ ] Add configuration backup and rollback capabilities
+- [ ] Encrypt sensitive configuration data
+- [ ] Create configuration documentation generator
+- [ ] Implement configuration testing and validation
