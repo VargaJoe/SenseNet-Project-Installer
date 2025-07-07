@@ -16,12 +16,16 @@ Step-System-Stop -StepSettings @{ WebAppName = 'MySite' }
 ##>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$true)]
         [hashtable]$StepSettings
     )
     try {
+        if (-not $StepSettings.ContainsKey('WebAppName') -or [string]::IsNullOrWhiteSpace($StepSettings['WebAppName'])) {
+            Write-Error 'StepSettings["WebAppName"] is required.'
+            $script:Result = 1
+            return
+        }
         $webAppName = $StepSettings['WebAppName']
-        if (-not $webAppName) { throw 'WebAppName is required.' }
         & "$ScriptBaseFolderPath/Ops/Stop-IISSite.ps1" $webAppName
         $script:Result = $LASTEXITCODE
     } catch {
@@ -43,12 +47,16 @@ Step-System-Start -StepSettings @{ WebAppName = 'MySite' }
 ##>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$true)]
         [hashtable]$StepSettings
     )
     try {
+        if (-not $StepSettings.ContainsKey('WebAppName') -or [string]::IsNullOrWhiteSpace($StepSettings['WebAppName'])) {
+            Write-Error 'StepSettings["WebAppName"] is required.'
+            $script:Result = 1
+            return
+        }
         $webAppName = $StepSettings['WebAppName']
-        if (-not $webAppName) { throw 'WebAppName is required.' }
         & "$ScriptBaseFolderPath/Ops/Start-IISSite.ps1" $webAppName
         $script:Result = $LASTEXITCODE
     } catch {
