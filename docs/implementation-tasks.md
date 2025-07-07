@@ -22,7 +22,23 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [x] Create story-driven development tracking system
 
 ### In Progress Stories
-*None currently - ready to start next story*
+
+#### Story 03 - PowerShell Code Standardization 🚧
+**Goal**: Standardize code formatting, modern practices, and error handling
+**Priority**: High - Foundation for reliable automation
+**Effort**: Medium (1 week)
+- [ ] Analyze current PowerShell codebase for inconsistencies (feature/powershell-standardization branch)
+- [ ] Define PowerShell coding standards document
+- [ ] Implement PSScriptAnalyzer rules and configuration
+- [ ] Standardize function naming conventions (Verb-Noun pattern)
+- [ ] Update all functions with proper [CmdletBinding] attributes
+- [ ] Standardize parameter definitions and validation
+- [ ] Implement consistent error handling patterns
+- [ ] Add comprehensive help documentation to functions
+- [ ] Update variable naming conventions
+- [ ] Remove deprecated PowerShell syntax
+- [ ] Implement structured logging with severity levels
+- [ ] Create code review checklist for future changes
 
 ### Planned Stories
 
@@ -42,23 +58,6 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [ ] Update build and development scripts
 - [ ] Test all GUI functionality after migration
 - [ ] Update documentation for new development setup
-
-#### Story 03 - PowerShell Code Standardization  
-**Goal**: Standardize code formatting, modern practices, and error handling
-**Priority**: High - Foundation for reliable automation
-**Effort**: Medium (1 week)
-- [ ] Analyze current PowerShell codebase for inconsistencies
-- [ ] Define PowerShell coding standards document
-- [ ] Implement PSScriptAnalyzer rules and configuration
-- [ ] Standardize function naming conventions (Verb-Noun pattern)
-- [ ] Update all functions with proper [CmdletBinding] attributes
-- [ ] Standardize parameter definitions and validation
-- [ ] Implement consistent error handling patterns
-- [ ] Add comprehensive help documentation to functions
-- [ ] Update variable naming conventions
-- [ ] Remove deprecated PowerShell syntax
-- [ ] Implement structured logging with severity levels
-- [ ] Create code review checklist for future changes
 
 #### Story 04 - Comprehensive Testing Framework
 **Goal**: Implement automated testing for PowerShell scripts and Angular frontend
