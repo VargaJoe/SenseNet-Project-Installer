@@ -2,6 +2,7 @@
 # Implements PowerShell standards for system-related steps
 
 $ErrorActionPreference = 'Stop'
+. "$ScriptBaseFolderPath/Core/Core-Helpers.ps1"
 
 function Step-System-Stop {
 <##
@@ -20,16 +21,13 @@ Step-System-Stop -StepSettings @{ WebAppName = 'MySite' }
         [hashtable]$StepSettings
     )
     try {
-        if (-not $StepSettings.ContainsKey('WebAppName') -or [string]::IsNullOrWhiteSpace($StepSettings['WebAppName'])) {
-            Write-Error 'StepSettings["WebAppName"] is required.'
-            $script:Result = 1
-            return
-        }
+        Assert-RequiredSetting -Settings $StepSettings -Key 'WebAppName'
         $webAppName = $StepSettings['WebAppName']
+        Write-Log -Message "Stopping IIS site: $webAppName" -Severity Info
         & "$ScriptBaseFolderPath/Ops/Stop-IISSite.ps1" $webAppName
         $script:Result = $LASTEXITCODE
     } catch {
-        Write-Error $_
+        Write-Log -Message $_ -Severity Error
         $script:Result = 1
     }
 }
@@ -51,16 +49,13 @@ Step-System-Start -StepSettings @{ WebAppName = 'MySite' }
         [hashtable]$StepSettings
     )
     try {
-        if (-not $StepSettings.ContainsKey('WebAppName') -or [string]::IsNullOrWhiteSpace($StepSettings['WebAppName'])) {
-            Write-Error 'StepSettings["WebAppName"] is required.'
-            $script:Result = 1
-            return
-        }
+        Assert-RequiredSetting -Settings $StepSettings -Key 'WebAppName'
         $webAppName = $StepSettings['WebAppName']
+        Write-Log -Message "Starting IIS site: $webAppName" -Severity Info
         & "$ScriptBaseFolderPath/Ops/Start-IISSite.ps1" $webAppName
         $script:Result = $LASTEXITCODE
     } catch {
-        Write-Error $_
+        Write-Log -Message $_ -Severity Error
         $script:Result = 1
     }
 }
