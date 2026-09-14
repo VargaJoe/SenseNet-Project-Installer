@@ -1,5 +1,8 @@
 # Implementation Tasks and Project Analysis
 
+> 2026-09-14: the native package/runtime refactor is implemented. See [runtime status](powershell-standards-implementation-plan.md) and [tests](../tests/README.md). The story list below is the broader historical roadmap; it is not a claim that every old step or the GUI has been migrated.
+
+
 ## Project Overview
 Plot Manager is a comprehensive PowerShell-based automation framework designed for operational task management and deployment orchestration. Originally developed for SenseNet CMS deployments, it has evolved into a general-purpose automation platform capable of managing diverse operational workflows including containerized deployments, cloud automation, and enterprise application lifecycle management.
 
@@ -11,7 +14,7 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 **Goal**: Transform project to general-purpose Plot Manager with proper documentation and licensing
 **Status**: 100% Complete
 - [x] Analyze project structure and architecture
-- [x] Compare develop vs master branches  
+- [x] Compare develop vs master branches
 - [x] Create feature branch: feature/foundation-improvements
 - [x] Rewrite README as Plot Manager automation framework
 - [x] Standardize license to MIT across all components

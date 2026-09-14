@@ -1,49 +1,17 @@
-# PowerShell Standards Implementation Plan
+# Runtime refactor status
 
-## 1. Function Naming
-- All step functions must use the `Verb-Noun` format, with a unique, descriptive noun.
-- Step functions should be prefixed by their logical group (e.g., `System-Stop`, `Db-Backup`, `Deploy-GetLatest`).
-- No duplicate step names across files; use group or module prefix to ensure uniqueness.
+The native runtime refactor is implemented on feature/powershell-standardization.
 
-## 2. CmdletBinding and Advanced Functions
-- All functions must use `[CmdletBinding()]`.
-- Use advanced parameter blocks with `[Parameter()]` attributes.
+Delivered:
+- Explicit package registry, collision detection, dependency checks and isolated module dispatch.
+- Validated per-invocation settings, deep-copy merge, references and source diagnostics.
+- Repeated step invocations with distinct inputs and IDs.
+- CLI planning, WhatIf, structured results and exit codes.
+- Independently installable text, filesystem and IIS packages.
+- A separate-process legacy entry point, preserving historical workflows.
+- IIS polling repair, backup parser repair and legacy false/zero override repair.
+- Automated runtime tests for PowerShell 5.1 and 7, plus a CI workflow.
 
-## 3. Parameter Definitions
-- All step functions must accept a `[hashtable]$StepSettings` parameter for extensibility.
-- Clearly define all required/optional parameters and document them.
+Historical AutoExt steps retain their original implementations except for the explicitly documented fixes. They are not implicitly imported into the new registry. The old GUI remains separate. These boundaries are described in [runtime architecture](plot-manager-runtime.md).
 
-## 4. Error Handling
-- Use `try/catch` blocks for error handling.
-- Use `Write-Error` for user-facing errors, `throw` for terminating errors.
-- Set `$ErrorActionPreference = 'Stop'` at the top of scripts.
-
-## 5. Logging
-- Use `Write-Verbose`, `Write-Information`, and `Write-Error` for logging.
-- Implement a logging function with severity levels (Info, Warning, Error, Debug).
-
-## 6. Help Documentation
-- All functions must include comment-based help (`<# .SYNOPSIS ... #>`).
-- Provide usage examples for each function.
-
-## 7. Variable Naming
-- Use `camelCase` for local variables, `PascalCase` for global variables.
-- Prefix private variables with `_` if needed.
-
-## 8. Deprecated Syntax
-- Mark deprecated steps/functions with a clear comment and add to a deprecation list.
-- Remove deprecated code in a later cleanup phase.
-
-## 9. Grouping and Refactoring
-- Group step functions by logical domain (System, Db, Deploy, Project, etc.).
-- Move each group to its own module/file for clarity.
-- Add a manifest or registry for available steps and their group.
-
-## 10. Next Steps
-- Refactor a sample group (e.g., System Operations) to the new standard.
-- Document deprecated/obsolete steps for review.
-- Iterate through all groups, refactoring and documenting as you go.
-
----
-
-This plan will be updated as implementation progresses. See also: `docs/powershell-coding-standards.md` and `docs/plots-steps-audit.md`.
+The next cross-repository comparison must begin only after this refactor is verified. Company-specific configurations and Git history must not be copied into this repository.

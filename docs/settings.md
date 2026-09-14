@@ -1,171 +1,89 @@
-# Configuration Settings
+# Plot configuration
 
-Configuration in Plot Manager is handled through JSON settings files that define environment-specific parameters, plot definitions, and operational settings. The framework uses a layered configuration approach where project-specific settings override default configurations.
-
-## Settings File Structure
-
-### Default Configuration Files
-- **`project-default.json`**: Contains base settings and common plot definitions
-- **`project-local.json`**: Local development environment overrides
-- **Environment-specific files**: Custom configurations for different deployment targets
-
-### Configuration Merging
-When executing plots, the framework merges configurations in this order:
-1. Load default settings from `project-default.json`
-2. Load environment-specific settings (e.g., `project-local.json`)
-3. Project settings override default settings where conflicts exist
-4. Environment variables with `PLOTMANAGER_` prefix override any setting
-
-## Configuration Sections
-
-### Plots Section
-Defines automation scenarios as sequences of steps:
+Configuration is a JSON object. Pass its path with `-ConfigPath`; `-Settings name` selects `Settings/project-name.json`. These options are mutually exclusive. The native runner uses the selected file as a complete configuration; it does not implicitly load historical default settings.
 
 ```json
 {
+  "Message": { "Name": "operator" },
   "Plots": {
-    "fullinstall": [
-      "stop", 
-      "restorepckgs", 
-      "prbuild", 
-      "dropdb", 
-      "snservices", 
-      "createsite", 
-      "start"
-    ],
-    "backup": [
-      "stop",
-      "backupdb", 
-      "start"
-    ]
+    "hello": {
+      "Steps": [
+        {
+          "Id": "compose",
+          "Step": "text.join",
+          "With": {
+            "Items": ["Hello", { "$ref": "settings.Message.Name" }],
+            "Separator": ", "
+          }
+        },
+        {
+          "Id": "save",
+          "Step": "filesystem.write",
+          "With": {
+            "Path": "hello.txt",
+            "Content": { "$ref": "steps.compose.Output.Text" }
+          }
+        }
+      ]
+    }
   }
 }
 ```
 
-**Step Syntax**: Steps can include section targeting using colon notation:
-- `"index"`: Execute step with default section
-- `"index:TestSite"`: Execute step using "TestSite" configuration section
+A step ID identifies a definition; an invocation ID identifies one occurrence in a plot. The same step may occur any number of times. Invocation IDs must start with a letter and contain letters, numbers, underscores or hyphens. Omitted IDs become `step1`, `step2`, etc.; explicit IDs are preferable for references.
 
-### Source Section
-Defines resource locations and shared paths independent of specific environments:
+## Precedence
 
-```json
-{
-  "Source": {
-    "PackagesPath": "..\\Packages",
-    "DbBackupFilePath": "..\\Databases\\project-latest.bak",
-    "DatabasesPath": "..\\Databases\\",
-    "VsTemplatesRepo": "https://github.com/SenseNet/sn-vs-projecttemplates",
-    "TemplatesBranch": "master",
-    "SnWebFolderFilePath": "..\\Archives\\project-Web.zip"
-  }
-}
-```
+Later layers override earlier layers:
 
-### Project Section
-The default configuration section for most steps, typically containing local development settings:
+1. Defaults in the step's parameter schema.
+2. Configuration `Defaults`.
+3. Configuration `StepDefaults["package.step"]`.
+4. The invocation's selected top-level `Section`, if any.
+5. The plot's `Defaults`.
+6. The invocation's `With`.
+7. Explicit run overrides, keyed by invocation ID.
 
-```json
-{
-  "Project": {
-    "DataSource": "MySenseNetContentRepositoryDatasource",
-    "InitialCatalog": "sensenetdb",
-    "WebAppName": "sensenetapp",
-    "AppPoolName": "sensenetapp",
-    "Hosts": ["sensenet.local"],
-    "DotNetVersion": "v4.0",
-    "WebFolderPath": "..\\WebApplication",
-    "AsmFolderPath": "..\\WebApplication\\bin",
-    "WebConfigFilePath": "..\\WebApplication\\web.config"
-  }
-}
-```
-
-## Common Configuration Properties
-
-### Database Settings
-- **`DataSource`**: SQL Server instance name or connection string
-- **`InitialCatalog`**: Database name
-- **`UserName`**: SQL Server authentication username (optional)
-- **`UserPsw`**: SQL Server authentication password (optional)
-
-### Application Settings  
-- **`WebAppName`**: IIS site name
-- **`AppPoolName`**: IIS application pool name
-- **`DotNetVersion`**: .NET Framework version (e.g., "v4.0")
-- **`Hosts`**: Array of hostnames for local development
-
-### File System Paths
-- **`WebFolderPath`**: Web application root directory
-- **`AsmFolderPath`**: Binary assemblies directory (typically bin/)
-- **`ToolsFolderPath`**: Utilities and tools directory
-- **`SolutionFilePath`**: Visual Studio solution file path
-
-### SenseNet-Specific Settings
-- **`SnAdminFilePath`**: Path to snadmin.exe utility
-- **`IndexerPath`**: Path to index populator executable
-- **`RepoFsFolderPath`**: Repository content import directory
-- **`DeployFolderPath`**: Deployment manifest directory
-
-## Environment-Specific Sections
-
-Create custom sections for different deployment targets:
-
-```json
-{
-  "Production": {
-    "DataSource": "prod-sql-server",
-    "InitialCatalog": "ProductionDB",
-    "WebAppName": "ProductionSite",
-    "MachineName": "PROD-SERVER-01"
-  },
-  "Staging": {
-    "DataSource": "staging-sql-server", 
-    "InitialCatalog": "StagingDB",
-    "WebAppName": "StagingSite"
-  }
-}
-```
-
-## Tools Section
-Defines paths to external utilities used by various steps:
-
-```json
-{
-  "Tools": {
-    "VisualStudio": "C:\\Program Files\\Microsoft Visual Studio\\2019\\Professional\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer\\tf.exe",
-    "UnZipperFilePath": "C:\\Program Files\\7-Zip\\7z.exe",
-    "NuGetFilePath": "..\\Tools\\nuget\\nuget.exe"
-  }
-}
-```
-
-## Environment Variable Overrides
-
-Any configuration setting can be overridden using environment variables with the `PLOTMANAGER_` prefix:
+Defaults apply only where appropriate: a common Defaults map must contain parameters accepted by every affected step. Use StepDefaults or explicit With mappings for heterogeneous plots. Unknown parameter names are rejected.
 
 ```powershell
-# Override database settings
-$env:PLOTMANAGER_DataSource = "new-sql-server"
-$env:PLOTMANAGER_InitialCatalog = "NewDatabase"
-
-# Override application settings  
-$env:PLOTMANAGER_WebAppName = "TestApplication"
+# Override only one invocation. JSON values retain their types.
+./src/Deployment/Scripts/Run.ps1 hello -ConfigPath ./hello.json -Params '{"save":{"Path":"other.txt","Overwrite":true}}'
 ```
 
-## Best Practices
+Objects merge recursively. Arrays replace as a whole, including an empty array. Explicit null replaces; the schema must allow null. False and zero are values, not missing settings. Every invocation receives a deep copy, so changing it cannot change the base configuration or another invocation's inputs.
 
-### Security
-- Store sensitive data like passwords in environment variables rather than configuration files
-- Use SQL Server integrated authentication when possible
-- Protect configuration files with appropriate file system permissions
+## References
 
-### Organization
-- Keep environment-specific settings separate from shared configurations
-- Use descriptive section names without special characters or spaces
-- Document custom configuration properties and their purpose
+- `{"$ref":"settings.Message.Name"}` selects a configuration value.
+- `{"$ref":"steps.compose.Output.Text"}` selects an earlier invocation's output.
+- `{"$env":"MY_SETTING"}` explicitly reads an environment variable.
 
-### Maintenance
-- Regularly validate configuration paths and ensure tools are accessible
-- Test configurations across all target environments
-- Version control configuration files but exclude sensitive data
+Reference objects must contain exactly one directive. They are value references, not PowerShell expressions or string interpolation. Property paths use dots; keys containing dots are not addressable through this syntax. A reference to an output is allowed only for an earlier invocation. The actual output property and final type are checked immediately before the consuming step runs.
+
+Environment references are resolved during planning. There is no hidden environment overlay in native mode. Missing variables fail validation; string values are converted only for declared int/bool parameters. Boolean strings must be true or false, so "false" never becomes truthy through a string cast.
+
+## Schema validation
+
+Types: `string`, `int`, `bool`, `array`, `object` (a map). Parameters may declare `Required`, `Default`, `AllowNull`, `ValidateSet`, numeric `Minimum`/`Maximum`, and `Secret`.
+
+Missing required settings, unknown parameters, invalid scalar types and invalid static references fail preflight before any step runs. Deferred output references are validated after their producing step, because those values do not exist at preflight.
+
+## Inspection
+
+`-Explain` returns invocation IDs, resolved step IDs and parameter-source labels without executing package commands. `-Verbose` logs the selected step and source labels; it does not print settings values. `-WhatIf` returns skipped results and does not invoke any package command.
+
+Declared secret scalar values are redacted if they occur in a step exception message. This is not a general data-loss-prevention boundary: package authors must never emit secrets in their own outputs, logs or exception records.
+
+## Compatibility forms
+
+A plot may use an array directly. String entries can use `package.step:Section` to select a settings section:
+
+```json
+{
+  "Chosen": { "Items": ["one", "two"], "Separator": "-" },
+  "Plots": { "example": ["text.join:Chosen"] }
+}
+```
+
+These strings refer to native step IDs or registered aliases. Historical `Step-*` functions require `-Legacy`; their configurations use the historical loader. See [legacy configuration](legacy/settings.md).

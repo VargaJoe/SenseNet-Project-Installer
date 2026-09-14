@@ -1,0 +1,43 @@
+{
+  "Message": {
+    "Recipient": "operator"
+  },
+  "Plots": {
+    "compose-files": {
+      "Steps": [
+        {
+          "Id": "greeting",
+          "Step": "text.join",
+          "With": {
+            "Items": ["Hello", { "$ref": "settings.Message.Recipient" }],
+            "Separator": ", "
+          }
+        },
+        {
+          "Id": "farewell",
+          "Step": "text.join",
+          "With": {
+            "Items": ["Goodbye", { "$ref": "settings.Message.Recipient" }],
+            "Separator": ", "
+          }
+        },
+        {
+          "Id": "writeGreeting",
+          "Step": "filesystem.write",
+          "With": {
+            "Path": "greeting.txt",
+            "Content": { "$ref": "steps.greeting.Output.Text" }
+          }
+        },
+        {
+          "Id": "writeFarewell",
+          "Step": "filesystem.write",
+          "With": {
+            "Path": "farewell.txt",
+            "Content": { "$ref": "steps.farewell.Output.Text" }
+          }
+        }
+      ]
+    }
+  }
+}

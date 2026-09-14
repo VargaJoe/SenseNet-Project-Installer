@@ -11,3 +11,6 @@ src/WebSitWithWebpages/
 src/WebSite/
 .github/*.md
 .vscode/*
+!tests/
+!tests/**
+tests/.work*/

@@ -1,46 +1,22 @@
-# PowerShell Coding Standards (Draft)
+# PowerShell conventions
 
-## 1. Function Naming
-- Use `Verb-Noun` format (e.g., `Start-Service`, `Get-Config`).
-- Use approved PowerShell verbs where possible.
+These conventions apply to the native runtime and packages. Historical AutoExt scripts remain behind the explicit compatibility runner.
 
-## 2. CmdletBinding and Advanced Functions
-- All functions must use `[CmdletBinding()]`.
-- Use advanced parameter blocks with `[Parameter()]` attributes.
+- Support PowerShell 5.1 and 7 without requiring external tooling for the engine.
+- Use approved Verb-Noun function names; keep plot step IDs separate from function names.
+- Export only the commands declared in the package manifest.
+- Accept validated Settings plus a small Context object; avoid global variables.
+- Return structured data on the success stream. Throw on failure.
+- Check native executable exit codes immediately and convert failures to terminating errors.
+- Use Write-Verbose/Write-Information for diagnostics. Never dump configurations or credentials.
+- Guard mutating commands with SupportsShouldProcess and a real ShouldProcess call.
+- Treat package imports as definition-only operations.
+- Resolve package resources from Context.PackageRoot, and operator file paths from Context.WorkDirectory.
+- Define parameter types and defaults in the manifest. Avoid false/zero truthiness checks for presence.
+- Preserve input settings; merge into independent copies, with documented array/null behavior.
+- Add tests for behavior, failure paths, package isolation and CLI results.
+- Keep all PowerShell files parseable, including retained compatibility files.
 
-## 3. Parameter Definitions
-- Clearly define all parameters with type, mandatory/optional, and validation attributes.
-- Use `[ValidateNotNullOrEmpty()]`, `[ValidateSet()]`, etc., as appropriate.
+[Authoring guide](custom-steps.md) · [Settings contract](settings.md) · [Test commands](../tests/README.md)
 
-## 4. Error Handling
-- Use `try/catch` blocks for error handling.
-- Use `Write-Error` for user-facing errors, `throw` for terminating errors.
-- Always set `$ErrorActionPreference = 'Stop'` at the top of scripts.
-
-## 5. Logging
-- Use `Write-Verbose`, `Write-Information`, and `Write-Error` for logging.
-- Implement a logging function with severity levels (Info, Warning, Error, Debug).
-
-## 6. Help Documentation
-- All functions must include comment-based help (`<# .SYNOPSIS ... #>`).
-- Provide usage examples for each function.
-
-## 7. Variable Naming
-- Use `camelCase` for local variables, `PascalCase` for global variables.
-- Prefix private variables with `_` if needed.
-
-## 8. Deprecated Syntax
-- Avoid deprecated cmdlets and syntax (e.g., `Write-Host`, legacy array syntax).
-
-## 9. Plot/Step Grouping
-- Group steps by logical domain (system, Docker, Kubernetes, etc.).
-- Use folders or naming prefixes for grouping.
-
-## 10. Settings Injection
-- Design a standard mechanism for injecting settings into steps.
-- Use parameter objects or hashtables for extensibility.
-- Document required/optional settings for each step.
-
----
-
-This document is a draft and will be updated as Story 03 progresses.
+The repository currently uses a dependency-free runtime suite and parser checks. PSScriptAnalyzer is not bundled; the suite must not be described as a full analyzer pass.

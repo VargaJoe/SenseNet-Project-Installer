@@ -1,3 +1,7 @@
-# How to execute steps
+# Execute one step
 
-Usually a scenario has multiple steps, but it is not a must, it is possible to create a scenario with only one step. The steps could be executed directly as well, we only have to keep in mind that step and scenario should have a different name. If the executer does not find an executable scenario with the given name (-Plot x), than it will searching for a step with the given name and executes the found one. Earlier the Plot parameter had another name and was less ambigous, so maybe later this things will be separated or the direct execution feature will be removed. However it seems to be really useful so far, this logic starts the process and if it is needed it provides a return value to the caller.
+Use Run.ps1 -Step package.step. The single invocation ID is single; pass its parameters as JSON with -Params, for example:
+
+    ./src/Deployment/Scripts/Run.ps1 -Step text.join -Params '{"single":{"Items":["one","two"],"Separator":"-"}}'
+
+See [settings](settings.md) for type validation, references and override rules. Historical Step-* execution is described in [legacy/how-to-execute-steps.md](legacy/how-to-execute-steps.md) and uses -Legacy.

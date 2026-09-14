@@ -1,115 +1,72 @@
-[CmdletBinding(SupportsShouldProcess = $True)]
-Param(
-	[Parameter(Mandatory = $false)]
-	[string]$Plot,
-	[Parameter(Mandatory = $false)] 
-	[string]$Settings = "local",
-	[Parameter(Mandatory = $false)] 
-	[string]$Params,
-	[Parameter(Mandatory = $false)] 
-	[string]$Step,
-	[Parameter(Mandatory = $false)] 
-	[string]$ExportFilter,
-	[Parameter(Mandatory = $false)] 
-	[string]$ShowOutput = $True,
-	[Parameter(Mandatory = $false)] 
-	[string]$OutputMode = "Host",
-	[Parameter(Mandatory = $false)] 
-	[string]$Help
+#requires -Version 5.1
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Position=0)][string]$Plot,
+    [string]$Step,
+    [string]$ConfigPath,
+    [string]$Settings,
+    [string]$Params = '{}',
+    [string]$AutoPath,
+    [string]$WorkDirectory = (Get-Location).Path,
+    [ValidateSet('steps','plots')][string]$Help,
+    [switch]$Explain,
+    [switch]$Legacy
 )
-
-$ErrorActionPreference = "Stop"
-$Result = 0
-
-# ================================================
-# ============== GLOBAL VARIABLES ================
-# ================================================
-
-$Global:ScriptBaseFolderPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Global:ProjectSettingsPath = $null
-$Global:DefaultSettingsPath = $null
-$Global:ProjectSettings = $null
-$Global:DefaultSettings = $null
-$Global:OutputMode = $OutputMode
-$Global:ShowOutput = $ShowOutput
-
-$Global:GlobalSettings = $null
-$Global:JsonResult = $Null
-
-$AutoLoadExtensions = [IO.Path]::GetFullPath([IO.Path]::Combine($ScriptBaseFolderPath, "AutoExt"))
-
-# ================================================
-# ================ MAIN SCRIPT ===================
-# ================================================
-
-# Load steps and functions for plot manager
-$AutoLoadExtensionFiles = Get-ChildItem "$AutoLoadExtensions\*.ps1"
-foreach ($file in $AutoLoadExtensionFiles) {
-	. "$file"
+$ErrorActionPreference = 'Stop'
+$registry = $null
+try {
+    if ($Legacy) {
+        if ($WhatIfPreference -or $Explain) { throw 'Legacy scripts do not provide a reliable preview. Use native packages for WhatIf/Explain.' }
+        if ($ConfigPath -or $PSBoundParameters.ContainsKey('AutoPath') -or $PSBoundParameters.ContainsKey('WorkDirectory')) {
+            throw 'Legacy mode accepts Plot, Step, Settings, Params and Help only.'
+        }
+        # Run historical global-variable scripts in another PowerShell process.
+        $hostPath = (Get-Process -Id $PID).Path
+        $arguments = @('-NoProfile','-NonInteractive','-File',(Join-Path $PSScriptRoot 'Run-Legacy.ps1'))
+        foreach ($pair in @{ Plot=$Plot; Step=$Step; Settings=$Settings; Params=$Params; Help=$Help }.GetEnumerator()) {
+            if (-not [string]::IsNullOrEmpty($pair.Value)) { $arguments += "-$($pair.Key)"; $arguments += $pair.Value }
+        }
+        if ($VerbosePreference -eq 'Continue') { $arguments += '-Verbose' }
+        & $hostPath @arguments
+        exit $LASTEXITCODE
+    }
+    if (-not $AutoPath) { $AutoPath = Join-Path $PSScriptRoot 'Auto' }
+    Import-Module (Join-Path $PSScriptRoot 'Core/PlotManager.psm1') -ErrorAction Stop
+    $registry = New-PlotRegistry -AutoPath $AutoPath
+    if ($Help -eq 'steps' -or (-not $Plot -and -not $Step -and -not $Help)) {
+        $registry.Steps.Values | Sort-Object Id | ForEach-Object {
+            [pscustomobject]@{ Step=$_.Id; Package=$_.Package.Name; Version=$_.Package.Version; Parameters=($_.Definition.Parameters.Keys | Sort-Object) }
+        } | ConvertTo-Json -Depth 6
+        exit 0
+    }
+    if ($ConfigPath -and $Settings) { throw 'Use either ConfigPath or Settings, not both.' }
+    if ($Settings) {
+        if ($Settings -notmatch '^[a-zA-Z0-9_-]+$') { throw 'Settings must be a preset name. Use ConfigPath for a path.' }
+        $ConfigPath = Join-Path $PSScriptRoot "Settings/project-$Settings.json"
+    }
+    $configuration = if ($ConfigPath) { Read-PlotConfiguration -Path $ConfigPath } else { @{} }
+    if ($Help -eq 'plots') {
+        if ($configuration.ContainsKey('Plots')) { @($configuration.Plots.Keys | Sort-Object) | ConvertTo-Json }
+        else { '[]' }
+        exit 0
+    }
+    if ($Plot -and $Step) { throw 'Use either Plot or Step, not both.' }
+    if ($Step) { $Plot = 'single'; $configuration.Plots = @{ single=@(@{ Id='single'; Step=$Step }) } }
+    if (-not $Plot) { throw 'Specify Plot or Step.' }
+    $overrides = Copy-PlotValue ($Params | ConvertFrom-Json -ErrorAction Stop)
+    if ($overrides -isnot [hashtable]) { throw 'Params must be a JSON object keyed by invocation id.' }
+    if ($Explain) {
+        $plan = Get-PlotPlan -Registry $registry -Configuration $configuration -Plot $Plot -Overrides $overrides
+        @($plan | ForEach-Object { [pscustomobject]@{ Id=$_.Id; Step=$_.Step.Id; Sources=$_.Sources } }) | ConvertTo-Json -Depth 8
+        exit 0
+    }
+    $result = Invoke-Plot -Registry $registry -Configuration $configuration -Plot $Plot -Overrides $overrides -WorkDirectory $WorkDirectory -WhatIf:$WhatIfPreference
+    $result | ConvertTo-Json -Depth 30
+    if ($result.Status -eq 'Failed') { exit 1 }
+    exit 0
+} catch {
+    Write-Error $_ -ErrorAction Continue
+    exit 1
+} finally {
+    if ($null -ne $registry) { Remove-PlotRegistry -Registry $registry }
 }
-
-if (Is-Administrator) {
-	# Load default settings
-	$defaultsettingspath = set-settingspath -settingname "default"
-	Write-Log "default setting path: $defaultsettingspath"
-	$DefaultSettings = load-settings -settingspath $defaultsettingspath
-
-	# Load Project settings
-	$projectsettingspath = set-settingspath $settings
-	Write-Log "project setting path: $projectsettingspath"
-	$ProjectSettings = load-settings -settingspath $projectsettingspath
-
-	# Extend project settings with default
-	$GlobalSettings = Merge-Settings -prior $ProjectSettings -fallback $DefaultSettings
-
-	# Settings overwrite may happen at Run-Steps
-
-	# Add steps section to settings
-	$GlobalSettings = Steps-Settings -setting $GlobalSettings
-	
-	if ($help -eq "steps") {
-		Write-Output "You can call steps* by the following syntaxt:"
-		Write-Output "`t.\Run.ps1 <stepname>"
-		Write-Output "`n*Please note that if there is a plot with similar name, it will triggered instead."
-		Write-Output "`nAvailable steps:"
-	
-		# Set output field separator for this logic
-		$OFS = "`r`n`t- "
-	
-		$GlobalSettings.Steps | Sort-Object | ForEach-Object {
-			Write-Output "`t- $_"
-		}	
-	
-		# Set back output field separator back to default
-		$OFS = " "
-	
-		exit 0
-	}
-	
-	if ($help -eq "plots") {
-		Write-Output "You can call plots by the following syntaxt:"
-		Write-Output "`t.\Run.ps1 <plotname>"
-		Write-Output "`nAvailable plots:"
-	
-		Get-Member -Type NoteProperty -InputObject $GlobalSettings.Plots | 
-		Sort-Object Name | 
-		% { Write-Output "`t- $($_.Name)" }
-	
-		exit 0
-	}
-	
-	if (!$Plot -and !$Step) {
-		exit
-	} 
-	elseif (Is-Administrator) {
-		# Run given process
-		Run-Steps -Plot "$Plot" -Step "$Step"
-
-		$Global:JsonResult = $JsonResult
-	}
-}
-else {
-		Write-Verbose you have to run this script in administrator mode!
-}
-
-exit $Result
