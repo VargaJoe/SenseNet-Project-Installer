@@ -1,114 +1,81 @@
 # ******************************************************************  Steps ******************************************************************
-Function Step-NetcoreDockerTest {
-	<#
-	.SYNOPSIS
-	test docker with netcore
-	.DESCRIPTION
-	
-	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	Param(
-		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
-	)
-	
-	$exitCode = 0
-	try {	
-		# create test sql server
-		Step-StartContainerSql -Section $Section
-		$exitCode = $exitCode + $LASTEXITCODE
-		
-		# create empty dv for console installer
-		Step-CreateEmptyDockerDb -Section $Section
-		$exitCode = $exitCode + $LASTEXITCODE
-
-		# create test nuget feed
-		Step-StartNugetFeed -Section $Section
-		$exitCode = $exitCode + $LASTEXITCODE
-		
-		# set nuget ip in nuget config 
-		Step-PrepareNugetConfig -Section $Section
-		$exitCode = $exitCode + $LASTEXITCODE
-		
-		# set sql ip in apsettings
-		Step-SetInstallerConnectionWithDockerDb -Section $Section
-		$exitCode = $exitCode + $LASTEXITCODE
-
-		# # build docker image for installer
-		Step-BuildInstallerImage -Section $Section
-		$exitCode = $exitCode + $LASTEXITCODE
-
-		# start installer
-		Step-CallConsoleInstallerWithDocker -Section $Section
-		$exitCode = $exitCode + $LASTEXITCODE
-
-		# build docker image
-		Step-BuildNetcoreWebAppImage -Section $Section
-		$exitCode = $exitCode + $LASTEXITCODE
-
-		# start netcore
-		Step-StartNetCoreWebApp -Section $Section
-		$exitCode = $exitCode + $LASTEXITCODE
-
-		# set host file
-		#. ..\Ops\Set-Host.ps1 -SiteHosts [ "projectwithwebpagesdocker" ] -SiteIp $snAppIp
-		
-		# open netcore webapp in chrome
-		Step-OpenNetCoreWebApp -Section $Section
-
-		$exitCode = $exitCode + $LASTEXITCODE
-		
-		$script:Result = $exitCode 
-	}
-	catch {
-		$script:Result = 1
-	}
+Function Step-Docker-NetcoreTest {
+<#!
+    .SYNOPSIS
+    Test Docker with .NET Core and SQL container
+    .DESCRIPTION
+    Runs a full test workflow: SQL container, empty DB, NuGet feed, config, build, run, and open webapp.
+    .PARAMETER StepSettings
+    Hashtable of settings for the test. Must include all required keys for sub-steps.
+    .EXAMPLE
+    Step-Docker-NetcoreTest -StepSettings @{ ... }
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]$StepSettings
+    )
+    try {
+        Assert-RequiredSetting -Settings $StepSettings -Key 'RequiredKey1' # TODO: List all required keys
+        Write-Log -Message 'Starting Docker .NET Core test workflow...' -Severity Info
+        Step-Docker-StartContainerSql -StepSettings $StepSettings
+        Step-Docker-CreateEmptyDb -StepSettings $StepSettings
+        Step-Docker-StartNugetFeed -StepSettings $StepSettings
+        Step-Docker-PrepareNugetConfig -StepSettings $StepSettings
+        Step-Docker-SetInstallerConnectionWithDb -StepSettings $StepSettings
+        Step-Docker-BuildInstallerImage -StepSettings $StepSettings
+        Step-Docker-CallConsoleInstaller -StepSettings $StepSettings
+        Step-Docker-BuildWebAppImage -StepSettings $StepSettings
+        Step-Docker-StartWebApp -StepSettings $StepSettings
+        Step-Docker-OpenWebApp -StepSettings $StepSettings
+        $script:Result = 0
+    } catch {
+        Write-Log -Message $_ -Severity Error
+        $script:Result = 1
+    }
 }
 
-Function Step-BuildInstallerImage {
-	<#
-	.SYNOPSIS
-	build .net core console installer image
-	.DESCRIPTION
-	build .net core console installer image from  netcore SnWebApplicationWithIdentity of vs templates
-	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	Param(
-		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
-	)
-	
-	$exitCode = 0
-	try {	
-		$dockerImageName=$GlobalSettings."$Section".InstallerDockerImageName
-		$dockerFilePath=$GlobalSettings."$Section".InstallerDockerFilePath
-		$solutionFolderPath=$GlobalSettings."$Section".SolutionFolderPath
-
-		if (-Not($solutionFolderPath)) {
-			$solutionFolderPath = $GlobalSettings.Source.SolutionFolderPath
-		}	
-		
-		# build docker image for installer
-		Write-Output "docker build -t $dockerimageName -f $dockerFilePath $solutionFolderPath"
-		docker build -t $dockerimageName -f "$dockerFilePath" "$solutionFolderPath"
-		$exitCode = $LASTEXITCODE
-
-		$script:Result = $exitCode 
-	}
-	catch {
-		$script:Result = 1
-	}
+Function Step-Docker-BuildInstallerImage {
+<#!
+    .SYNOPSIS
+    Build .NET Core console installer Docker image
+    .DESCRIPTION
+    Builds a Docker image for the .NET Core console installer using StepSettings.
+    .PARAMETER StepSettings
+    Hashtable of settings. Must include 'InstallerDockerImageName', 'InstallerDockerFilePath', 'SolutionFolderPath'.
+    .EXAMPLE
+    Step-Docker-BuildInstallerImage -StepSettings @{ InstallerDockerImageName = '...'; InstallerDockerFilePath = '...'; SolutionFolderPath = '...' }
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]$StepSettings
+    )
+    try {
+        Assert-RequiredSetting -Settings $StepSettings -Key 'InstallerDockerImageName'
+        Assert-RequiredSetting -Settings $StepSettings -Key 'InstallerDockerFilePath'
+        Assert-RequiredSetting -Settings $StepSettings -Key 'SolutionFolderPath'
+        $dockerImageName = $StepSettings['InstallerDockerImageName']
+        $dockerFilePath = $StepSettings['InstallerDockerFilePath']
+        $solutionFolderPath = $StepSettings['SolutionFolderPath']
+        Write-Log -Message "docker build -t $dockerImageName -f $dockerFilePath $solutionFolderPath" -Severity Info
+        docker build -t $dockerImageName -f "$dockerFilePath" "$solutionFolderPath"
+        $script:Result = $LASTEXITCODE
+    } catch {
+        Write-Log -Message $_ -Severity Error
+        $script:Result = 1
+    }
 }
 
 
-Function Step-CallConsoleInstallerWithDocker {
+Function Step-Docker-CallConsoleInstaller {
 	<#
 	.SYNOPSIS
 	run .net core console installer from docker container
 	.DESCRIPTION
 	Network related error for some reason. Use default "CallConsoleInstaller" for now.
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -150,14 +117,14 @@ Function Step-CallConsoleInstallerWithDocker {
 	}
 }
 
-Function Step-BuildNetcoreWebApp {
+Function Step-Docker-BuildWebAppImage {
 	<#
 	.SYNOPSIS
 	build .net core webapp image
 	.DESCRIPTION
 	build .net core webapp image from  netcore SnWebApplicationWithIdentity of vs templates
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -185,14 +152,14 @@ Function Step-BuildNetcoreWebApp {
 	}
 }
 
-Function Step-StartNetCoreWebApp {
+Function Step-Docker-StartWebApp {
 	<#
 	.SYNOPSIS
 	start .netcore web application in docker container
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -270,14 +237,14 @@ Function Step-StartNetCoreWebApp {
 	}
 }
 
-Function Step-GetNetCoreWebApp {
+Function Step-Docker-GetNetCoreWebApp {
 	<#
 	.SYNOPSIS
 	get ip of test docker container for internal nuget feed
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -303,14 +270,14 @@ Function Step-GetNetCoreWebApp {
 	}
 }
 
-Function Step-OpenNetCoreWebApp {
+Function Step-Docker-OpenWebApp {
 	<#
 	.SYNOPSIS
 	get ip of test docker container for internal nuget feed
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -341,14 +308,14 @@ Function Step-OpenNetCoreWebApp {
 	}
 }
 
-Function Step-OpenNetCoreWebAppUnSecure {
+Function Step-Docker-OpenWebAppUnSecure {
 	<#
 	.SYNOPSIS
 	get ip of test docker container for internal nuget feed
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -379,14 +346,14 @@ Function Step-OpenNetCoreWebAppUnSecure {
 	}
 }
 
-Function Step-StopNetCoreWebApp {
+Function Step-Docker-StopNetCoreWebApp {
 	<#
 	.SYNOPSIS
 	stop container before test from scratch again
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -414,14 +381,14 @@ Function Step-StopNetCoreWebApp {
 	}
 }
 
-Function Step-RemoveNetCoreWebApp {
+Function Step-Docker-RemoveNetCoreWebApp {
 	<#
 	.SYNOPSIS
 	stop container before test from scratch again
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -450,14 +417,14 @@ Function Step-RemoveNetCoreWebApp {
 
 
 #================CONTAINERS=====================
-Function Step-PruneContainers {
+Function Step-Docker-PruneContainers {
 	<#
 	.SYNOPSIS
 	remove containers before test from scratch again
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -473,14 +440,14 @@ Function Step-PruneContainers {
 	}
 }
 
-Function Step-PeekLinuxContainer {
+Function Step-Docker-PeekLinuxContainer {
 	<#
 	.SYNOPSIS
 	exec dash interactive mode 
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -500,14 +467,14 @@ Function Step-PeekLinuxContainer {
 	}
 }
 
-Function Step-PeekWindowsContainer {
+Function Step-Docker-PeekWindowsContainer {
 	<#
 	.SYNOPSIS
 	exec dash interactive mode 
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -528,14 +495,14 @@ Function Step-PeekWindowsContainer {
 }
 
 #================NETWORK====================
-Function Step-CheckDockerNetwork {
+Function Step-Docker-CheckDockerNetwork {
 	<#
 	.SYNOPSIS
 	Check whether certain network is accessible or not
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -556,14 +523,14 @@ Function Step-CheckDockerNetwork {
 	}
 }
 
-Function Step-CreateDockerNetwork {
+Function Step-Docker-CreateDockerNetwork {
 	<#
 	.SYNOPSIS
 	Createcertain network if it is not available
 	.DESCRIPTION
 	
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -586,14 +553,14 @@ Function Step-CreateDockerNetwork {
 
 
 #===============TEMP================
-Function Step-BuildInstallerImageOnWindows {
+Function Step-Docker-BuildInstallerImageOnWindows {
 	<#
 	.SYNOPSIS
 	build .net core console installer image
 	.DESCRIPTION
 	build .net core console installer image from  netcore SnWebApplicationWithIdentity of vs templates
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -611,14 +578,14 @@ Function Step-BuildInstallerImageOnWindows {
 	}
 }
 
-Function Step-BuildInstallerImageOnLinux {
+Function Step-Docker-BuildInstallerImageOnLinux {
 	<#
 	.SYNOPSIS
 	build .net core console installer image
 	.DESCRIPTION
 	build .net core console installer image from  netcore SnWebApplicationWithIdentity of vs templates
 	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -635,14 +602,14 @@ Function Step-BuildInstallerImageOnLinux {
 		$script:Result = 1
 	}
 }
-Function Step-SetJsonConnectionsWithSqlContainerOnLinux {
+Function Step-Docker-SetJsonConnectionsWithSqlContainerOnLinux {
 	<#
 	.SYNOPSIS
 	Set installer and project json configurations to sql container
 	.DESCRIPTION
 	
 	#>
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -681,14 +648,14 @@ Function Step-SetJsonConnectionsWithSqlContainerOnLinux {
 	}
 }
 
-Function Step-SetInstallerConnectionWithDockerDb {
+Function Step-Docker-SetInstallerConnectionWithDockerDb {
 	<#
 	.SYNOPSIS
 	temp Set installer json configurations
 	.DESCRIPTION
 	
 	#>
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 	Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -718,14 +685,14 @@ Function Step-SetInstallerConnectionWithDockerDb {
 
 	
 # basic createemptydb step in default packages file
-Function Step-CreateEmptyDockerDb {
+Function Step-Docker-CreateEmptyDb {
 	<#
 	.SYNOPSIS
 	Create empty sql database using docker container ip
 	.DESCRIPTION
 	
 	#>
-	[CmdletBinding(SupportsShouldProcess=$True)]
+	[CmdletBinding()]
 		Param(
 		[Parameter(Mandatory=$false)]
 		[string]$Section="Project"
@@ -750,17 +717,16 @@ Function Step-CreateEmptyDockerDb {
 	catch {
 		$script:Result = 1
 	}
-	
 }
 
-Function Step-DropDockerDb {
+Function Step-Docker-DropDockerDb {
 	<#
 		.SYNOPSIS
 		Drop sql database
 		.DESCRIPTION
 		
 		#>
-		[CmdletBinding(SupportsShouldProcess=$True)]
+		[CmdletBinding()]
 			Param(
 			[Parameter(Mandatory=$false)]
 			[string]$Section="Project"
@@ -790,14 +756,14 @@ Function Step-DropDockerDb {
 
 
 
-	Function Step-CallConsoleInstallerWithDockerAndSqlContainer {
+	Function Step-Docker-CallConsoleInstallerWithDockerAndSqlContainer {
 		<#
 		.SYNOPSIS
 		run .net core console installer from docker container
 		.DESCRIPTION
 		
 		#>	
-		[CmdletBinding(SupportsShouldProcess=$True)]
+		[CmdletBinding()]
 		Param(
 			[Parameter(Mandatory=$false)]
 			[string]$Section="Project"
@@ -850,14 +816,14 @@ Function Step-DropDockerDb {
 		}
 	}
 
-	Function Step-StartNetCoreWebAppWithSqlContainer {
+	Function Step-Docker-StartNetCoreWebAppWithSqlContainer {
 		<#
 		.SYNOPSIS
 		start .netcore web application in docker container
 		.DESCRIPTION
 		
 		#>	
-		[CmdletBinding(SupportsShouldProcess=$True)]
+		[CmdletBinding()]
 		Param(
 			[Parameter(Mandatory=$false)]
 			[string]$Section="Project"
@@ -902,14 +868,14 @@ Function Step-DropDockerDb {
 		}
 	}
 
-	Function Step-TagDockerImage {
+	Function Step-Docker-TagDockerImage {
 		<#
 		.SYNOPSIS
 		tag docker image according to settings
 		.DESCRIPTION
 
 		#>	
-		[CmdletBinding(SupportsShouldProcess=$True)]
+		[CmdletBinding()]
 		Param(
 			[Parameter(Mandatory=$false)]
 			[string]$Section="Project"
@@ -931,14 +897,14 @@ Function Step-DropDockerDb {
 		}
 	}
 
-	Function Step-PublishDockerImage {
+	Function Step-Docker-PublishDockerImage {
 		<#
 		.SYNOPSIS
 		tag docker image according to settings
 		.DESCRIPTION
 
 		#>	
-		[CmdletBinding(SupportsShouldProcess=$True)]
+		[CmdletBinding()]
 		Param(
 			[Parameter(Mandatory=$false)]
 			[string]$Section="Project"

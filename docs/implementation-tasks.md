@@ -27,9 +27,87 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 **Goal**: Standardize code formatting, modern practices, and error handling
 **Priority**: High - Foundation for reliable automation
 **Effort**: Medium (1 week)
-- [ ] Analyze current PowerShell codebase for inconsistencies (feature/powershell-standardization branch)
-- [ ] Define PowerShell coding standards document
-- [ ] Implement PSScriptAnalyzer rules and configuration
+
+#### Refactor Plan & Progress Checklist
+- [x] Audit all PowerShell step modules and helper scripts (`powershell-audit-summary.md`, `plots-steps-audit.md`)
+- [x] Define and document PowerShell coding standards (`powershell-coding-standards.md`)
+- [x] Create implementation plan for standards adoption (`powershell-standards-implementation-plan.md`)
+- [x] Implement core helpers: logging, settings injection, validation (`Core-Helpers.ps1`)
+- [x] Refactor System step group to standards (`System-Steps.ps1`)
+    - [x] Step-System-RestartComputer
+    - [x] Step-System-SetEnvVar
+    - [x] Step-System-SetExecutionPolicy
+    - [x] Step-System-SetTimeZone
+    - [x] Step-System-SetUserPassword
+    - [x] Step-System-SetWinFeature
+    - [x] Step-System-SetWinService
+    - [x] Step-System-StartWinService
+    - [x] Step-System-StopWinService
+    - [x] Step-System-TestPort
+    - [x] Step-System-WaitForPort
+- [x] Refactor Db step group to standards (`MsSql-Modules.ps1`)
+    - [x] Step-Db-StartSqlWindowsContainer
+    - [x] Step-Db-StartSqlLinuxContainer
+    - [x] Step-Db-GetSqlContainer
+    - [x] Step-Db-OpenSqlManagementStudio
+    - [x] Step-Db-StopSqlContainer
+    - [x] Step-Db-RemoveSqlContainer
+    - [x] Step-Db-SetHostSqlServer
+- [x] Refactor Deploy step group to standards
+    - [x] Step-Deploy-PrInstall
+    - [x] Step-Deploy-PrImport
+    - [x] Step-Deploy-SetInstallerConnection
+    - [x] Step-Deploy-SetJsonPackages
+    - [x] Step-Deploy-SetJsonImports
+    - [x] Step-Deploy-PrAsmDeploy
+    - [x] Step-Deploy-PrLucDeploy
+    - [x] Step-Deploy-CleanWebFolder
+    - [x] Step-Deploy-CleanWebFolderWOIndex
+    - [x] Step-Deploy-CreateWebFolder
+    - [x] Step-Deploy-DeployWebFolder
+    - [x] Step-Deploy-DeployWebFolderFromZip
+    - [x] Step-Deploy-SetHostPermissionOnDb
+- [x] Refactor Project step group to standards
+    - [x] Download-GitProject.ps1 → Step-Project-DownloadGitProject
+    - [x] Download-GitHubProject.ps1 → Step-Project-DownloadGitHubProject
+    - [x] Download-File.ps1 → Step-Project-DownloadFile
+    - [x] Create-Artifact.ps1 → Step-Project-CreateArtifact
+    - [x] Build-Solution.ps1 → Step-Project-BuildSolution (**deprecated legacy script marked, new function in place**)
+    - [x] Publish-Solution.ps1 → Step-Project-PublishSolution (**deprecated legacy script marked, new function in place**)
+    - [x] Restore-NuGetPckgs.ps1 → Step-Project-RestoreNuGetPckgs (**deprecated legacy script marked, new function in place**)
+    - [x] Update-NuGet.ps1 → Step-Project-UpdateNuGet (**deprecated legacy script marked, new function in place**)
+    - [x] Download-NuGet.ps1 → Step-Project-DownloadNuGet (**deprecated legacy script marked, new function in place**)
+- [x] Refactor Docker step group to standards
+    - [x] Step-Docker-NetcoreTest
+    - [x] Step-Docker-BuildInstallerImage
+    - [x] Step-Docker-CallConsoleInstaller
+    - [x] Step-Docker-BuildWebAppImage
+    - [x] Step-Docker-StartWebApp
+    - [x] Step-Docker-GetWebApp
+    - [x] Step-Docker-OpenWebApp
+    - [x] Step-Docker-OpenWebAppUnSecure
+    - [x] Step-Docker-StopWebApp
+    - [x] Step-Docker-RemoveWebApp
+    - [x] Step-Docker-PruneContainers
+    - [x] Step-Docker-PeekLinuxContainer
+    - [x] Step-Docker-PeekWindowsContainer
+    - [x] Step-Docker-CheckNetwork
+    - [x] Step-Docker-CreateNetwork
+    - [x] Step-Docker-BuildInstallerImageOnWindows
+    - [x] Step-Docker-BuildInstallerImageOnLinux
+    - [x] Step-Docker-SetJsonConnectionsWithSqlContainerOnLinux
+    - [x] Step-Docker-SetInstallerConnectionWithDb
+    - [x] Step-Docker-CreateEmptyDb
+    - [x] Step-Docker-DropDb
+- [ ] Refactor all remaining step modules to standards
+- [ ] Group step functions by domain, move to separate files
+- [ ] Create/Update step registry/manifest for discoverability
+- [ ] Mark and document deprecated/obsolete steps
+- [ ] Ensure all steps support standardized settings injection/validation
+- [ ] Update all related documentation and usage examples
+- [ ] Review/enforce standards in all helper/utility scripts
+- [ ] Implement PSScriptAnalyzer rules/configuration
+- [ ] Create code review checklist for future changes
 - [ ] Standardize function naming conventions (Verb-Noun pattern)
 - [ ] Update all functions with proper [CmdletBinding] attributes
 - [ ] Standardize parameter definitions and validation
@@ -38,7 +116,6 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [ ] Update variable naming conventions
 - [ ] Remove deprecated PowerShell syntax
 - [ ] Implement structured logging with severity levels
-- [ ] Create code review checklist for future changes
 
 ### Planned Stories
 

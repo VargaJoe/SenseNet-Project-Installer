@@ -1,253 +1,240 @@
+# MsSql Step Module
+# Implements PowerShell standards for SQL-related steps
+
+$ErrorActionPreference = 'Stop'
+. "$ScriptBaseFolderPath/Core/Core-Helpers.ps1"
+
 # ******************************************************************  Steps ******************************************************************
-Function Step-StartSqlWindowsContainer {
+Function Step-Db-StartSqlWindowsContainer {
 	<#
 	.SYNOPSIS
-	test docker container for test sql server
+	Start test SQL Server in a Windows Docker container
 	.DESCRIPTION
-	
-	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	Param(
-		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
+	Starts a SQL Server Windows container for testing, outputs connection info.
+	.PARAMETER StepSettings
+	Hashtable of settings. Must include 'UserPsw', 'DockerNetworkName'.
+	.EXAMPLE
+	Step-Db-StartSqlWindowsContainer -StepSettings @{ UserPsw = 'P@ssw0rd'; DockerNetworkName = 'default' }
+	#>
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory=$true)]
+		[hashtable]$StepSettings
 	)
-	
-	$LASTEXITCODE = 0
-	try {	
-		$networkName=$GlobalSettings."$Section".DockerNetworkName
-
-		# UserName is defaul sa
-		#$UserName = $GlobalSettings."$Section".UserName
-		$UserPsw = $GlobalSettings."$Section".UserPsw
-		
-		# Start mssql container
-		Write-Output "docker run --rm -it -e ACCEPT_EULA=Y -e sa_password=$($UserPsw) -p 1433:1433 -d --name sql1 microsoft/mssql-server-windows-developer:2017-latest"
-
-		# Windows container
-		docker run --rm -it -e ACCEPT_EULA=Y -e sa_password=$($UserPsw) -p 1433:1433 -d --name sql1 microsoft/mssql-server-windows-developer:2017-latest
-		#docker run --rm -it -e ACCEPT_EULA=Y -e sa_password=QWEasd123% -p 1433:1433 -d --name sql1 microsoft/mssql-server-windows-developer:2017-latest
-		
-		# get mssql ip
-		$msSqlIp = docker inspect --format "{{ .NetworkSettings.Networks.$($networkName).IPAddress }}" sql1
-		Write-Output "Container sql server ip: $msSqlIp"
-		
+	try {
+		Assert-RequiredSetting -Settings $StepSettings -Key 'UserPsw'
+		Assert-RequiredSetting -Settings $StepSettings -Key 'DockerNetworkName'
+		$networkName = $StepSettings['DockerNetworkName']
+		$userPsw = $StepSettings['UserPsw']
+		Write-Log -Message "Starting SQL Server Windows container..." -Severity Info
+		Write-Log -Message "docker run --rm -it -e ACCEPT_EULA=Y -e sa_password=$userPsw -p 1433:1433 -d --name sql1 microsoft/mssql-server-windows-developer:2017-latest" -Severity Debug
+		docker run --rm -it -e ACCEPT_EULA=Y -e sa_password=$userPsw -p 1433:1433 -d --name sql1 microsoft/mssql-server-windows-developer:2017-latest
+		$msSqlIp = docker inspect --format "{{ .NetworkSettings.Networks.$networkName.IPAddress }}" sql1
+		Write-Log -Message "Container sql server ip: $msSqlIp" -Severity Info
 		$script:Result = $LASTEXITCODE
-	}
-	catch {
+	} catch {
+		Write-Log -Message $_ -Severity Error
 		$script:Result = 1
 	}
 }
 
-Function Step-StartSqlLinuxContainer {
+Function Step-Db-StartSqlLinuxContainer {
 	<#
 	.SYNOPSIS
-	test docker container for test sql server on linux 
+	Start test SQL Server in a Linux Docker container
 	.DESCRIPTION
-	
-	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	Param(
-		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
+	Starts a SQL Server Linux container for testing, outputs connection info.
+	.PARAMETER StepSettings
+	Hashtable of settings. Must include 'UserPsw', 'DockerNetworkName', 'DockerContainerName'.
+	.EXAMPLE
+	Step-Db-StartSqlLinuxContainer -StepSettings @{ UserPsw = 'P@ssw0rd'; DockerNetworkName = 'default'; DockerContainerName = 'sql1' }
+	#>
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory=$true)]
+		[hashtable]$StepSettings
 	)
-	
-	$LASTEXITCODE = 0
-	try {	
-		$containerName=$GlobalSettings."$Section".DockerContainerName
-		$networkName=$GlobalSettings."$Section".DockerNetworkName
-
-		# UserName is defaul sa
-		#$UserName = $GlobalSettings."$Section".UserName
-		$UserPsw = $GlobalSettings."$Section".UserPsw
-		
-		# Linux container
-		Write-Output "docker run -it -e ACCEPT_EULA=Y -e SA_PASSWORD=$($UserPsw) -p 1433:1433 -d --net $($networkName) --name $($containerName) mcr.microsoft.com/mssql/server:2017-latest-ubuntu"
-		docker run -it -e ACCEPT_EULA=Y -e SA_PASSWORD=$($UserPsw) -p 12433:1433 -d --net $($networkName) --name $($containerName) mcr.microsoft.com/mssql/server:2017-latest-ubuntu
-		# docker run --rm -it -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=QWEasd123%' --net mynet123 -p 1433:1433 -d --name sql1 mcr.microsoft.com/mssql/server:2017-latest-ubuntu
-		
-		# get mssql ip
-		#Write-Output "docker inspect --format {{ .NetworkSettings.Networks.$($networkName).IPAddress }} $containerName"
-		$msSqlIp = docker inspect --format "{{ .NetworkSettings.Networks.$($networkName).IPAddress }}" $containerName
-		#Write-Output "docker inspect --format {{ .NetworkSettings.Ports.1433//tcp.HostPort }} $containerName"
-		$msSqlPort = docker inspect --format '{{ (index (index .NetworkSettings.Ports \"1433/tcp\") 0).HostPort }}' $containerName
-		Write-Output "Container sql server ip: $msSqlIp"
-		Write-Output "Container sql server port: $msSqlPort"
-		Write-Output "Container sql server private: $($msSqlIp):$($msSqlPort)"
-		Write-Output "Container sql server public: localhost:$msSqlPort"
-
-
-	
-		
+	try {
+		Assert-RequiredSetting -Settings $StepSettings -Key 'UserPsw'
+		Assert-RequiredSetting -Settings $StepSettings -Key 'DockerNetworkName'
+		Assert-RequiredSetting -Settings $StepSettings -Key 'DockerContainerName'
+		$containerName = $StepSettings['DockerContainerName']
+		$networkName = $StepSettings['DockerNetworkName']
+		$userPsw = $StepSettings['UserPsw']
+		Write-Log -Message "Starting SQL Server Linux container..." -Severity Info
+		Write-Log -Message "docker run -it -e ACCEPT_EULA=Y -e SA_PASSWORD=$userPsw -p 12433:1433 -d --net $networkName --name $containerName mcr.microsoft.com/mssql/server:2017-latest-ubuntu" -Severity Debug
+		docker run -it -e ACCEPT_EULA=Y -e SA_PASSWORD=$userPsw -p 12433:1433 -d --net $networkName --name $containerName mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+		$msSqlIp = docker inspect --format "{{ .NetworkSettings.Networks.$networkName.IPAddress }}" $containerName
+		$msSqlPort = docker inspect --format '{{ (index (index .NetworkSettings.Ports "1433/tcp") 0).HostPort }}' $containerName
+		Write-Log -Message "Container sql server ip: $msSqlIp" -Severity Info
+		Write-Log -Message "Container sql server port: $msSqlPort" -Severity Info
 		$script:Result = $LASTEXITCODE
-	}
-	catch {
+	} catch {
+		Write-Log -Message $_ -Severity Error
 		$script:Result = 1
 	}
 }
 
-Function Step-GetSqlContainer {
+Function Step-Db-GetSqlContainer {
 	<#
 	.SYNOPSIS
-	get ip of test docker container for internal nuget feed
+	Get IP and port of test SQL Server Docker container
 	.DESCRIPTION
-	
-	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	Param(
-		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
+	Outputs connection info for a running SQL Server Docker container.
+	.PARAMETER StepSettings
+	Hashtable of settings. Must include 'DockerNetworkName', 'DockerContainerName'.
+	.EXAMPLE
+	Step-Db-GetSqlContainer -StepSettings @{ DockerNetworkName = 'default'; DockerContainerName = 'sql1' }
+	#>
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory=$true)]
+		[hashtable]$StepSettings
 	)
-	
-	$LASTEXITCODE = 0
-	try {	
-		$containerName=$GlobalSettings."$Section".DockerContainerName
-		$networkName=$GlobalSettings."$Section".DockerNetworkName
-
-		# get docker sql ip
-		$msSqlIp = docker inspect --format "{{ .NetworkSettings.Networks.$($networkName).IPAddress }}" $containerName
-		$msSqlPort = docker inspect --format '{{ (index (index .NetworkSettings.Ports \"1433/tcp\") 0).HostPort }}' $containerName
-		Write-Output "Container sql server ip: $msSqlIp"
-		Write-Output "Container sql server port: $msSqlPort"
-		Write-Output "Container sql server private: $($msSqlIp):$($msSqlPort)"
-		Write-Output "Container sql server public: localhost:$msSqlPort"
-		
+	try {
+		Assert-RequiredSetting -Settings $StepSettings -Key 'DockerNetworkName'
+		Assert-RequiredSetting -Settings $StepSettings -Key 'DockerContainerName'
+		$containerName = $StepSettings['DockerContainerName']
+		$networkName = $StepSettings['DockerNetworkName']
+		$msSqlIp = docker inspect --format "{{ .NetworkSettings.Networks.$networkName.IPAddress }}" $containerName
+		$msSqlPort = docker inspect --format '{{ (index (index .NetworkSettings.Ports "1433/tcp") 0).HostPort }}' $containerName
+		Write-Log -Message "Container sql server ip: $msSqlIp" -Severity Info
+		Write-Log -Message "Container sql server port: $msSqlPort" -Severity Info
 		$script:Result = $LASTEXITCODE
-	}
-	catch {
+	} catch {
+		Write-Log -Message $_ -Severity Error
 		$script:Result = 1
 	}
 }
 
-Function Step-OpenSqlManagementStudio {
+Function Step-Db-OpenSqlManagementStudio {
 	<#
 	.SYNOPSIS
-	get ip of test docker container for internal nuget feed
+	Open SQL Server Management Studio for Docker SQL Server
 	.DESCRIPTION
-	
-	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	Param(
-		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
+	Opens SSMS for a running SQL Server Docker container.
+	.PARAMETER StepSettings
+	Hashtable of settings. Must include 'DockerNetworkName', 'DockerContainerName', 'UserName', 'UserPsw'.
+	.EXAMPLE
+	Step-Db-OpenSqlManagementStudio -StepSettings @{ DockerNetworkName = 'default'; DockerContainerName = 'sql1'; UserName = 'sa'; UserPsw = 'P@ssw0rd' }
+	#>
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory=$true)]
+		[hashtable]$StepSettings
 	)
-	
-	$LASTEXITCODE = 0
-	try {	
-		$containerName=$GlobalSettings."$Section".DockerContainerName
-		$networkName=$GlobalSettings."$Section".DockerNetworkName
-
-		# UserName is defaul sa
-		$UserName = $GlobalSettings."$Section".UserName
-		$UserPsw = $GlobalSettings."$Section".UserPsw
-
-		# get mssql ip
-		$msSqlIp = docker inspect --format "{{ .NetworkSettings.Networks.$($networkName).IPAddress }}" $containerName
-		$msSqlPort = docker inspect --format '{{ (index (index .NetworkSettings.Ports \"1433/tcp\") 0).HostPort }}' $containerName
-		Write-Output "Container sql server ip: $msSqlIp"
-		Write-Output "Container sql server port: $msSqlPort"
-		Write-Output "Container sql server private: $($msSqlIp):$($msSqlPort)"
-		Write-Output "Container sql server public: localhost:$msSqlPort"
-		
-		Write-Output "Try to open sql server in sql management studio..."
-		Start-Process "Ssms.exe" "-S localhost,$($MsSqlPort) -U $($UserName) -P $($UserPsw)"
-		Write-Output "Done. Use should've seen now."
-
+	try {
+		Assert-RequiredSetting -Settings $StepSettings -Key 'DockerNetworkName'
+		Assert-RequiredSetting -Settings $StepSettings -Key 'DockerContainerName'
+		Assert-RequiredSetting -Settings $StepSettings -Key 'UserName'
+		Assert-RequiredSetting -Settings $StepSettings -Key 'UserPsw'
+		$containerName = $StepSettings['DockerContainerName']
+		$networkName = $StepSettings['DockerNetworkName']
+		$userName = $StepSettings['UserName']
+		$userPsw = $StepSettings['UserPsw']
+		$msSqlIp = docker inspect --format "{{ .NetworkSettings.Networks.$networkName.IPAddress }}" $containerName
+		$msSqlPort = docker inspect --format '{{ (index (index .NetworkSettings.Ports "1433/tcp") 0).HostPort }}' $containerName
+		Write-Log -Message "Container sql server ip: $msSqlIp" -Severity Info
+		Write-Log -Message "Container sql server port: $msSqlPort" -Severity Info
+		Write-Log -Message "Try to open sql server in sql management studio..." -Severity Info
+		Start-Process "Ssms.exe" "-S localhost,$msSqlPort -U $userName -P $userPsw"
+		Write-Log -Message "Done. You should see SSMS now." -Severity Info
 		$script:Result = $LASTEXITCODE
-	}
-	catch {
+	} catch {
+		Write-Log -Message $_ -Severity Error
 		$script:Result = 1
-		Write-Error "$_"
 	}
 }
 
-Function Step-StopSqlContainer {
+Function Step-Db-StopSqlContainer {
 	<#
 	.SYNOPSIS
-	stop container before test from scratch again
+	Stop SQL Server Docker container
 	.DESCRIPTION
-	
-	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	Param(
-		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
+	Stops a running SQL Server Docker container.
+	.PARAMETER StepSettings
+	Hashtable of settings. Must include 'DockerContainerName'.
+	.EXAMPLE
+	Step-Db-StopSqlContainer -StepSettings @{ DockerContainerName = 'sql1' }
+	#>
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory=$true)]
+		[hashtable]$StepSettings
 	)
-	
-	$exitCode = 0
-	try {	
-		$containerName=$GlobalSettings."$Section".DockerContainerName
+	try {
+		Assert-RequiredSetting -Settings $StepSettings -Key 'DockerContainerName'
+		$containerName = $StepSettings['DockerContainerName']
 		$existingContainer = docker ps -a --format '{{.Names}}' | findstr $containerName
-
 		if ($existingContainer) {
 			docker container stop $containerName
-			$exitCode = $LastExitcode
-			Write-Output "$containerName container has been stopped."
+			Write-Log -Message "$containerName container has been stopped." -Severity Info
 		} else {
-			Write-Output "$containerName container is not running."
+			Write-Log -Message "$containerName container is not running." -Severity Warning
 		}
-
-		$script:Result = $exitCode
-	}
-	catch {
+		$script:Result = $LASTEXITCODE
+	} catch {
+		Write-Log -Message $_ -Severity Error
 		$script:Result = 1
-		Write-Error "$_"
 	}
 }
 
-Function Step-RemoveSqlContainer {
+Function Step-Db-RemoveSqlContainer {
 	<#
 	.SYNOPSIS
-	stop container before test from scratch again
+	Remove SQL Server Docker container
 	.DESCRIPTION
-	
-	#>	
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	Param(
-		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
+	Removes a stopped SQL Server Docker container.
+	.PARAMETER StepSettings
+	Hashtable of settings. Must include 'DockerContainerName'.
+	.EXAMPLE
+	Step-Db-RemoveSqlContainer -StepSettings @{ DockerContainerName = 'sql1' }
+	#>
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory=$true)]
+		[hashtable]$StepSettings
 	)
-	
-	$exitCode = 0
-	try {	
-		$containerName=$GlobalSettings."$Section".DockerContainerName
+	try {
+		Assert-RequiredSetting -Settings $StepSettings -Key 'DockerContainerName'
+		$containerName = $StepSettings['DockerContainerName']
 		$existingContainer = docker ps -a --format '{{.Names}}' | findstr $containerName
-
 		if ($existingContainer) {
 			docker container rm $containerName
-			$exitCode = $LastExitcode
-			Write-Output "$containerName container has been removed."
+			Write-Log -Message "$containerName container has been removed." -Severity Info
 		} else {
-			Write-Output "$containerName container is not exist."
+			Write-Log -Message "$containerName container does not exist." -Severity Warning
 		}
-
-		$script:Result = $exitCode
-	}
-	catch {
+		$script:Result = $LASTEXITCODE
+	} catch {
+		Write-Log -Message $_ -Severity Error
 		$script:Result = 1
-		Write-Error "$_"
 	}
 }
 
-Function Step-SetHostSqlServer {
-<#
+Function Step-Db-SetHostSqlServer {
+	<#
 	.SYNOPSIS
-	Set urls in hosts file
+	Set SQL Server host entries
 	.DESCRIPTION
-	
+	Sets host file entries for SQL Server containers.
+	.PARAMETER StepSettings
+	Hashtable of settings. Must include 'Hosts'.
+	.EXAMPLE
+	Step-Db-SetHostSqlServer -StepSettings @{ Hosts = @('127.0.0.1 sql1') }
 	#>
-	[CmdletBinding(SupportsShouldProcess=$True)]
-		Param(
-		[Parameter(Mandatory=$false)]
-		[string]$Section="Project"
-		)
-	
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory=$true)]
+		[hashtable]$StepSettings
+	)
 	try {
-		$ProjectSiteHosts = $GlobalSettings."$Section".Hosts
-		& $ScriptBaseFolderPath\Ops\Set-Host.ps1 -SiteHosts $ProjectSiteHosts
+		Assert-RequiredSetting -Settings $StepSettings -Key 'Hosts'
+		$projectSiteHosts = $StepSettings['Hosts']
+		& $ScriptBaseFolderPath\Ops\Set-Host.ps1 -SiteHosts $projectSiteHosts
 		$script:Result = $LASTEXITCODE
-	}
-	catch {
+	} catch {
+		Write-Log -Message $_ -Severity Error
 		$script:Result = 1
 	}
-	
 }
