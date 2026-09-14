@@ -1,241 +1,64 @@
-# Plot Manager - Automation Framework
+# Plot Manager
 
-> **A comprehensive PowerShell-based automation framework for operational task management and deployment orchestration.**
+Plot Manager composes scriptable tasks from small, parameterized steps. A plot describes the step invocations and their inputs. Operators install only the capability packages they need by copying their directories into `src/Deployment/Scripts/Auto/`.
 
-## Overview
+The repository's historical name, **SenseNet-Project-Installer**, describes its first use case. SenseNet installation is one of the retained legacy workflows; it is not a restriction on the engine.
 
-Plot Manager is a sophisticated automation framework that orchestrates complex operational tasks through a flexible plot/step architecture. Originally developed for SenseNet CMS deployments, it has evolved into a general-purpose automation platform capable of managing diverse operational workflows including containerized deployments, cloud automation, and enterprise application lifecycle management.
+## Run a plot
 
-## Core Concepts
+Requires PowerShell 5.1 or PowerShell 7. The engine, text package and filesystem package do not require administrator privileges or external modules. IIS steps require Windows and WebAdministration when executed.
 
-**Plot Manager** uses a simple but powerful paradigm:
-- **Plots**: Predefined scenarios that execute a sequence of steps
-- **Steps**: Individual PowerShell functions that perform specific tasks  
-- **Settings**: JSON-based configuration supporting multiple environments
-- **Modules**: Auto-loaded PowerShell modules that extend functionality
+From the repository root:
 
-This architecture enables complex automation workflows to be composed from reusable components, making it easy to create, maintain, and extend operational processes.
-
-## Key Capabilities
-
-### Infrastructure & Deployment
-- **IIS Management**: Complete website and application pool lifecycle
-- **Database Operations**: SQL Server database creation, backup, restore with authentication support
-- **Container Orchestration**: Docker container management and networking
-- **Cloud Deployment**: Azure Web App deployment automation
-- **SSL/TLS Management**: Certificate creation and configuration
-
-### Development & Build Support  
-- **Solution Building**: Visual Studio solution compilation and artifact creation
-- **Package Management**: NuGet package restoration and dependency resolution
-- **Source Control**: TFS/Git integration for code retrieval
-- **.NET Core & Framework**: Support for both modern .NET Core and traditional .NET Framework
-
-### SenseNet CMS Automation
-- **Content Management**: Import/export of content and configurations
-- **Search Indexing**: Lucene index population and management  
-- **Site Provisioning**: Complete SenseNet site setup and configuration
-- **Package Deployment**: SnAdmin package installation and management
-
-### Environment Management
-- **Configuration**: JSON-based settings with environment variable override
-- **Host Management**: Local host file configuration for development
-- **Network Operations**: Port management and firewall configuration
-- **Multi-Environment**: Support for local, staging, and production deployments
-
-## Prerequisites
-
-### Core Requirements
-1. **PowerShell 5.1+**: The automation engine requires PowerShell with script execution enabled
-   ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-   ```
-
-2. **Administrator Privileges**: Many operations require elevated permissions for system configuration
-
-3. **SqlServer PowerShell Module**: Required for database operations
-   ```powershell
-   Install-Module -Name SqlServer -Force -AllowClobber
-   ```
-
-### Optional Components (Based on Usage)
-- **Visual Studio**: Required for solution building and TFS integration
-- **Microsoft SQL Server**: For database-related operations
-- **IIS**: For web application deployment
-- **Docker**: For containerized deployment scenarios  
-- **7-Zip**: For archive extraction operations
-- **Azure CLI**: For Azure deployment automation
-
-### Environment Configuration
-The framework requires proper configuration through JSON settings files that define:
-- Database connection strings and authentication
-- File system paths for applications and tools
-- Environment-specific deployment targets
-- Network and security configurations
-
-## Quick Start
-
-### Basic Usage
-Execute a predefined plot with default settings:
 ```powershell
-.\Run.ps1 fullinstall
+# Discover the installed steps.
+./src/Deployment/Scripts/Run.ps1 -Help steps
+
+# Resolve and validate the example without executing steps.
+./src/Deployment/Scripts/Run.ps1 compose-files -ConfigPath ./src/Deployment/Scripts/Examples/compose-files.json -Explain
+
+# WorkDirectory must exist. This example creates greeting.txt and farewell.txt.
+New-Item -ItemType Directory ./plot-output
+./src/Deployment/Scripts/Run.ps1 compose-files -ConfigPath ./src/Deployment/Scripts/Examples/compose-files.json -WorkDirectory ./plot-output
+
+# WhatIf skips every step, including steps that consume earlier results.
+./src/Deployment/Scripts/Run.ps1 compose-files -ConfigPath ./src/Deployment/Scripts/Examples/compose-files.json -WhatIf
 ```
 
-### Advanced Usage
-Specify custom settings and sections:
+The example calls `text.join` twice with different inputs, then passes their outputs into two `filesystem.write` invocations. Existing files are preserved unless an explicit `Overwrite: true` parameter is supplied.
+
+CLI success is exit code 0; validation or execution failure is exit code 1. Executed runs return JSON containing the run ID, plot status and each executed step's output, error and duration. Execution stops at the first failure.
+
+## Packages and configuration
+
+- `Auto/<package>/package.psd1`: package identity, version, module, dependencies and exported step schemas.
+- `Auto/<package>/*.psm1`: isolated PowerShell functions. Package import must only define functions and initialize local state.
+- `Core/PlotManager.psm1`: discovery, collision detection, parameter resolution and execution.
+- `Examples/compose-files.json`: portable example with independently configured invocations.
+- `Run-Legacy.ps1` and `AutoExt/`: retained historical execution path.
+
+Installed native packages: **text**, **filesystem**, **iis**. Copy a whole package folder, including its module and any resources, to another Auto directory; select that directory with `-AutoPath`. Missing dependencies and duplicate names are rejected before package imports. Canonical step IDs are qualified by package, such as `filesystem.copy`. Repeating a step in a plot is supported through separate invocation IDs.
+
+See [configuration and execution](docs/settings.md), [package authoring](docs/custom-steps.md), [architecture and compatibility](docs/plot-manager-runtime.md) and [testing](tests/README.md).
+
+## Historical workflows
+
+Existing section/global-variable scripts remain available in a separate PowerShell process:
+
 ```powershell
-.\Run.ps1 -Plot fullinstall -Settings production -Verbose
+./src/Deployment/Scripts/Run.ps1 -Legacy -Help steps
+./src/Deployment/Scripts/Run.ps1 -Legacy -Plot fullinstall -Settings local
 ```
 
-### Available Commands
-List available plots:
+Review the selected legacy configuration before executing it: these workflows can modify IIS, databases and deployments. The compatibility runner retains their platform/tool requirements and administrator requirement for execution. Historical steps are not native packages and cannot be mixed into a native plot. Legacy preview is rejected because those scripts do not consistently implement WhatIf.
+
+The Angular GUI and experimental HTTP listener are historical clients; this refactor does not modernize or expose them. Native CLI/API functionality does not depend on them. Original historical guides are under [docs/legacy](docs/legacy/).
+
+## Development
+
 ```powershell
-.\Run.ps1 -Help plots
+pwsh -NoProfile -File ./tests/Run-Tests.ps1
+powershell.exe -NoProfile -File ./tests/Run-Tests.ps1
 ```
 
-List available steps:  
-```powershell
-.\Run.ps1 -Help steps
-```
-
-Execute individual steps:
-```powershell
-.\Run.ps1 -Step createdb:production
-```
-
-## Architecture
-
-### Core Components
-- **`Run.ps1`**: Main entry point and orchestration engine
-- **`AutoExt/`**: Auto-loaded PowerShell modules containing step definitions
-- **`Settings/`**: JSON configuration files for different environments
-- **`Deploy/`, `Dev/`, `Ops/`**: Specialized script collections
-- **`Tools/`**: External utilities and dependencies
-
-### Execution Flow
-1. **Initialization**: Load configuration and modules from `AutoExt/` directory
-2. **Configuration Merge**: Combine default and environment-specific settings
-3. **Plot Resolution**: Resolve plot name to sequence of steps
-4. **Step Execution**: Execute each step with appropriate error handling
-5. **Result Reporting**: Return execution status and optional JSON results
-
-### Extension Model
-Add custom functionality by creating PowerShell modules in the `AutoExt/` directory:
-```powershell
-Function Step-CustomOperation {
-    [CmdletBinding(SupportsShouldProcess=$True)]
-    Param([Parameter(Mandatory=$false)][string]$Section="Project")
-    
-    try {
-        # Your custom logic here
-        $script:Result = 0
-    }
-    catch {
-        $script:Result = 1
-    }
-}
-```
-
-## Example Plots
-
-### SenseNet CMS Deployment
-Complete SenseNet installation from scratch:
-```powershell
-.\Run.ps1 fullinstall
-```
-**Steps**: Get templates → Restore packages → Build → Deploy → Create database → Install services → Configure → Start
-
-### Container Deployment  
-Containerized application deployment:
-```powershell
-.\Run.ps1 netcoredockertest
-```
-**Steps**: Container setup → Database creation → Build images → Deploy containers → Network configuration
-
-### Production Deployment
-Deploy to production environment:
-```powershell
-.\Run.ps1 fulldeploy -Settings production
-```
-**Steps**: Stop services → Build → Deploy → Database update → Restart services
-
-### Backup Operations
-Database backup with site management:
-```powershell
-.\Run.ps1 backup
-```
-**Steps**: Stop site → Backup database → Restart site
-
-## Configuration
-
-### Settings Files
-- **`project-default.json`**: Base configuration and common plots
-- **`project-local.json`**: Local development overrides  
-- **`project-production.json`**: Production environment settings
-- **Custom settings**: Create environment-specific configurations as needed
-
-### Environment Variables
-Override any setting using environment variables with `PLOTMANAGER_` prefix:
-```powershell
-$env:PLOTMANAGER_DataSource = "production-sql-server"
-$env:PLOTMANAGER_InitialCatalog = "ProductionDB"
-```
-
-### JSON Structure
-```json
-{
-  "Plots": {
-    "myplot": ["step1", "step2:section", "step3"]
-  },
-  "Project": {
-    "DataSource": "localhost",
-    "InitialCatalog": "mydb",
-    "WebAppName": "myapp"
-  },
-  "CustomSection": {
-    "DataSource": "remote-server"
-  }
-}
-```
-
-## Documentation
-
-### User Guides
-- [How to Execute Plots](/docs/how-to-execute-a-plot.md) - Comprehensive guide to running automation scenarios
-- [Step Execution](/docs/how-to-execute-steps.md) - Running individual automation steps
-- [Configuration Guide](/docs/settings.md) - Setting up environments and configurations
-- [Custom Steps](/docs/custom-steps.md) - Creating custom automation steps
-- [Build Server Integration](/docs/build-server-basic-steps.md) - CI/CD integration patterns
-
-### API Reference
-- Step functions follow the naming convention `Step-{Name}`
-- All steps accept optional `Section` parameter for configuration targeting
-- Return codes: 0 (success), 1 (failure)
-- JSON results available through `$Global:JsonResult` variable
-
-## Contributing
-
-### Adding New Steps
-1. Create PowerShell function in `AutoExt/` directory
-2. Follow naming convention: `Step-{YourStepName}`
-3. Include proper error handling and result codes
-4. Add synopsis for help system
-5. Test with multiple environment configurations
-
-### Code Standards
-- Use `[CmdletBinding(SupportsShouldProcess=$True)]` for all steps
-- Implement try/catch with proper `$script:Result` setting
-- Use `Write-Verbose` for detailed logging
-- Follow existing parameter patterns for consistency
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For issues, questions, or contributions, please refer to the project's issue tracking system or contact the development team.
-
----
-
-**Note**: This framework has evolved from SenseNet-specific tooling into a general-purpose operational automation platform. While SenseNet CMS deployment remains a core use case, the framework now supports diverse automation scenarios across different platforms and technologies.
+The dependency-free suite checks configuration, package isolation, collisions, CLI exit codes, actual temporary-file workflows and mocked IIS transitions. It does not operate real infrastructure. [MIT license](LICENSE).

@@ -1,71 +1,73 @@
-# Custom Step deklaráció 
+# Author a step package
 
-Ahhoz hogy a fenti automatizmus működhessen, illetve testzőleges lépésekkel lehessen kiegészíteni a lépésnek az alábbi módon kell felépülnie:
+An operator installs a package by copying its complete directory into an Auto folder. Discovery scans direct subdirectories for `package.psd1`. Keep resource paths relative to the package; do not depend on the repository's current directory or global variables.
+
+Example layout:
+
+```text
+Auto/
+  Example/
+    package.psd1
+    Plot.Example.psm1
+```
+
+## Manifest
 
 ```powershell
-Function Step-Lepesneve {
-<#
-.SYNOPSIS
-Lépés rövid leírása
-.DESCRIPTION
-lépés leírásának bővebb kifejtése
-#>
-[CmdletBinding(SupportsShouldProcess=$True)]
-Param(
-[parameter(Mandatory=$false)]
-[String]$section="Project"
-)
-
-try {
-$ProjectSiteName = $GlobalSettings."$section".WebAppName
-& "$ScriptBaseFolderPath\Ops\Stop-IISSite.ps1" $ProjectSiteName
-$script:Result = $LASTEXITCODE
+@{
+    Name = 'example'
+    Version = '1.0.0'
+    RootModule = 'Plot.Example.psm1'
+    Dependencies = @() # Installed package names; cycles are rejected.
+    Steps = @{
+        greet = @{
+            Command = 'Get-ExampleGreeting'
+            Aliases = @('greet')
+            Parameters = @{
+                Name = @{ Type='string'; Required=$true }
+                Prefix = @{ Type='string'; Default='Hello' }
+            }
+        }
+    }
 }
-catch {
-$script:Result = 1
+```
+
+The canonical step ID is `example.greet`. Package names, canonical IDs and aliases are compared case-insensitively. An alias can collide with a canonical name, so all names are validated together before module imports. Duplicate errors identify both source manifests.
+
+Name and step keys start with a letter and contain letters, numbers or hyphens. Version must parse as a .NET Version. RootModule must identify a psm1 file inside the package. Optional Platform is Any or Windows.
+
+Dependencies express installed-package requirements and import order. They do not grant access to another module's private functions. Compose cross-package operations in the plot and pass results explicitly.
+
+## Module
+
+```powershell
+function Get-ExampleGreeting {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][hashtable]$Settings,
+        [Parameter(Mandatory)]$Context
+    )
+    [pscustomobject]@{ Text="$($Settings.Prefix), $($Settings.Name)" }
 }
-}
+Export-ModuleMember -Function Get-ExampleGreeting
 ```
 
-A fenti példában a lépés közvetlenül meghívható a Run-on keresztül, ha nincs azonos nevű forgatókönyv:
-```powershell
-.\Run.ps1 lepesneve
-```
+The exported command must accept Settings and Context. The registry invokes its function object, so separate modules can use the same internal function names. Do not export or define global functions or variables.
 
-vagy bővebben (itt ne tévesszen meg, hogy a paraméter neve plot):
-```powershell
-.\Run.ps1 -Plot lepesneve -Settings local
-```
+Context provides RunId, InvocationId, PackageRoot and WorkDirectory. Settings contains only the resolved, validated parameters for this invocation.
 
-Az adott lépés futtatáskor a script leírásából megjelenítjük a synopsys részt, valahogy így:
+Return data on the success stream. Throw on failure. Use Write-Verbose/Write-Information for diagnostics, and never print settings or credentials wholesale. If an external executable is used, inspect LASTEXITCODE immediately and throw on failure; a native nonzero exit is not automatically a PowerShell exception on all supported runtimes.
 
-```console
-================================================
-============= Plotneve/Lepesneve =============
-================================================
-Synopsis: Lépés rövid leírása
-Progress: 100
-```
+## Operations and WhatIf
 
-A descriptiont érdemes a jövő felhasználói számára kitölteni, illetve itt használható egyéb komment lehetőség is. Ezek a Get-Help powershell függvénnyel hívhatók elő.
+A mutating function should declare SupportsShouldProcess and guard its actual operation with `$PSCmdlet.ShouldProcess(...)`. The engine also guards each step invocation, so native plot WhatIf executes no step functions at all. The function-level guard protects direct calls.
 
-A következő paraméter biztosítja a step számára, hogy megcímezhető legyen a beállítás szekció. Példánkban a default szekció a "Project". Ha a lépés nem igényli, nem kötelező deklarálni, de azt vegyük figyelembe, hogy ha Section paraméterrel érkezik a hívás, a lépés hibát fog dobni.
-```powershell
-[CmdletBinding(SupportsShouldProcess=$True)]
-Param(
-[parameter(Mandatory=$false)]
-[String]$section="Project"
-)
-```
+Use the filesystem and IIS packages for examples. The filesystem writer uses CreateNew by default to avoid silently replacing existing files. IIS imports WebAdministration only when an actual operation is requested.
 
-Az üzleti logikát érdemes try/cacth feldolgozásba rakni, így biztosítható, hogy hiba esetén is legyen visszaadott érték. Általános hiba esetén megegyezés szerint 1-es értékkel térünk vissza. Ettől el lehet térni, tudomásom szerint - még - nem használja semmi a visszatérési értékeket, egyelőre csak információforrásként utazik.
+Importing a package executes PowerShell module initialization code. Installed packages are trusted executable code: imports must only define functions and local initialization, without deployment/file/network operations. Static manifest checks are not a sandbox.
 
-A settings file beállításokat a section paraméterrel együtt egy globális változóból érjük el. Ebben már össze van fűzve a projekt és default beállítás is.
-```powershell
-$GlobalSettings."$section".beállításnév
-```
+## Testing
 
-Végül érdemes normál lefutás esetén a exitcode környezeti változó értékével visszatérni. Console applikációk esetén valószínűleg ez megfelelő értéket fog adni, egyedi scriptek esetén érdemes emulálni:
-```powershell
-$script:Result = $LASTEXITCODE
-```
+Run `./tests/Run-Tests.ps1` in PowerShell 5.1 and 7. Add behavior tests when adding package commands. Test a package in a separate Auto directory so accidental dependencies on the full repo are detected.
+
+Historical AutoExt step conventions are documented in [legacy/custom-steps.md](legacy/custom-steps.md). They belong to the separate compatibility runner.

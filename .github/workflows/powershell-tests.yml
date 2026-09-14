@@ -1,0 +1,21 @@
+name: Plot Manager tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shell: [powershell, pwsh]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run runtime regression tests
+        shell: pwsh
+        run: |
+          & '${{ matrix.shell }}' -NoProfile -NonInteractive -File ./tests/Run-Tests.ps1
+          exit $LASTEXITCODE

@@ -13,8 +13,8 @@ Function Load-Settings {
             [Parameter(Mandatory=$False)]
             [String]$SettingsPath
          )
-	
-	$JsonConfig = (Get-Content $SettingsPath) -join "`n" | ConvertFrom-Json 
+
+	$JsonConfig = (Get-Content $SettingsPath) -join "`n" | ConvertFrom-Json
 	return $JsonConfig
 }
 
@@ -31,7 +31,7 @@ Function Get-FullPath {
 	} else {
 		$CombinedPath = [IO.Path]::Combine($ScriptBaseFolderPath, "$Path")
 		$FullPath = [IO.Path]::GetFullPath($CombinedPath)
-	}	
+	}
 	return $FullPath
 }
 
@@ -43,7 +43,7 @@ Function Run-Steps {
         [String]$Step
 		)
 	$Output = if ($show) {'Out-Default'} else {'Out-Null'}
-	
+
 	$PlotNameArr = $Plot.Split(":")
 	$PlotName = $PlotNameArr[0]
 
@@ -52,13 +52,13 @@ Function Run-Steps {
 	} else {
 		$DefaultSection = $GlobalSettings.DefaultSection
 	}
-	
+
 	if ($DefaultSection) {
 		Write-Output "Default section is set to $DefaultSection"
 	} else {
 		Write-Output "Section is determined by step scripts."
 	}
-	
+
 	$ProcessSteps = $GlobalSettings.plots."$PlotName".Length
 
 	$StepCount = 0
@@ -83,22 +83,22 @@ Function Run-Steps {
 			}
 			else {$stepParameters = @{}}
 			# end
-		
+
 			$script:Result = 0
 			$StepCount += 1
 			$Synopsis = Get-Help Step-"$StepName" |  ForEach-Object { $_.Synopsis  }
 			$Progress=(($StepCount/($ProcessSteps))*100)
-			
+
 			Write-Log "================================================" -foregroundcolor "green"
 			Write-Log "============= $PlotName/$StepName =============" -foregroundcolor "green"
 			Write-Log "================================================" -foregroundcolor "green"
-			Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"			
+			Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"
 			Write-Log "Progress: $Progress/100" -foregroundcolor "green"
-			
+
 			# write-progress -id 1 -activity "$PlotName" -status "$Synopsis" -percentComplete (($StepCount/($ProcessSteps))*100);
-			
+
 			try {
-				# Invoke-Expression "Step-$StepName" 
+				# Invoke-Expression "Step-$StepName"
 				& "Step-$StepName" @stepParameters
 			}
 			catch {
@@ -107,14 +107,14 @@ Function Run-Steps {
 				$error.clear()
 			}
 			Write-Log "Exit code: $Result" -foregroundcolor "green"
-			Write-Verbose "Exit code: $Result" 
-			Write-Log 
+			Write-Verbose "Exit code: $Result"
+			Write-Log
 			if (!($Result -eq 0)) {
-				Write-Verbose "Step failed, exiting.." 
+				Write-Verbose "Step failed, exiting.."
 				exit $Result
 			}
 		}
-		Write-Log 
+		Write-Log
 		Write-Log "--------------------------------------------------"
 		Write-Log "-------------------- FINISH ----------------------"
 		Write-Log "--------------------------------------------------"
@@ -134,26 +134,26 @@ Function Run-Steps {
 		$StepName = $StepNameArr[0]
 		if (-not ($Null -eq $StepNameArr[1])){
 			$DefaultSection = $StepNameArr[1]
-		} 
-		
+		}
+
 		if ($DefaultSection) {
 			$stepParameters = @{
 				Section = $DefaultSection
 			}
 		} else {$stepParameters = @{}}
-		
+
 		# Overwrite default section settings with environments
 		$GlobalSettings = Set-Environments -prior $GlobalSettings -sctn $DefaultSection
-			
+
 		$Synopsis = Get-Help Step-"$StepName" |  foreach { $_.Synopsis  }
 		Write-Log "================================================" -foregroundcolor "green"
 		Write-Log "============= Step/$StepName =============" -foregroundcolor "green"
 		Write-Log "================================================" -foregroundcolor "green"
-		Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"			
+		Write-Log "Synopsis: $Synopsis" -foregroundcolor "green"
 		Write-Log "Progress: 100/100" -foregroundcolor "green"
-		
+
 		try {
-			# Invoke-Expression "Step-$StepName" 
+			# Invoke-Expression "Step-$StepName"
 			& "Step-$StepName" @stepParameters
 		}
 		catch {
@@ -162,8 +162,8 @@ Function Run-Steps {
 			$error.clear()
 		}
 		Write-Log "Exit code: $Result" -foregroundcolor "green"
-		Write-Verbose "Exit code: $Result" 
-		Write-Log 
+		Write-Verbose "Exit code: $Result"
+		Write-Log
 	}
 }
 
@@ -186,12 +186,12 @@ Function Write-Log {
 		[Parameter(Mandatory=$False)]
         [String]$Plot=$OutputMode,
 		[Parameter(Mandatory=$False)]
-        [String]$ForegroundColor=(get-host).ui.rawui.ForegroundColor	
+        [String]$ForegroundColor=(get-host).ui.rawui.ForegroundColor
 		)
-		
+
 	if ($ShowOutput -eq $True){
-		switch ($Plot) 
-		{ 
+		switch ($Plot)
+		{
 			"Output" {
 				Write-Output $Message
 			}
@@ -207,11 +207,11 @@ Function Write-Log {
 
 Function List-Packages {
 	[System.Collections.ArrayList]$Result = @()
-	$PackagesPath = Get-FullPath $GlobalSettings.Packages.PackagesPath	
+	$PackagesPath = Get-FullPath $GlobalSettings.Packages.PackagesPath
 	$Packages = Get-ChildItem "$PackagesPath"
 	foreach ($pckg in $Packages) {
 		$Result.Add($pckg)
-	}	
+	}
 	return $Result
 }
 
@@ -223,7 +223,7 @@ Function List-Packages {
 # 			[Parameter(Mandatory=$True)]
 #             [String]$ConnectionString
 #          )
-	
+
 # 	Set-ItemProperty $ConfigPath -name IsReadOnly -value $false
 # 	$doc = [xml](get-content $ConfigPath)
 # 	$root = $doc.get_DocumentElement();
@@ -240,7 +240,7 @@ function Set-AppSetting {
 			[Parameter(Mandatory=$True)]
             [String]$Value
          )
-	
+
 	Write-Log "Config path: $ConfigPath"
 	Set-ItemProperty $ConfigPath -name IsReadOnly -value $false
 	$doc = [xml](get-content $ConfigPath)
@@ -253,7 +253,7 @@ function Set-AppSetting {
 		$newAppSetting = $doc.CreateElement("add")
 		$doc.configuration.appSettings.AppendChild($newAppSetting)
 		$newAppSetting.SetAttribute("key",$Key);
-		$newAppSetting.SetAttribute("value",$Value);	
+		$newAppSetting.SetAttribute("value",$Value);
 	}
 	$doc.Save($ConfigPath)
 }
@@ -270,15 +270,15 @@ function Set-PathTooLongHandling {
             [String]$ConfigPath
          )
 
-	#  <AppContextSwitchOverrides value="Switch.System.IO.UseLegacyPathHandling=false;Switch.System.IO.BlockLongPaths=false" />		 
-	
+	#  <AppContextSwitchOverrides value="Switch.System.IO.UseLegacyPathHandling=false;Switch.System.IO.BlockLongPaths=false" />
+
 	Write-Log "Config path: $ConfigPath"
 	Set-ItemProperty $ConfigPath -name IsReadOnly -value $false
 	$doc = [xml](get-content $ConfigPath)
 	if (!($doc.configuration.runtime.AppContextSwitchOverrides)){
 		$override = $doc.CreateElement("AppContextSwitchOverrides")
 		$override.SetAttribute("value","Switch.System.IO.UseLegacyPathHandling=false;Switch.System.IO.BlockLongPaths=false");
-		$doc.configuration.runtime.AppendChild($override)		
+		$doc.configuration.runtime.AppendChild($override)
 	}
 	$doc.Save($ConfigPath)
 }
@@ -299,14 +299,14 @@ function Set-PathTooLongHandling {
         # # </site>
       # # </sites>
     # # </urlList>
-		 
+
 	# Write-Log Config path: $ConfigPath
 	# $doc = [xml](get-content $ConfigPath)
 	# if (!($doc.configuration.sensenet.urlList)){
 		# $override = $doc.CreateElement("urlList")
 		# $override = $doc.CreateElement("sites")
 		# $override.SetAttribute("value","Switch.System.IO.UseLegacyPathHandling=false;Switch.System.IO.BlockLongPaths=false");
-		# $doc.configuration.runtime.AppendChild($override)		
+		# $doc.configuration.runtime.AppendChild($override)
 	# }
 	# $doc.Save($ConfigPath)
 # }
@@ -314,7 +314,7 @@ function Set-PathTooLongHandling {
 # Functions uncertain if needed
 Function Go-Verbose {
      [CmdletBinding()]Param()
-     Write-Log -Message "Alright, you prefer talkative functions. First of all, I appreciate your wish to learn more about the common parameter -Verbose. Secondly, blah blah.." -Mode Verbose 
+     Write-Log -Message "Alright, you prefer talkative functions. First of all, I appreciate your wish to learn more about the common parameter -Verbose. Secondly, blah blah.." -Mode Verbose
      Write-Log "This is self-explanatory, anyway."
 }
 
@@ -336,11 +336,11 @@ Function Register-PSRepositoryFix {
     $ErrorActionPreference = 'Stop'
 
     Try {
-        Write-Log -Message 'Trying to register via ​Register-PSRepository' -Mode Verbose 
+        Write-Log -Message 'Trying to register via ​Register-PSRepository' -Mode Verbose
         ​Register-PSRepository -Name $Name -SourceLocation $SourceLocation -InstallationPolicy $InstallationPolicy
-        Write-Log -Message 'Registered via Register-PSRepository' -Mode Verbose 
+        Write-Log -Message 'Registered via Register-PSRepository' -Mode Verbose
     } Catch {
-        Write-Log -Message 'Register-PSRepository failed, registering via workaround' -Mode Verbose 
+        Write-Log -Message 'Register-PSRepository failed, registering via workaround' -Mode Verbose
 
         # Adding PSRepository directly to file
         Register-PSRepository -name $Name -SourceLocation $env:TEMP -InstallationPolicy $InstallationPolicy
@@ -354,7 +354,7 @@ Function Register-PSRepositoryFix {
 
         # Reloading PSRepository list
         Set-PSRepository -Name PSGallery -InstallationPolicy Untrusted
-        Write-Log -Message 'Registered via workaround' -Mode Verbose 
+        Write-Log -Message 'Registered via workaround' -Mode Verbose
     }
 }
 
@@ -366,21 +366,21 @@ function New-Directory([string]$dir) {
 
 
 # The intent of this script is to locate and return the path to the MSBuild directory that
-# we should use for bulid operations. The preference order for MSBuild to use is as 
+# we should use for bulid operations. The preference order for MSBuild to use is as
 # follows
 #
 #   1. MSBuild from an active VS command prompt
 #   2. MSBuild from a machine wide VS install
-#   3. MSBuild from the xcopy toolset 
+#   3. MSBuild from the xcopy toolset
 #
 # This function will return two values: the kind of MSBuild chosen and the MSBuild directory.
 function Get-MSBuildKindAndDir([switch]$xcopy = $false) {
-    if ($xcopy) { 
+    if ($xcopy) {
         Write-Log "xcopy"
         Write-Log "(Get-MSBuildDirXCopy)"
         return
     }
-    # MSBuild from an active VS command prompt.  
+    # MSBuild from an active VS command prompt.
     if (${env:VSINSTALLDIR} -ne $null) {
         # This line deliberately avoids using -ErrorAction.  Inside a VS command prompt
         # an MSBuild command should always be available.
@@ -400,7 +400,7 @@ function Get-MSBuildKindAndDir([switch]$xcopy = $false) {
         Write-Log "$p"
         return
     }
-    catch { 
+    catch {
         # Failures are expected here when no VS installation is present on the machine.
     }
     Write-Log "xcopy"
@@ -451,7 +451,7 @@ function Get-MSBuild([switch]$xcopy = $false) {
     return $p
 }
 
-# if ($subproperty.Value.GetType().FullName -eq "System.Object[]") 
+# if ($subproperty.Value.GetType().FullName -eq "System.Object[]")
 
 # Merge settings with environment variables
 Function Set-Environments {
@@ -461,23 +461,21 @@ Function Set-Environments {
 		[Parameter(Mandatory = $True)]
 		[Object]$sctn
 	)
-	
+
 	$pmenvlist = Get-ChildItem env:PLOTMANAGER_*
-	
-	foreach ($pmenv in $pmenvlist) { 
+
+	foreach ($pmenv in $pmenvlist) {
 		$settingName=$pmenv.Name.Substring(12)
 		$settingValue=$pmenv.Value
-		
-		Write-Verbose "Process $($settingName)... " 
-		if ($prior."$sctn"."$settingName") {
-			Write-Verbose "Original value: $($prior."$sctn"."$settingName")"
+
+		Write-Verbose "Process $($settingName)... "
+		if ($null -ne $prior."$sctn" -and $prior."$sctn".PSObject.Properties.Match($settingName).Count -gt 0) {
 			$prior."$sctn"."$settingName"=$settingValue
-			Write-Verbose "Changed value: $($prior."$sctn"."$settingName")"
 		} else {
 			Write-Verbose "setting does not exists"
 		}
 	}
-	
+
 	return $prior
 }
 
@@ -489,18 +487,18 @@ Function Merge-Settings {
 		[Parameter(Mandatory = $True)]
 		[Object]$fallback
 	)
-	
+
 	# Iterate through default setting properties
 	foreach ($property in $fallback.psobject.Properties) {
 		# If property is found in project setting too, use the latter
 		if ($prior.PSObject.Properties.Match($property.Name).Count) {
 			# should be use with settings instead of hardcoded
 			$mergePropName = $($property.Name)
-			# if prop exists and mergePropName we merge subproperties 
+			# if prop exists and mergePropName we merge subproperties
 			$subobj = $prior."$($mergePropName)"
 			# Iterate through default setting property's subproperties
 			foreach ($subproperty in $property.Value.psobject.Properties) {
-				# If found a missing subproperty in project setting then add to it 
+				# If found a missing subproperty in project setting then add to it
 				if (-Not $subobj.PSObject.Properties.Match($subproperty.Name).Count) {
 					$prior."$($mergePropName)" | Add-Member -MemberType NoteProperty -Name $subproperty.Name -Value $subproperty.Value
 				}
@@ -532,10 +530,10 @@ Function Merge-Json {
 	foreach ($property in $fallback.psobject.Properties) {
 		$doProcess = $($property.MemberType -eq "NoteProperty")
 		write-host $doProcess
-		
+
 		if (-not $doProcess) {
 			write-host "skipelj!!!"
-			continue 
+			continue
 		}
 
 		# should be use with settings instead of hardcoded
@@ -548,10 +546,10 @@ Function Merge-Json {
 		if ($prior.PSObject.Properties.Match($property.Name).Count) {
 			write-host "prior found: $mergePropName"
 
-			# if prop exists and mergePropName we merge subproperties 
-			$priorSub = $prior."$($mergePropName)" 
-			$fallbackSub = $fallback."$($mergePropName)" 
-			
+			# if prop exists and mergePropName we merge subproperties
+			$priorSub = $prior."$($mergePropName)"
+			$fallbackSub = $fallback."$($mergePropName)"
+
 			if ($property.TypeNameOfValue -eq "System.Management.Automation.PSCustomObject" -and $property.Value.psobject.Properties.Count) {
 				# Iterate through default setting property's subproperties
 				write-host "step in"
@@ -559,7 +557,7 @@ Function Merge-Json {
 				write-host "fallback sub object: $fallbackSub"
 				#$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
 				$prior."$($mergePropName)" = Merge-Json -prior $priorSub -fallback $fallbackSub -deep $($deep + 1)
-			} 
+			}
 		}
 		else {
 			write-host "prior not found"

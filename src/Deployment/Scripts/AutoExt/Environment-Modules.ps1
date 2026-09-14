@@ -8,25 +8,23 @@ Function Step-MergeEnvironmentSettings {
 		.SYNOPSIS
 		Merge environment settings to global settings
 		.DESCRIPTION
-		
+
 		#>
 	[CmdletBinding(SupportsShouldProcess = $True)]
 	Param(
 		[Parameter(Mandatory = $false)]
 		[string]$Section = "Project"
 	)
-		
+
 	Write-Output "environmentalism"
 	try {
-		
-		Get-ChildItem env:PLOTMANAGER_* | ForEach-Object { 
+
+		Get-ChildItem env:PLOTMANAGER_* | ForEach-Object {
 			$settingName=$_.Name.Substring(12)
 			$settingValue=$_.Value
 			Write-Output "Process $($settingName)... "
-			if ($GlobalSettings."$Section"."$settingName") {
-				Write-Output "Original value: $($GlobalSettings."$Section"."$settingName")"
+			if ($null -ne $GlobalSettings."$Section" -and $GlobalSettings."$Section".PSObject.Properties.Match($settingName).Count -gt 0) {
 				$GlobalSettings."$Section"."$settingName"=$settingValue
-				Write-Output "Changed value: $($GlobalSettings."$Section"."$settingName")"
 			} else {
 				Write-Output "setting does not exists"
 			}
@@ -38,4 +36,3 @@ Function Step-MergeEnvironmentSettings {
 		$script:Result = 1
 	}
 }
-
