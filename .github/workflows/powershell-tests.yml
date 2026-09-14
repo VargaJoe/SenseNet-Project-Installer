@@ -15,5 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run runtime regression tests
-        shell: ${{ matrix.shell }}
-        run: ./tests/Run-Tests.ps1
+        shell: pwsh
+        run: |
+          & '${{ matrix.shell }}' -NoProfile -NonInteractive -File ./tests/Run-Tests.ps1
+          exit $LASTEXITCODE
