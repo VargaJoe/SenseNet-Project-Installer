@@ -70,7 +70,7 @@ try {
     }
     $registry = New-PlotRegistry -AutoPath (Join-Path $scriptsPath 'Auto')
     Test-Case 'Registry exposes canonical IDs and aliases' {
-        Assert-Equal $registry.Steps.Count 5
+        Assert-Equal $registry.Steps.Count 26
         Assert-Equal $registry.Names['System-Start'].Id 'iis.start'
     }
     Test-Case 'Two packages and repeated invocations execute with output references' {
@@ -348,6 +348,9 @@ try {
         Assert-Equal $LASTEXITCODE 0
         Assert-True (($output -join ' ') -like '*backupdb*')
     }
+    . (Join-Path $PSScriptRoot 'Configuration.Tests.ps1')
+    . (Join-Path $PSScriptRoot 'GenericPackages.Tests.ps1')
+    . (Join-Path $PSScriptRoot 'Operations.Tests.ps1')
 } finally {
     if ($null -ne $registry) { Remove-PlotRegistry $registry }
     $resolved = [IO.Path]::GetFullPath($testRoot)

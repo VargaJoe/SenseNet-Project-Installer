@@ -1,5 +1,6 @@
 #requires -Version 5.1
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot 'JsonText.ps1')
 
 function Copy-PlotValue {
     param([AllowNull()]$Value)
@@ -46,11 +47,23 @@ function Merge-PlotSettings {
 }
 
 function Read-PlotConfiguration {
+    <#
+    .SYNOPSIS
+    Read JSON configuration files in precedence order; later files override earlier files.
+    #>
     [CmdletBinding()]
-    param([Parameter(Mandatory)][string]$Path)
-    $configuration = Copy-PlotValue (Get-Content -LiteralPath $Path -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop)
-    if ($configuration -isnot [hashtable]) { throw "Configuration must be a JSON object: $Path" }
-    return $configuration
+    param([Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]]$Path)
+    $merged = @{}
+    foreach ($file in $Path) {
+        if ([string]::IsNullOrWhiteSpace($file)) { throw 'Configuration paths must not be empty.' }
+        Write-Verbose "Configuration layer: $([IO.Path]::GetFullPath($file))"
+        $json = Get-Content -LiteralPath $file -Raw -Encoding UTF8 -ErrorAction Stop
+        if ([string]::IsNullOrWhiteSpace($json) -or -not $json.TrimStart().StartsWith('{')) { throw "Configuration must be a JSON object: $file" }
+        $configuration = Copy-PlotValue (ConvertFrom-PlotJsonText $json)
+        if ($configuration -isnot [hashtable]) { throw "Configuration must be a JSON object: $file" }
+        $merged = Merge-PlotSettings -Layers @($merged, $configuration)
+    }
+    return $merged
 }
 
 function Get-PlotMember {
@@ -376,6 +389,18 @@ function Invoke-Plot {
                 $settings = Resolve-PlotValue $invocation.Settings $roots $invocation.PreviousIds
                 $settings = Convert-StepParameters $settings $invocation.Step.Definition.Parameters $invocation.Id
                 $context = [pscustomobject]@{ RunId=$runId; InvocationId=$invocation.Id; PackageRoot=$invocation.Step.Package.Root; WorkDirectory=[IO.Path]::GetFullPath($WorkDirectory) }
+                $dependencies = @{}
+                foreach ($dependency in @(Get-PlotMember $invocation.Step.Package.Manifest 'Dependencies' @())) {
+                    foreach ($dependencyStep in $Registry.Steps.Values | Where-Object { $_.Package.Name -eq $dependency }) {
+                        $defaults = @{}
+                        foreach ($key in $dependencyStep.Definition.Parameters.Keys) {
+                            $rule = $dependencyStep.Definition.Parameters[$key]
+                            if ($rule.ContainsKey('Default')) { $defaults[$key] = Copy-PlotValue $rule.Default }
+                        }
+                        $dependencies[$dependencyStep.Id] = [pscustomobject]@{ Command=$dependencyStep.Command; Defaults=$defaults }
+                    }
+                }
+                $context | Add-Member -NotePropertyName Dependencies -NotePropertyValue $dependencies
                 Write-Verbose "[$runId/$($invocation.Id)] $($invocation.Step.Id); parameter sources: $(($invocation.Sources.GetEnumerator() | Sort-Object Key | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ', ')"
                 $output = @(& $invocation.Step.Command -Settings (Copy-PlotValue $settings) -Context $context -ErrorAction Stop)
                 if ($output.Count -eq 1) { $outputValue = $output[0] } elseif ($output.Count -gt 1) { $outputValue = $output }
@@ -399,4 +424,4 @@ function Invoke-Plot {
     [pscustomobject]@{ RunId=$runId; Plot=$Plot; Status=$status; Steps=$results.ToArray() }
 }
 
-Export-ModuleMember -Function Copy-PlotValue, Merge-PlotSettings, Read-PlotConfiguration, New-PlotRegistry, Remove-PlotRegistry, Get-PlotPlan, Invoke-Plot
+Export-ModuleMember -Function ConvertFrom-PlotJsonText, Copy-PlotValue, Merge-PlotSettings, Read-PlotConfiguration, New-PlotRegistry, Remove-PlotRegistry, Get-PlotPlan, Invoke-Plot

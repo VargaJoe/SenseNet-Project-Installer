@@ -37,9 +37,19 @@ CLI success is exit code 0; validation or execution failure is exit code 1. Exec
 - `Examples/compose-files.json`: portable example with independently configured invocations.
 - `Run-Legacy.ps1` and `AutoExt/`: retained historical execution path.
 
-Installed native packages: **text**, **filesystem**, **iis**. Copy a whole package folder, including its module and any resources, to another Auto directory; select that directory with `-AutoPath`. Missing dependencies and duplicate names are rejected before package imports. Canonical step IDs are qualified by package, such as `filesystem.copy`. Repeating a step in a plot is supported through separate invocation IDs.
+Installed native packages: **text**, **filesystem**, **archive**, **json**, **xml**, **process**, **http**, **git**, **build**, **docker**, **iis**. See the [general-purpose package catalog and complete local example](docs/generic-packages.md). Copy a whole package folder, including its module and any resources, to another Auto directory; select that directory with `-AutoPath`. Missing dependencies and duplicate names are rejected before package imports. Canonical step IDs are qualified by package, such as `filesystem.copy`. Repeating a step in a plot is supported through separate invocation IDs.
 
 See [configuration and execution](docs/settings.md), [package authoring](docs/custom-steps.md), [architecture and compatibility](docs/plot-manager-runtime.md) and [testing](tests/README.md).
+
+## Layered configuration
+
+Default settings are inherited by the project, then overridden by the selected environment. Explicit run parameters override the resolved invocation settings.
+
+```powershell
+./src/Deployment/Scripts/Run.ps1 my-plot -DefaultConfigPath ./default.json -ConfigPath ./project.json -EnvironmentConfigPath ./environment.json
+```
+
+Layers are optional. Nested objects merge; arrays replace; explicit null, false and zero remain values. Existing single-file commands work unchanged. The [layered artifact example](docs/generic-packages.md#complete-local-example) exercises these layers with real JSON/XML, directory, ZIP and hash operations.
 
 ## Historical workflows
 
@@ -61,4 +71,4 @@ pwsh -NoProfile -File ./tests/Run-Tests.ps1
 powershell.exe -NoProfile -File ./tests/Run-Tests.ps1
 ```
 
-The dependency-free suite checks configuration, package isolation, collisions, CLI exit codes, actual temporary-file workflows and mocked IIS transitions. It does not operate real infrastructure. [MIT license](LICENSE).
+The suite uses PowerShell/.NET and local Git to check configuration, package isolation, CLI exit codes, temporary files, child processes, loopback HTTP/TCP, real local Git operations and mocked IIS/CLI adapters. It does not operate deployed infrastructure. [MIT license](LICENSE).

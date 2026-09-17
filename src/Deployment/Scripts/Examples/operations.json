@@ -1,0 +1,94 @@
+{
+  "Values": {
+    "SourceDirectory": "source",
+    "SourceRef": "origin/main",
+    "Project": "source/Example.csproj",
+    "BuildArguments": [
+      "--configuration",
+      "Release"
+    ],
+    "DockerArguments": [
+      "--tag",
+      "example:local",
+      "."
+    ],
+    "Url": "https://example.invalid/health",
+    "HostName": "example.invalid",
+    "Port": 443
+  },
+  "Plots": {
+    "source-build": {
+      "Steps": [
+        {
+          "Step": "git.fetch",
+          "With": {
+            "Directory": {
+              "$ref": "settings.Values.SourceDirectory"
+            }
+          }
+        },
+        {
+          "Step": "git.checkout",
+          "With": {
+            "Directory": {
+              "$ref": "settings.Values.SourceDirectory"
+            },
+            "Ref": {
+              "$ref": "settings.Values.SourceRef"
+            }
+          }
+        },
+        {
+          "Step": "build.dotnet",
+          "With": {
+            "Project": {
+              "$ref": "settings.Values.Project"
+            },
+            "Arguments": {
+              "$ref": "settings.Values.BuildArguments"
+            }
+          }
+        }
+      ]
+    },
+    "container-build": {
+      "Steps": [
+        {
+          "Step": "docker.cli",
+          "With": {
+            "Command": "build",
+            "Directory": {
+              "$ref": "settings.Values.SourceDirectory"
+            },
+            "Arguments": {
+              "$ref": "settings.Values.DockerArguments"
+            }
+          }
+        }
+      ]
+    },
+    "readiness": {
+      "Steps": [
+        {
+          "Step": "http.wait-tcp",
+          "With": {
+            "HostName": {
+              "$ref": "settings.Values.HostName"
+            },
+            "Port": {
+              "$ref": "settings.Values.Port"
+            }
+          }
+        },
+        {
+          "Step": "http.wait",
+          "With": {
+            "Url": {
+              "$ref": "settings.Values.Url"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

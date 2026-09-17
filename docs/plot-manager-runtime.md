@@ -23,7 +23,7 @@ flowchart LR
 
 The output reference check cannot know a future runtime value's shape. A producer can succeed and a consuming step still fail validation; the result records that consuming invocation as failed. There is no automatic rollback, retry or parallel execution.
 
-Use `Merge-PlotSettings` explicitly when assembling multiple configuration files through the module API. The CLI reads one complete configuration file, avoiding implicit dependence on historical settings.
+The CLI deep-merges explicit default, project and environment files, in that order. `Read-PlotConfiguration -Path` accepts an ordered array of files through the module API; `Merge-PlotSettings -Layers` merges in-memory objects. The resulting configuration feeds the invocation parameter layers. See [configuration](settings.md).
 
 ## Module API
 
@@ -55,6 +55,6 @@ The historical GUI/HTTP listener is not part of this runtime and has not been mo
 
 ## Validation
 
-The dependency-free suite in tests covers real temporary-file composition, repeated calls, configuration isolation, module isolation, duplicate rejection, parameter/reference validation, dependency errors, CLI exit codes and IIS mocks. Real IIS, SQL Server, Docker, deployments and GUI are outside these tests.
+The suite in tests covers layered CLI files, ZIP roundtrips, directory operations, JSON/XML transformations, the complete layered artifact example, real temporary-file composition, repeated calls, configuration isolation, module isolation, duplicate rejection, parameter/reference validation, dependency errors, CLI exit codes and IIS mocks. The operational suite adds process argument/timeout checks, local HTTP/TCP servers, real local Git repositories and build/Docker adapter contract tests. Real IIS, SQL Server, Docker daemon operations, deployments and GUI are outside these tests. Git must be on PATH.
 
 No corporate repository code or configuration is required by the new engine or its native packages.

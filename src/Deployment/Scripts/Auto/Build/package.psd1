@@ -1,0 +1,4 @@
+@{ Name='build'; Version='1.0.0'; RootModule='Plot.Build.psm1'; Dependencies=@('process'); Steps=@{
+dotnet=@{Command='Invoke-PlotDotnet';Parameters=@{Command=@{Type='string';Default='build';ValidateSet=@('restore','build','test','publish','pack')}; Project=@{Type='string';Required=$true}; Directory=@{Type='string';Default='.'}; Arguments=@{Type='array';Default=@();Secret=$true};TimeoutSeconds=@{Type='int';Default=300;Minimum=1;Maximum=86400}; Environment=@{Type='object';Default=@{};Secret=$true}}}
+nuget=@{Command='Invoke-PlotNuget';Parameters=@{Command=@{Type='string';Required=$true;ValidateSet=@('push','delete','list','locals','add','remove','update','enable','disable')}; Directory=@{Type='string';Default='.'}; Arguments=@{Type='array';Default=@();Secret=$true};TimeoutSeconds=@{Type='int';Default=300;Minimum=1;Maximum=86400}; Environment=@{Type='object';Default=@{};Secret=$true}}}
+}}

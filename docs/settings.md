@@ -1,6 +1,28 @@
 # Plot configuration
 
-Configuration is a JSON object. Pass its path with `-ConfigPath`; `-Settings name` selects `Settings/project-name.json`. These options are mutually exclusive. The native runner uses the selected file as a complete configuration; it does not implicitly load historical default settings.
+Configuration is a JSON object. The CLI reads up to three files in this order:
+
+1. `-DefaultConfigPath`: shared baseline.
+2. `-ConfigPath`: project configuration. Alternatively, `-Settings name` selects `Settings/project-name.json`.
+3. `-EnvironmentConfigPath`: environment-specific overrides.
+
+Each layer is optional; explicitly supplied files must exist and contain a JSON object. Later files override earlier files recursively. Omitted properties are inherited; arrays replace, including empty arrays, and null/false/zero are preserved. The same rules apply to settings and plot definitions. The loader finishes before any step executes.
+
+```powershell
+./src/Deployment/Scripts/Run.ps1 build-report -DefaultConfigPath ./default.json -ConfigPath ./project.json -EnvironmentConfigPath ./production.json
+```
+
+`-ConfigPath` and `-Settings` are mutually exclusive ways to select the project layer. Both can be combined with default and environment layers. Existing single-file invocations continue to work. File paths are resolved against the invoking working directory; `-WorkDirectory` controls step file operations, not configuration-file discovery. Native mode does not implicitly load legacy `Settings/project-default.json`; select the intended native baseline explicitly.
+
+Through the module API, any number of files can be supplied in precedence order:
+
+```powershell
+$config = Read-PlotConfiguration -Path @('./default.json', './project.json', './production.json')
+```
+
+Use `Merge-PlotSettings -Layers` for configuration objects already in memory. `-Explain` lists the loaded ConfigurationFiles in order together with invocation parameter-source labels; `-Verbose` logs the loaded paths without their values. Parameter-source labels describe invocation layers, not individual source JSON files.
+
+After the file layers are merged, the invocation precedence below applies. Explicit `-Params` overrides still win. An environment file overrides matching JSON property paths; a global default does not override a more specific invocation `With` value. See the complete [layered artifact example](generic-packages.md#complete-local-example).
 
 ```json
 {
@@ -87,3 +109,5 @@ A plot may use an array directly. String entries can use `package.step:Section` 
 ```
 
 These strings refer to native step IDs or registered aliases. Historical `Step-*` functions require `-Legacy`; their configurations use the historical loader. See [legacy configuration](legacy/settings.md).
+
+JSON strings remain strings, including ISO timestamps with offsets. This applies to configuration layers, `-Params`, and the JSON package. An explicitly supplied empty or whitespace configuration path is an error; omit an optional argument to skip that layer.

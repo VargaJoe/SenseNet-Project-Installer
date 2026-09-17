@@ -4,6 +4,8 @@ param(
     [Parameter(Position=0)][string]$Plot,
     [string]$Step,
     [string]$ConfigPath,
+    [string]$DefaultConfigPath,
+    [string]$EnvironmentConfigPath,
     [string]$Settings,
     [string]$Params = '{}',
     [string]$AutoPath,
@@ -15,9 +17,14 @@ param(
 $ErrorActionPreference = 'Stop'
 $registry = $null
 try {
+    foreach ($pathArgument in @('DefaultConfigPath','ConfigPath','EnvironmentConfigPath')) {
+        if ($PSBoundParameters.ContainsKey($pathArgument) -and [string]::IsNullOrWhiteSpace($PSBoundParameters[$pathArgument])) {
+            throw "$pathArgument must not be empty when supplied."
+        }
+    }
     if ($Legacy) {
         if ($WhatIfPreference -or $Explain) { throw 'Legacy scripts do not provide a reliable preview. Use native packages for WhatIf/Explain.' }
-        if ($ConfigPath -or $PSBoundParameters.ContainsKey('AutoPath') -or $PSBoundParameters.ContainsKey('WorkDirectory')) {
+        if ($ConfigPath -or $DefaultConfigPath -or $EnvironmentConfigPath -or $PSBoundParameters.ContainsKey('AutoPath') -or $PSBoundParameters.ContainsKey('WorkDirectory')) {
             throw 'Legacy mode accepts Plot, Step, Settings, Params and Help only.'
         }
         # Run historical global-variable scripts in another PowerShell process.
@@ -44,7 +51,8 @@ try {
         if ($Settings -notmatch '^[a-zA-Z0-9_-]+$') { throw 'Settings must be a preset name. Use ConfigPath for a path.' }
         $ConfigPath = Join-Path $PSScriptRoot "Settings/project-$Settings.json"
     }
-    $configuration = if ($ConfigPath) { Read-PlotConfiguration -Path $ConfigPath } else { @{} }
+    $configurationFiles = @($DefaultConfigPath, $ConfigPath, $EnvironmentConfigPath | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    $configuration = if ($configurationFiles.Count) { Read-PlotConfiguration -Path $configurationFiles } else { @{} }
     if ($Help -eq 'plots') {
         if ($configuration.ContainsKey('Plots')) { @($configuration.Plots.Keys | Sort-Object) | ConvertTo-Json }
         else { '[]' }
@@ -53,11 +61,11 @@ try {
     if ($Plot -and $Step) { throw 'Use either Plot or Step, not both.' }
     if ($Step) { $Plot = 'single'; $configuration.Plots = @{ single=@(@{ Id='single'; Step=$Step }) } }
     if (-not $Plot) { throw 'Specify Plot or Step.' }
-    $overrides = Copy-PlotValue ($Params | ConvertFrom-Json -ErrorAction Stop)
+    $overrides = Copy-PlotValue (ConvertFrom-PlotJsonText $Params)
     if ($overrides -isnot [hashtable]) { throw 'Params must be a JSON object keyed by invocation id.' }
     if ($Explain) {
         $plan = Get-PlotPlan -Registry $registry -Configuration $configuration -Plot $Plot -Overrides $overrides
-        @($plan | ForEach-Object { [pscustomobject]@{ Id=$_.Id; Step=$_.Step.Id; Sources=$_.Sources } }) | ConvertTo-Json -Depth 8
+        @($plan | ForEach-Object { [pscustomobject]@{ Id=$_.Id; Step=$_.Step.Id; Sources=$_.Sources; ConfigurationFiles=@($configurationFiles | ForEach-Object { [IO.Path]::GetFullPath($_) }) } }) | ConvertTo-Json -Depth 8
         exit 0
     }
     $result = Invoke-Plot -Registry $registry -Configuration $configuration -Plot $Plot -Overrides $overrides -WorkDirectory $WorkDirectory -WhatIf:$WhatIfPreference
