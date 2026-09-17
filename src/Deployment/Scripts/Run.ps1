@@ -73,7 +73,8 @@ try {
     if ($result.Status -eq 'Failed') { exit 1 }
     exit 0
 } catch {
-    Write-Error $_ -ErrorAction Continue
+    # Keep CLI errors stable on redirected/noninteractive hosts; avoid ErrorRecord truncation.
+    [Console]::Error.WriteLine($_.Exception.Message)
     exit 1
 } finally {
     if ($null -ne $registry) { Remove-PlotRegistry -Registry $registry }

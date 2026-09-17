@@ -31,8 +31,9 @@ Test-Case 'CLI rejects explicit blank configuration layers including help and le
             elseif ($mode -eq 'help') { $arguments+=@('-Help','steps') }
             else { $arguments+=@('-Legacy','-Help','steps') }
             $cli=Invoke-TestCli $arguments
-            Assert-True ($cli.Code -ne 0)
-            Assert-True (($cli.ErrorText -replace '\s+',' ') -like '*must not be empty*')
+            if ($cli.Code -ne 1 -or $cli.ErrorText -notlike '*must not be empty*') {
+                throw ('Blank layer '+$parameter+'/'+$mode+': exit='+$cli.Code+'; stderr='+$cli.ErrorText)
+            }
         }
     }
 }
