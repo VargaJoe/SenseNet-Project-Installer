@@ -3,8 +3,6 @@ function Write-TestJson($Path, $Value) {
     [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 30), [Text.UTF8Encoding]::new($false))
 }
 function Invoke-TestCli([string[]]$Arguments) {
-    $errorFile = Join-Path $testRoot ('cli-' + [guid]::NewGuid().ToString('N') + '.err')
-    $ErrorActionPreference = 'Continue'
     # Encode a PowerShell invocation so PS5.1 native argument marshalling cannot strip JSON quotes.
     $command = "& '" + (Join-Path $scriptsPath 'Run.ps1').Replace("'", "''") + "'"
     foreach ($argument in $Arguments) {
@@ -12,9 +10,21 @@ function Invoke-TestCli([string[]]$Arguments) {
         else { $command += " '" + $argument.Replace("'", "''") + "'" }
     }
     $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($command))
-    $output = & (Get-Process -Id $PID).Path -NoProfile -NonInteractive -OutputFormat Text -EncodedCommand $encoded 2> $errorFile
-    $code = $LASTEXITCODE
-    [pscustomobject]@{ Code=$code; Text=($output -join [Environment]::NewLine); ErrorText=[IO.File]::ReadAllText($errorFile) }
+    # Native stderr redirection in PS5.1 adds width-dependent ErrorRecord formatting.
+    # Capture the real pipes independently, then normalize only error whitespace for assertions.
+    $start=[Diagnostics.ProcessStartInfo]::new()
+    $start.FileName=(Get-Process -Id $PID).Path
+    $start.Arguments='-NoProfile -NonInteractive -OutputFormat Text -EncodedCommand '+$encoded
+    $start.UseShellExecute=$false; $start.CreateNoWindow=$true
+    $start.RedirectStandardOutput=$true; $start.RedirectStandardError=$true
+    $start.StandardOutputEncoding=[Text.Encoding]::UTF8; $start.StandardErrorEncoding=[Text.Encoding]::UTF8
+    $process=[Diagnostics.Process]::Start($start)
+    try {
+        $stdout=$process.StandardOutput.ReadToEndAsync(); $stderr=$process.StandardError.ReadToEndAsync()
+        if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'CLI test timed out.' }
+        if (-not [Threading.Tasks.Task]::WaitAll([Threading.Tasks.Task[]]@($stdout,$stderr),5000)) { throw 'CLI output timed out.' }
+        [pscustomobject]@{ Code=$process.ExitCode; Text=$stdout.Result; ErrorText=($stderr.Result -replace '\s+',' ') }
+    } finally { $process.Dispose() }
 }
 $layersRoot = Join-Path $testRoot 'configuration layers'
 $null = [IO.Directory]::CreateDirectory($layersRoot)
