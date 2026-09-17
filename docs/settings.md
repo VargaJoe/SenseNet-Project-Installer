@@ -83,7 +83,13 @@ Objects merge recursively. Arrays replace as a whole, including an empty array. 
 
 Reference objects must contain exactly one directive. They are value references, not PowerShell expressions or string interpolation. Property paths use dots; keys containing dots are not addressable through this syntax. A reference to an output is allowed only for an earlier invocation. The actual output property and final type are checked immediately before the consuming step runs.
 
-Environment references are resolved during planning. There is no hidden environment overlay in native mode. Missing variables fail validation; string values are converted only for declared int/bool parameters. Boolean strings must be true or false, so "false" never becomes truthy through a string cast.
+Settings references are expanded recursively during planning. A selected value may itself contain another settings reference, an environment reference, or nested objects/arrays containing references. Repeated references in separate fields are valid. Circular references fail with their reference path before any step executes; a chain is limited to 64 settings references to bound expansion. Missing values and statically invalid parameter types also fail before execution.
+
+For example, a shared `"Values": {"Message": {"$env":"MESSAGE_TEXT"}}` can be consumed with `"Content": {"$ref":"settings.Values.Message"}`. This reads MESSAGE_TEXT before validating Content as a string.
+
+A settings alias may also select an earlier step's output reference. The engine keeps that reference deferred until the consumer executes; forward/self output references remain invalid. Step output is terminal data: `$ref`/`$env`-shaped objects returned by a step are not interpreted as new configuration directives.
+
+Environment references are resolved during planning, including indirect references through settings. There is no hidden environment overlay in native mode. Missing variables fail validation; string values are converted only for declared int/bool parameters. Boolean strings must be true or false, so "false" never becomes truthy through a string cast.
 
 ## Schema validation
 

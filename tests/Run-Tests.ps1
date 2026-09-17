@@ -351,6 +351,7 @@ try {
     . (Join-Path $PSScriptRoot 'Configuration.Tests.ps1')
     . (Join-Path $PSScriptRoot 'GenericPackages.Tests.ps1')
     . (Join-Path $PSScriptRoot 'Operations.Tests.ps1')
+    . (Join-Path $PSScriptRoot 'References.Tests.ps1')
 } finally {
     if ($null -ne $registry) { Remove-PlotRegistry $registry }
     $resolved = [IO.Path]::GetFullPath($testRoot)

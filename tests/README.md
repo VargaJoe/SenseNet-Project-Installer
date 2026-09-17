@@ -18,3 +18,7 @@ The runner also includes Configuration.Tests.ps1 and GenericPackages.Tests.ps1. 
 `Operations.Tests.ps1` runs automatically in the main suite. Requires Git on PATH; HTTP tests compile the small `HttpFixture.cs` loopback fixture with Add-Type and use an ephemeral port. No internet endpoints, Docker daemon or database are needed.
 
 Coverage includes ISO string preservation (JSON/config/CLI), blank CLI layer rejection, exact process argument boundaries, concurrent stdout/stderr draining, exit failures and timeouts, child-only environment, checksummed/atomic downloads, size limits, redirects, retries, slow response deadlines, TCP availability, real Git clone/fetch/checkout and dirty-worktree refusal. Build/NuGet and Docker command construction is tested against a process dependency fixture; their actual SDK/daemon behavior depends on the installed tools. Direct adapter WhatIf is also covered.
+
+## Recursive settings references
+
+`References.Tests.ps1` covers indirect environment values through actual layered CLI files, nested map/array expansion without input mutation, repeated sibling references, null/false/zero, a 64-reference chain and its depth limit, self/mutual/object cycles, missing values and type errors before earlier side effects. It also checks case-insensitive earlier-output aliases, forward/self-output rejection, missing runtime output properties and literal directive-shaped data returned by a step.

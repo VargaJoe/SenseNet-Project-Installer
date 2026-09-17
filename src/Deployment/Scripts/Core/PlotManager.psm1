@@ -197,18 +197,26 @@ function Get-ReferenceValue {
 }
 
 function Resolve-PlotValue {
-    param($Value, [hashtable]$Roots, [string[]]$PreviousIds, [switch]$Preflight)
+    param($Value, [hashtable]$Roots, [string[]]$PreviousIds, [switch]$Preflight, [string[]]$ReferenceStack = @())
     if ($Value -is [hashtable]) {
         if ($Value.ContainsKey('$ref')) {
             if ($Value.Count -ne 1 -or $Value['$ref'] -isnot [string]) { throw 'A $ref object must contain only a string $ref.' }
             $path = $Value['$ref']
             if ($path -notmatch '^(settings|steps)\.') { throw "Unsupported reference '$path'." }
-            if ($path.StartsWith('steps.')) {
+            if ($path.StartsWith('steps.', [StringComparison]::OrdinalIgnoreCase)) {
                 $parts = $path.Split('.')
                 if ($parts.Count -lt 3 -or $parts[1] -notin $PreviousIds) { throw "Reference '$path' must address an earlier invocation." }
                 if ($Preflight) { return Copy-PlotValue $Value }
+                # Output is data, not a new source of configuration directives.
+                return Get-ReferenceValue $path $Roots
             }
-            return Get-ReferenceValue $path $Roots
+            if ($path -in $ReferenceStack) {
+                throw "Circular settings reference: $( (@($ReferenceStack) + $path) -join ' -> ' )."
+            }
+            if ($ReferenceStack.Count -ge 64) { throw 'Settings reference chain exceeds the limit of 64 references.' }
+            $selected = Get-ReferenceValue $path $Roots
+            # Keep ancestry local to this branch so repeated sibling references are valid.
+            return Resolve-PlotValue $selected $Roots $PreviousIds -Preflight:$Preflight -ReferenceStack (@($ReferenceStack) + $path)
         }
         if ($Value.ContainsKey('$env')) {
             if ($Value.Count -ne 1 -or $Value['$env'] -isnot [string]) { throw 'An $env object must contain only a string $env.' }
@@ -217,12 +225,12 @@ function Resolve-PlotValue {
             return $environmentValue
         }
         $resolved = @{}
-        foreach ($key in $Value.Keys) { $resolved[$key] = Resolve-PlotValue $Value[$key] $Roots $PreviousIds -Preflight:$Preflight }
+        foreach ($key in $Value.Keys) { $resolved[$key] = Resolve-PlotValue $Value[$key] $Roots $PreviousIds -Preflight:$Preflight -ReferenceStack $ReferenceStack }
         return $resolved
     }
     if ($Value -is [array]) {
         $resolved = [Collections.Generic.List[object]]::new()
-        foreach ($item in $Value) { $resolved.Add((Resolve-PlotValue $item $Roots $PreviousIds -Preflight:$Preflight)) }
+        foreach ($item in $Value) { $resolved.Add((Resolve-PlotValue $item $Roots $PreviousIds -Preflight:$Preflight -ReferenceStack $ReferenceStack)) }
         return ,$resolved.ToArray()
     }
     return $Value
