@@ -51,10 +51,10 @@ The old backup-all script's parse errors were repaired. Legacy environment overl
 
 The previous unconnected Core-Helpers.ps1/System-Steps.ps1 prototypes have been replaced by the engine and IIS package; they are no longer competing function definitions.
 
-The historical GUI/HTTP listener is not part of this runtime and has not been modernized. Existing caller integrations must choose the new CLI/API contract or explicitly use legacy mode.
+The historical GUI/HTTP listener is not part of this runtime and has not been modernized. A new local Windows Forms host and structured catalog/plan/run bridge use the native engine; see [local integration](local-integration.md). Existing caller integrations must choose the new CLI/API contract or explicitly use legacy mode.
 
 ## Validation
 
-The suite in tests covers layered CLI files, ZIP roundtrips, directory operations, JSON/XML transformations, the complete layered artifact example, real temporary-file composition, repeated calls, configuration isolation, module isolation, duplicate rejection, parameter/reference validation, dependency errors, CLI exit codes and IIS mocks. The operational suite adds process argument/timeout checks, local HTTP/TCP servers, real local Git repositories and build/Docker adapter contract tests. Real IIS, SQL Server, Docker daemon operations, deployments and GUI are outside these tests. Git must be on PATH.
+The suite in tests covers layered CLI files, ZIP roundtrips, directory operations, JSON/XML transformations, the complete layered artifact example, real temporary-file composition, repeated calls, configuration isolation, module isolation, duplicate rejection, parameter/reference validation, dependency errors, CLI exit codes and IIS mocks. The operational suite adds process argument/timeout checks, local HTTP/TCP servers, real local Git repositories and build/Docker adapter contract tests. The default suite also covers SQL/IIS/Compose provider contracts and the local integration bridge. An opt-in isolated SQL Server/Compose test performs real database backup/restore and container lifecycle checks; see [testing](../tests/README.md). Real IIS deployment and visual GUI acceptance remain manual. Git must be on PATH.
 
 No corporate repository code or configuration is required by the new engine or its native packages.

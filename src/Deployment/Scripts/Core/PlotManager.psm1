@@ -393,7 +393,8 @@ function Invoke-Plot {
         $errorMessage = $null
         $settings = @{}
         try {
-            if ($PSCmdlet.ShouldProcess("$Plot/$($invocation.Id) [$($invocation.Step.Id)]", 'Execute step')) {
+            # Preview returns structured Skipped results without host text on JSON stdout.
+            if (-not $WhatIfPreference -and $PSCmdlet.ShouldProcess("$Plot/$($invocation.Id) [$($invocation.Step.Id)]", 'Execute step')) {
                 $settings = Resolve-PlotValue $invocation.Settings $roots $invocation.PreviousIds
                 $settings = Convert-StepParameters $settings $invocation.Step.Definition.Parameters $invocation.Id
                 $context = [pscustomobject]@{ RunId=$runId; InvocationId=$invocation.Id; PackageRoot=$invocation.Step.Package.Root; WorkDirectory=[IO.Path]::GetFullPath($WorkDirectory) }

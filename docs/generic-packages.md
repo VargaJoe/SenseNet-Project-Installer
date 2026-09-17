@@ -82,4 +82,4 @@ Add -Explain to inspect the layer file order and parameter sources, or -WhatIf t
 
 This first batch implements reusable file/directory, ZIP and JSON/XML operations as native packages. These are new general contracts, not aliases for historical deployment functions. Legacy scripts remain available only through legacy mode.
 
-The next generic group is now included: [process, HTTP/TCP, Git, build/NuGet and Docker](operations-packages.md). Compose and additional SQL/IIS helpers remain deferred. Application-specific installers, charts, environment settings and data remain outside this work.
+The next generic group is now included: [process, HTTP/TCP, Git, build/NuGet and Docker](operations-packages.md). [SQL Server, IIS provisioning, web maintenance and Compose](platform-packages.md) are also available as native steps, with a [local GUI/integration contract](local-integration.md). Application-specific installers, charts, environment settings and data remain outside this work.

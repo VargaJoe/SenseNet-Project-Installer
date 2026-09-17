@@ -37,7 +37,7 @@ CLI success is exit code 0; validation or execution failure is exit code 1. Exec
 - `Examples/compose-files.json`: portable example with independently configured invocations.
 - `Run-Legacy.ps1` and `AutoExt/`: retained historical execution path.
 
-Installed native packages: **text**, **filesystem**, **archive**, **json**, **xml**, **process**, **http**, **git**, **build**, **docker**, **iis**. See the [general-purpose package catalog and complete local example](docs/generic-packages.md). Copy a whole package folder, including its module and any resources, to another Auto directory; select that directory with `-AutoPath`. Missing dependencies and duplicate names are rejected before package imports. Canonical step IDs are qualified by package, such as `filesystem.copy`. Repeating a step in a plot is supported through separate invocation IDs.
+Installed native packages: **text**, **filesystem**, **archive**, **json**, **xml**, **process**, **http**, **git**, **build**, **docker**, **iis**, **sqlserver**, **compose**, **web** (49 steps). See the [general-purpose package catalog and complete local example](docs/generic-packages.md). Copy a whole package folder, including its module and any resources, to another Auto directory; select that directory with `-AutoPath`. Missing dependencies and duplicate names are rejected before package imports. Canonical step IDs are qualified by package, such as `filesystem.copy`. Repeating a step in a plot is supported through separate invocation IDs.
 
 See [configuration and execution](docs/settings.md), [package authoring](docs/custom-steps.md), [architecture and compatibility](docs/plot-manager-runtime.md) and [testing](tests/README.md).
 
@@ -62,7 +62,7 @@ Existing section/global-variable scripts remain available in a separate PowerShe
 
 Review the selected legacy configuration before executing it: these workflows can modify IIS, databases and deployments. The compatibility runner retains their platform/tool requirements and administrator requirement for execution. Historical steps are not native packages and cannot be mixed into a native plot. Legacy preview is rejected because those scripts do not consistently implement WhatIf.
 
-The Angular GUI and experimental HTTP listener are historical clients; this refactor does not modernize or expose them. Native CLI/API functionality does not depend on them. Original historical guides are under [docs/legacy](docs/legacy/).
+Use the [SQL/IIS/Compose packages and deployment scenarios](docs/platform-packages.md) and the [local Windows GUI / JSON integration](docs/local-integration.md). The Angular GUI and experimental HTTP listener remain historical clients. Native CLI/API functionality does not depend on them. Original historical guides are under [docs/legacy](docs/legacy/).
 
 ## Development
 

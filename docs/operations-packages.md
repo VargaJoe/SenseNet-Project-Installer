@@ -58,7 +58,7 @@ Outputs use the process result contract. Restore/build/test/publish may run proj
 - Container: run, start, stop, rm.
 - Network: network-create, network-inspect, network-connect, network-disconnect, network-rm (mapped to `docker network <verb>`).
 
-Arguments are passed as individual strings. Resource names, tags, paths, ports and flags are supplied by the plot. Outputs use the process result contract. No implicit cleanup or daemon-wide prune occurs. Timeout stops the CLI process; an operation already accepted by the Docker daemon can continue. Compose is not included in this batch.
+Arguments are passed as individual strings. Resource names, tags, paths, ports and flags are supplied by the plot. Outputs use the process result contract. No implicit cleanup or daemon-wide prune occurs. Timeout stops the CLI process; an operation already accepted by the Docker daemon can continue. The separate [compose package](platform-packages.md#docker-compose-compose) supplies multi-container lifecycle steps.
 
 ## Configuration example and commands
 

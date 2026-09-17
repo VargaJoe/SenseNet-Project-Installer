@@ -1,0 +1,104 @@
+{
+  "Values": {
+    "Site": "PlotExample",
+    "Pool": "PlotExamplePool",
+    "WebRoot": "web",
+    "Artifact": "artifact",
+    "Url": "http://localhost:18081/"
+  },
+  "Plots": {
+    "create": [
+      {
+        "Step": "filesystem.mkdir",
+        "With": {
+          "Path": {
+            "$ref": "settings.Values.WebRoot"
+          }
+        }
+      },
+      {
+        "Step": "iis.create",
+        "With": {
+          "WebsiteName": {
+            "$ref": "settings.Values.Site"
+          },
+          "AppPoolName": {
+            "$ref": "settings.Values.Pool"
+          },
+          "PhysicalPath": {
+            "$ref": "settings.Values.WebRoot"
+          },
+          "Port": 18081
+        }
+      }
+    ],
+    "deploy": [
+      {
+        "Step": "web.offline",
+        "With": {
+          "Directory": {
+            "$ref": "settings.Values.WebRoot"
+          }
+        }
+      },
+      {
+        "Step": "filesystem.copy-tree",
+        "With": {
+          "Source": {
+            "$ref": "settings.Values.Artifact"
+          },
+          "Destination": {
+            "$ref": "settings.Values.WebRoot"
+          },
+          "Overwrite": true
+        }
+      },
+      {
+        "Step": "web.online",
+        "With": {
+          "Directory": {
+            "$ref": "settings.Values.WebRoot"
+          }
+        }
+      },
+      {
+        "Step": "http.wait",
+        "With": {
+          "Url": {
+            "$ref": "settings.Values.Url"
+          }
+        }
+      }
+    ],
+    "status": [
+      {
+        "Step": "iis.status",
+        "With": {
+          "WebsiteName": {
+            "$ref": "settings.Values.Site"
+          }
+        }
+      }
+    ],
+    "recycle": [
+      {
+        "Step": "iis.recycle",
+        "With": {
+          "AppPoolName": {
+            "$ref": "settings.Values.Pool"
+          }
+        }
+      }
+    ],
+    "recover-online": [
+      {
+        "Step": "web.online",
+        "With": {
+          "Directory": {
+            "$ref": "settings.Values.WebRoot"
+          }
+        }
+      }
+    ]
+  }
+}
