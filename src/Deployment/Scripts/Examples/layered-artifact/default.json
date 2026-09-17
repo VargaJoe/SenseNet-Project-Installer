@@ -1,0 +1,114 @@
+{
+  "Report": {
+    "Label": "Default report",
+    "Environment": "local",
+    "Enabled": true,
+    "Iterations": 5,
+    "Formatting": {
+      "Keep": "inherited",
+      "Theme": "plain"
+    }
+  },
+  "Plots": {
+    "layered-artifact": {
+      "Steps": [
+        {
+          "Id": "prepare",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": "bundle-input"
+          }
+        },
+        {
+          "Id": "report",
+          "Step": "json.write",
+          "With": {
+            "Path": "bundle-input/report.json",
+            "Value": {
+              "$ref": "settings.Report"
+            }
+          }
+        },
+        {
+          "Id": "template",
+          "Step": "filesystem.write",
+          "With": {
+            "Path": "bundle-input/settings.xml",
+            "Content": "<settings><label>default</label><keep>unchanged</keep></settings>"
+          }
+        },
+        {
+          "Id": "configure",
+          "Step": "xml.set",
+          "With": {
+            "Source": "bundle-input/settings.xml",
+            "Destination": "bundle-input/settings.xml",
+            "XPath": "/settings/label",
+            "Value": {
+              "$ref": "settings.Report.Label"
+            },
+            "Overwrite": true
+          }
+        },
+        {
+          "Id": "stage",
+          "Step": "filesystem.copy-tree",
+          "With": {
+            "Source": "bundle-input",
+            "Destination": "staging"
+          }
+        },
+        {
+          "Id": "pack",
+          "Step": "archive.pack",
+          "With": {
+            "Source": {
+              "$ref": "steps.stage.Output.Path"
+            },
+            "Destination": "bundle.zip"
+          }
+        },
+        {
+          "Id": "restore",
+          "Step": "archive.unpack",
+          "With": {
+            "Source": {
+              "$ref": "steps.pack.Output.Path"
+            },
+            "Destination": "restored"
+          }
+        },
+        {
+          "Id": "inspect",
+          "Step": "json.read",
+          "With": {
+            "Path": "restored/report.json"
+          }
+        },
+        {
+          "Id": "originalHash",
+          "Step": "filesystem.hash",
+          "With": {
+            "Path": "bundle-input/report.json"
+          }
+        },
+        {
+          "Id": "restoredHash",
+          "Step": "filesystem.hash",
+          "With": {
+            "Path": "restored/report.json"
+          }
+        },
+        {
+          "Id": "cleanupStaging",
+          "Step": "filesystem.remove",
+          "With": {
+            "Root": ".",
+            "Path": "staging",
+            "Recurse": true
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,5 +1,6 @@
 #requires -Version 5.1
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot 'JsonText.ps1')
 
 function Copy-PlotValue {
     param([AllowNull()]$Value)
@@ -46,11 +47,23 @@ function Merge-PlotSettings {
 }
 
 function Read-PlotConfiguration {
+    <#
+    .SYNOPSIS
+    Read JSON configuration files in precedence order; later files override earlier files.
+    #>
     [CmdletBinding()]
-    param([Parameter(Mandatory)][string]$Path)
-    $configuration = Copy-PlotValue (Get-Content -LiteralPath $Path -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop)
-    if ($configuration -isnot [hashtable]) { throw "Configuration must be a JSON object: $Path" }
-    return $configuration
+    param([Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]]$Path)
+    $merged = @{}
+    foreach ($file in $Path) {
+        if ([string]::IsNullOrWhiteSpace($file)) { throw 'Configuration paths must not be empty.' }
+        Write-Verbose "Configuration layer: $([IO.Path]::GetFullPath($file))"
+        $json = Get-Content -LiteralPath $file -Raw -Encoding UTF8 -ErrorAction Stop
+        if ([string]::IsNullOrWhiteSpace($json) -or -not $json.TrimStart().StartsWith('{')) { throw "Configuration must be a JSON object: $file" }
+        $configuration = Copy-PlotValue (ConvertFrom-PlotJsonText $json)
+        if ($configuration -isnot [hashtable]) { throw "Configuration must be a JSON object: $file" }
+        $merged = Merge-PlotSettings -Layers @($merged, $configuration)
+    }
+    return $merged
 }
 
 function Get-PlotMember {
@@ -184,18 +197,26 @@ function Get-ReferenceValue {
 }
 
 function Resolve-PlotValue {
-    param($Value, [hashtable]$Roots, [string[]]$PreviousIds, [switch]$Preflight)
+    param($Value, [hashtable]$Roots, [string[]]$PreviousIds, [switch]$Preflight, [string[]]$ReferenceStack = @())
     if ($Value -is [hashtable]) {
         if ($Value.ContainsKey('$ref')) {
             if ($Value.Count -ne 1 -or $Value['$ref'] -isnot [string]) { throw 'A $ref object must contain only a string $ref.' }
             $path = $Value['$ref']
             if ($path -notmatch '^(settings|steps)\.') { throw "Unsupported reference '$path'." }
-            if ($path.StartsWith('steps.')) {
+            if ($path.StartsWith('steps.', [StringComparison]::OrdinalIgnoreCase)) {
                 $parts = $path.Split('.')
                 if ($parts.Count -lt 3 -or $parts[1] -notin $PreviousIds) { throw "Reference '$path' must address an earlier invocation." }
                 if ($Preflight) { return Copy-PlotValue $Value }
+                # Output is data, not a new source of configuration directives.
+                return Get-ReferenceValue $path $Roots
             }
-            return Get-ReferenceValue $path $Roots
+            if ($path -in $ReferenceStack) {
+                throw "Circular settings reference: $( (@($ReferenceStack) + $path) -join ' -> ' )."
+            }
+            if ($ReferenceStack.Count -ge 64) { throw 'Settings reference chain exceeds the limit of 64 references.' }
+            $selected = Get-ReferenceValue $path $Roots
+            # Keep ancestry local to this branch so repeated sibling references are valid.
+            return Resolve-PlotValue $selected $Roots $PreviousIds -Preflight:$Preflight -ReferenceStack (@($ReferenceStack) + $path)
         }
         if ($Value.ContainsKey('$env')) {
             if ($Value.Count -ne 1 -or $Value['$env'] -isnot [string]) { throw 'An $env object must contain only a string $env.' }
@@ -204,12 +225,12 @@ function Resolve-PlotValue {
             return $environmentValue
         }
         $resolved = @{}
-        foreach ($key in $Value.Keys) { $resolved[$key] = Resolve-PlotValue $Value[$key] $Roots $PreviousIds -Preflight:$Preflight }
+        foreach ($key in $Value.Keys) { $resolved[$key] = Resolve-PlotValue $Value[$key] $Roots $PreviousIds -Preflight:$Preflight -ReferenceStack $ReferenceStack }
         return $resolved
     }
     if ($Value -is [array]) {
         $resolved = [Collections.Generic.List[object]]::new()
-        foreach ($item in $Value) { $resolved.Add((Resolve-PlotValue $item $Roots $PreviousIds -Preflight:$Preflight)) }
+        foreach ($item in $Value) { $resolved.Add((Resolve-PlotValue $item $Roots $PreviousIds -Preflight:$Preflight -ReferenceStack $ReferenceStack)) }
         return ,$resolved.ToArray()
     }
     return $Value
@@ -372,10 +393,23 @@ function Invoke-Plot {
         $errorMessage = $null
         $settings = @{}
         try {
-            if ($PSCmdlet.ShouldProcess("$Plot/$($invocation.Id) [$($invocation.Step.Id)]", 'Execute step')) {
+            # Preview returns structured Skipped results without host text on JSON stdout.
+            if (-not $WhatIfPreference -and $PSCmdlet.ShouldProcess("$Plot/$($invocation.Id) [$($invocation.Step.Id)]", 'Execute step')) {
                 $settings = Resolve-PlotValue $invocation.Settings $roots $invocation.PreviousIds
                 $settings = Convert-StepParameters $settings $invocation.Step.Definition.Parameters $invocation.Id
                 $context = [pscustomobject]@{ RunId=$runId; InvocationId=$invocation.Id; PackageRoot=$invocation.Step.Package.Root; WorkDirectory=[IO.Path]::GetFullPath($WorkDirectory) }
+                $dependencies = @{}
+                foreach ($dependency in @(Get-PlotMember $invocation.Step.Package.Manifest 'Dependencies' @())) {
+                    foreach ($dependencyStep in $Registry.Steps.Values | Where-Object { $_.Package.Name -eq $dependency }) {
+                        $defaults = @{}
+                        foreach ($key in $dependencyStep.Definition.Parameters.Keys) {
+                            $rule = $dependencyStep.Definition.Parameters[$key]
+                            if ($rule.ContainsKey('Default')) { $defaults[$key] = Copy-PlotValue $rule.Default }
+                        }
+                        $dependencies[$dependencyStep.Id] = [pscustomobject]@{ Command=$dependencyStep.Command; Defaults=$defaults }
+                    }
+                }
+                $context | Add-Member -NotePropertyName Dependencies -NotePropertyValue $dependencies
                 Write-Verbose "[$runId/$($invocation.Id)] $($invocation.Step.Id); parameter sources: $(($invocation.Sources.GetEnumerator() | Sort-Object Key | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ', ')"
                 $output = @(& $invocation.Step.Command -Settings (Copy-PlotValue $settings) -Context $context -ErrorAction Stop)
                 if ($output.Count -eq 1) { $outputValue = $output[0] } elseif ($output.Count -gt 1) { $outputValue = $output }
@@ -399,4 +433,4 @@ function Invoke-Plot {
     [pscustomobject]@{ RunId=$runId; Plot=$Plot; Status=$status; Steps=$results.ToArray() }
 }
 
-Export-ModuleMember -Function Copy-PlotValue, Merge-PlotSettings, Read-PlotConfiguration, New-PlotRegistry, Remove-PlotRegistry, Get-PlotPlan, Invoke-Plot
+Export-ModuleMember -Function ConvertFrom-PlotJsonText, Copy-PlotValue, Merge-PlotSettings, Read-PlotConfiguration, New-PlotRegistry, Remove-PlotRegistry, Get-PlotPlan, Invoke-Plot
