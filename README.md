@@ -6,6 +6,14 @@ The repository's historical name, **SenseNet-Project-Installer**, describes its 
 
 Documentation: [guide index](docs/README.md), [component and migration map](docs/migration-map.md).
 
+## Shared management application
+
+The React/TypeScript management UI runs in a local browser, on an authenticated
+server, or inside the Tauri desktop host for Windows/Linux. It manages portable
+projects, explicit configuration layers, ordered plots, a generic guided installer
+and durable native-engine runs. See [build, desktop packaging and deployment](docs/management-deployment.md),
+the [user guide](docs/management-user-guide.md) and [architecture](docs/management-architecture.md).
+
 ## Run a plot
 
 Requires PowerShell 5.1 or PowerShell 7. The engine, text package and filesystem package do not require administrator privileges or external modules. IIS steps require Windows and WebAdministration when executed.

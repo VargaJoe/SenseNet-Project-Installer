@@ -180,8 +180,7 @@ Test-Case 'Generic write operations honor WhatIf when invoked directly' {
     Assert-Equal @(Get-ChildItem -LiteralPath $genericRoot -Filter 'preview*' -Force).Count 0
     Assert-True ([IO.Directory]::Exists((Join-Path $genericRoot 'restored')))
 }
-Test-Case 'Directory and archive operations reject junctions' {
-    if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) { return }
+Test-Case 'Directory and archive operations reject junctions' -WindowsOnly {
     $target=Join-Path $testRoot 'junction-target'
     $junction=Join-Path $genericRoot 'input/link'
     $null=[IO.Directory]::CreateDirectory($target)

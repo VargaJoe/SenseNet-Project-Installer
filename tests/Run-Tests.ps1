@@ -17,7 +17,11 @@ function Assert-Throws([scriptblock]$Action, [string]$Pattern) {
     try { & $Action | Out-Null } catch { $caught = $_.Exception.Message }
     if ($null -eq $caught -or $caught -notlike $Pattern) { throw "Expected error '$Pattern'; got '$caught'." }
 }
-function Test-Case([string]$Name, [scriptblock]$Action) {
+function Test-Case([string]$Name, [scriptblock]$Action, [switch]$WindowsOnly) {
+    if ($WindowsOnly -and [Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
+        $results.Add([pscustomobject]@{Test=$Name;Status='SKIP';Error='Requires Windows.'})
+        return
+    }
     try { & $Action; $results.Add([pscustomobject]@{ Test=$Name; Status='PASS'; Error=$null }) }
     catch { $results.Add([pscustomobject]@{ Test=$Name; Status='FAIL'; Error=$_.Exception.Message }) }
 }
@@ -353,6 +357,7 @@ try {
     . (Join-Path $PSScriptRoot 'Operations.Tests.ps1')
     . (Join-Path $PSScriptRoot 'References.Tests.ps1')
     . (Join-Path $PSScriptRoot 'Platform.Tests.ps1')
+    . (Join-Path $PSScriptRoot 'Management.Tests.ps1')
 } finally {
     if ($null -ne $registry) { Remove-PlotRegistry $registry }
     $resolved = [IO.Path]::GetFullPath($testRoot)
@@ -362,6 +367,8 @@ try {
 }
 $results | Format-Table -AutoSize -Wrap
 $failed = @($results | Where-Object Status -eq 'FAIL')
-Write-Output "PowerShell $($PSVersionTable.PSVersion): $($results.Count - $failed.Count)/$($results.Count) tests passed."
+$skipped = @($results | Where-Object Status -eq 'SKIP')
+$passed = @($results | Where-Object Status -eq 'PASS')
+Write-Output "PowerShell $($PSVersionTable.PSVersion): $($passed.Count)/$($results.Count - $skipped.Count) tests passed; $($skipped.Count) skipped."
 if ($failed.Count) { exit 1 }
 exit 0
