@@ -37,6 +37,12 @@ public sealed class ProjectStore(ServiceSettings settings)
     }
     public ProjectRecord Create(string owner, CreateProject request)
     {
+        // Reserve/check/create/register as one operation. Two operators must
+        // never both observe the same empty directory and overwrite it.
+        lock (registryGate) return CreateUnlocked(owner, request);
+    }
+    private ProjectRecord CreateUnlocked(string owner, CreateProject request)
+    {
         if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Length > 120) throw new ApiException(400, "Project name is required (maximum 120 characters).");
         if (request.Template is not (null or "generic")) throw new ApiException(400, "Unknown project template.");
         var name = Regex.Replace(request.Name.Trim(), @"[^\p{L}\p{N}_.-]", "-").Trim('.', '-');
@@ -68,6 +74,7 @@ public sealed class ProjectStore(ServiceSettings settings)
         _ = Layers(project, null);
         lock (registryGate)
         {
+            EnsureDirectoryAccess(owner, directory);
             var records = Records;
             var existing = records.FirstOrDefault(p => string.Equals(p.Directory, directory, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
             if (existing != null)
@@ -223,10 +230,12 @@ public sealed class ProjectStore(ServiceSettings settings)
             var current = data;
             foreach (var part in path[..^1])
             {
-                if (current[part] is not JsonObject child) current[part] = child = new JsonObject();
+                var existing = current.Select(x => x.Key).FirstOrDefault(x => x.Equals(part, StringComparison.OrdinalIgnoreCase)) ?? part;
+                if (current[existing] is not JsonObject child) current[existing] = child = new JsonObject();
                 current = child;
             }
-            current[path[^1]] = value!.DeepClone();
+            var leaf = current.Select(x => x.Key).FirstOrDefault(x => x.Equals(path[^1], StringComparison.OrdinalIgnoreCase)) ?? path[^1];
+            current[leaf] = value!.DeepClone();
         }
         return SaveUnlocked(project, layerId, new SaveLayer(request.Etag, data));
     }

@@ -46,7 +46,8 @@ public sealed class SecretStore(ServiceSettings settings, IDataProtectionProvide
         {
             if (node is JsonObject obj)
             {
-                if (obj["$env"] is JsonValue v && v.TryGetValue<string>(out var name)) names.Add(name);
+                var directive = obj.FirstOrDefault(x => x.Key.Equals("$env", StringComparison.OrdinalIgnoreCase));
+                if (directive.Value is JsonValue v && v.TryGetValue<string>(out var name)) names.Add(name);
                 foreach (var pair in obj) Walk(pair.Value);
             }
             else if (node is JsonArray array) foreach (var item in array) Walk(item);

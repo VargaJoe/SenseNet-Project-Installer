@@ -37,7 +37,9 @@ public static class Program
         if (OperatingSystem.IsWindows()) protection.ProtectKeysWithDpapi();
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
         {
-            options.Cookie.Name = "PlotManager.Session";
+            // Cookies are scoped by host, not port. Independent local services
+            // need different names even when both bind 127.0.0.1.
+            options.Cookie.Name = "PlotManager.Session." + TokenStamp(settings.DataDirectory)[..12];
             options.Cookie.HttpOnly = true;
             options.Cookie.SameSite = SameSiteMode.Strict;
             options.Cookie.SecurePolicy = settings.Mode == "hosted" ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;

@@ -94,6 +94,9 @@ function Get-ManagedCatalog {
         $tools=@(); if ($step.Package.Manifest.ContainsKey('RequiresCommands')) {
             $tools=@(foreach ($name in $step.Package.Manifest.RequiresCommands) { [pscustomobject]@{Name=$name;Available=($null -ne (Get-Command $name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1))} })
         }
+        if ($step.Package.Manifest.ContainsKey('RequiresModules')) {
+            $tools+=@(foreach ($name in $step.Package.Manifest.RequiresModules) { [pscustomobject]@{Name="PowerShell module: $name";Available=($null -ne (Get-Module -ListAvailable -Name $name | Select-Object -First 1))} })
+        }
         $outputs=@{}; if ($step.Definition.ContainsKey('Outputs')) { $outputs=Copy-PlotValue $step.Definition.Outputs }
         $description=$step.Id; if ($step.Definition.ContainsKey('Description')) { $description=$step.Definition.Description }
         [pscustomobject]@{ Id=$step.Id; Package=$step.Package.Name; Version=$step.Package.Version; Parameters=$parameters; Description=$description; Outputs=$outputs; Platform=$platform; Supported=($platform -ne 'Windows' -or $windows); Tools=@($tools) }

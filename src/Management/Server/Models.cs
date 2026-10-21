@@ -15,8 +15,16 @@ public static class JsonStore
     {
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
-        File.WriteAllText(temporary, JsonSerializer.Serialize(value, Options));
-        File.Move(temporary, path, true);
+        try
+        {
+            File.WriteAllText(temporary, JsonSerializer.Serialize(value, Options));
+            for (var attempt = 0; ; attempt++)
+            {
+                try { File.Move(temporary, path, true); break; }
+                catch (Exception ex) when ((ex is IOException or UnauthorizedAccessException) && attempt < 19) { Thread.Sleep(25); }
+            }
+        }
+        finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
     public static JsonObject Object(string path) => JsonNode.Parse(File.ReadAllText(path)) as JsonObject ?? throw new ApiException(400, "Configuration must be a JSON object.");
 }

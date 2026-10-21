@@ -60,6 +60,9 @@ startedAt,completedAt,steps,engine,error,snapshot}`. Status is `Queued`, `Runnin
 as lower-camel wrappers `{cursor,type,timestamp,invocationId,step,status,durationMs}`.
 No raw worker stdout/stderr is returned. Snapshot contains file hashes and package
 copies; secrets are injected into the worker environment, never written to snapshot.
+Referenced environment values, including encrypted owner secrets and absent
+variables, are captured once in memory when the run is submitted. Preflight and
+the run use that same capture even if a secret or service environment later changes.
 
 Project lookup and all child resources enforce authenticated ownership. Hosted
 mode uses separately configured operator tokens and HTTPS; access tokens never
@@ -73,6 +76,10 @@ Polling durable NDJSON is used instead of SignalR: the first service is a
 single-host sequential runner, and cursor replay supports reconnection without
 a separate transient event channel. Event delivery and run storage remain
 independent of browser connections.
+If terminal history cannot be persisted, the service reports `Failed` with a
+storage error from its in-memory record in both detail and history. It never
+claims a successful durable result. This fallback cannot survive a process crash;
+startup classifies any remaining unfinished record as `Interrupted`.
 
 The generic project's wizard lives in `plot-project.json`, with separate target
 and settings question groups. Each field's `settingPath`, for example
@@ -95,7 +102,8 @@ operator allowed to run `process.run` or other powerful steps is trusted to run
 code with that identity; project ownership is an API access boundary, not an OS
 sandbox. Host separate service identities/state roots for mutually untrusted
 operators. Hosted mode requires direct Kestrel HTTPS and distinct operator tokens
-in `PLOTMANAGER_USERS` JSON; reverse proxy forwarding and remote agent dispatch
+in `PLOTMANAGER_USERS` JSON (operator IDs: 1-64 ASCII letters, digits, underscores,
+hyphens); reverse proxy forwarding and remote agent dispatch
 are outside this first protocol.
 
 Run `dotnet run --project tests/Management.Server.Tests/Management.Server.Tests.csproj
@@ -103,3 +111,7 @@ Run `dotnet run --project tests/Management.Server.Tests/Management.Server.Tests.
 acceptance checks. The console suite needs .NET 8 and PowerShell 7, does not need
 NuGet test packages, and creates/cleans only its temporary project, state and
 ephemeral HTTPS test certificate.
+On Windows the suite also holds a read-only sharing handle to its own run record
+to verify truthful failure when atomic history replacement is denied. Run only
+that regression and authentication setup with `-- --storage-only` after the
+normal console command.

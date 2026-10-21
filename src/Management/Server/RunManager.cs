@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 
 namespace PlotManager.Server;
 
-public sealed class RunManager(ServiceSettings settings, ProjectStore projects, EngineClient engine) : IHostedService
+public sealed class RunManager(ServiceSettings settings, ProjectStore projects, EngineClient engine, ILogger<RunManager> logger) : IHostedService
 {
     private sealed class ActiveRun(RunRecord record, IDisposable projectLock)
     {
@@ -15,6 +15,7 @@ public sealed class RunManager(ServiceSettings settings, ProjectStore projects, 
         public bool UserCancelled { get; set; }
     }
     private readonly ConcurrentDictionary<string, ActiveRun> active = new();
+    private readonly ConcurrentDictionary<string, RunRecord> persistenceFailures = new();
     private readonly CancellationTokenSource shutdown = new();
     private readonly object eventGate = new();
     private string Root => Path.Combine(settings.DataDirectory, "runs");
@@ -77,12 +78,13 @@ public sealed class RunManager(ServiceSettings settings, ProjectStore projects, 
             var definitionPath = Path.Combine(folder, "snapshot/plot-project.json");
             CopyFile(Path.Combine(project.Directory, "plot-project.json"), definitionPath, record.Snapshot, folder);
             var request = engine.Request("plan", project, files, execution);
+            var environmentSnapshot = engine.CaptureEnvironment(owner, request);
             // Static validation runs against exactly the copied engine and layers.
             // The run has not been scheduled and no package command is invoked yet.
             using (var preflight = CancellationTokenSource.CreateLinkedTokenSource(shutdown.Token))
             {
                 preflight.CancelAfter(TimeSpan.FromMinutes(2));
-                _ = await engine.InvokeAsync(owner, request, enginePath, folder, null, null, preflight.Token);
+                _ = await engine.InvokeAsync(owner, request, enginePath, folder, null, null, preflight.Token, environmentSnapshot);
             }
             request["Operation"] = "run";
             var requestSnapshot = Path.Combine(folder, "snapshot/request.json");
@@ -92,7 +94,8 @@ public sealed class RunManager(ServiceSettings settings, ProjectStore projects, 
             Save(record);
             AppendEvent(record, new JsonObject { ["type"] = "Queued", ["status"] = "Queued" });
             if (!active.TryAdd(record.Id, run)) throw new InvalidOperationException("Duplicate run ID.");
-            run.Task = Task.Run(() => Execute(run, request, enginePath, folder));
+            run.Task = Task.Run(() => Execute(run, request, enginePath, folder, environmentSnapshot));
+            logger.LogInformation("Managed run {RunId} was scheduled at {Timestamp}.", record.Id, DateTimeOffset.UtcNow);
             scheduled = true;
             return record;
         }
@@ -128,8 +131,9 @@ public sealed class RunManager(ServiceSettings settings, ProjectStore projects, 
         File.Copy(source, target, false);
         hashes[Path.GetRelativePath(root, target).Replace('\\', '/')] = ProjectStore.Hash(target);
     }
-    private async Task Execute(ActiveRun run, JsonObject request, string enginePath, string folder)
+    private async Task Execute(ActiveRun run, JsonObject request, string enginePath, string folder, IReadOnlyDictionary<string, string?> environmentSnapshot)
     {
+        logger.LogInformation("Managed run {RunId} dispatch began at {Timestamp}.", run.Record.Id, DateTimeOffset.UtcNow);
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(shutdown.Token, run.Cancellation.Token);
         using var eventsDone = new CancellationTokenSource();
         var nativeEvents = Path.Combine(folder, "worker-events.ndjson");
@@ -144,7 +148,7 @@ public sealed class RunManager(ServiceSettings settings, ProjectStore projects, 
             }
             AppendEvent(run.Record, new JsonObject { ["type"] = "Running", ["status"] = "Running" });
             watcher = PumpEvents(run, nativeEvents, eventsDone.Token);
-            var result = await engine.InvokeAsync(run.Record.Owner, request, enginePath, folder, nativeEvents, null, linked.Token);
+            var result = await engine.InvokeAsync(run.Record.Owner, request, enginePath, folder, nativeEvents, null, linked.Token, environmentSnapshot);
             lock (run.Gate)
             {
                 run.Record.Engine = result;
@@ -163,8 +167,9 @@ public sealed class RunManager(ServiceSettings settings, ProjectStore projects, 
         {
             lock (run.Gate) { run.Record.Status = "Failed"; run.Record.Error = ex.Message; }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            logger.LogError(ex, "Managed run {RunId} failed before a structured engine response; HResult {HResult}.", run.Record.Id, ex.HResult);
             lock (run.Gate) { run.Record.Status = "Failed"; run.Record.Error = "The managed worker failed. No raw process streams are exposed; inspect runner installation and service diagnostics."; }
         }
         finally
@@ -186,6 +191,14 @@ public sealed class RunManager(ServiceSettings settings, ProjectStore projects, 
                     Save(run.Record);
                 }
                 AppendEvent(run.Record, new JsonObject { ["type"] = "Completed", ["status"] = run.Record.Status });
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                logger.LogError(ex, "Could not persist terminal history for run {RunId}; HResult {HResult}. Check runner storage.", run.Record.Id, ex.HResult);
+                run.Record.Status = "Failed";
+                run.Record.CompletedAt = DateTimeOffset.UtcNow;
+                run.Record.Error = "The worker ended, but terminal history could not be saved. Check runner storage and permissions. No rollback was performed.";
+                persistenceFailures[run.Record.Id] = run.Record;
             }
             finally
             {
@@ -251,8 +264,9 @@ public sealed class RunManager(ServiceSettings settings, ProjectStore projects, 
     {
         _ = projects.Get(owner, projectId);
         var file = RecordPath(id);
-        if (!File.Exists(file)) throw new ApiException(404, "Run not found.");
-        var record = JsonStore.Read<RunRecord>(file);
+        var record = persistenceFailures.TryGetValue(id, out var unpersisted)
+            ? System.Text.Json.JsonSerializer.Deserialize<RunRecord>(System.Text.Json.JsonSerializer.Serialize(unpersisted, JsonStore.Options), JsonStore.Options)!
+            : File.Exists(file) ? JsonStore.Read<RunRecord>(file) : throw new ApiException(404, "Run not found.");
         if (record.Owner != owner || record.ProjectId != projectId) throw new ApiException(403, "Run access denied.", "forbidden");
         // A durable terminal record is published before the lock is released.
         // Do not tell a polling client it can edit/start again until that release.
@@ -267,7 +281,9 @@ public sealed class RunManager(ServiceSettings settings, ProjectStore projects, 
     {
         _ = projects.Get(owner, projectId);
         if (!Directory.Exists(Root)) return new();
-        return Directory.EnumerateDirectories(Root).Select(path => Path.Combine(path, "run.json")).Where(File.Exists).Select(JsonStore.Read<RunRecord>).Where(x => x.Owner == owner && x.ProjectId == projectId).OrderByDescending(x => x.CreatedAt).ToList();
+        var ids = Directory.EnumerateDirectories(Root).Select(path => Path.Combine(path, "run.json")).Where(File.Exists).Select(JsonStore.Read<RunRecord>).Where(x => x.Owner == owner && x.ProjectId == projectId).Select(x => x.Id)
+            .Concat(persistenceFailures.Values.Where(x => x.Owner == owner && x.ProjectId == projectId).Select(x => x.Id)).Distinct().ToArray();
+        return ids.Select(id => Get(owner, projectId, id)).OrderByDescending(x => x.CreatedAt).ToList();
     }
     public object Events(string owner, string projectId, string id, long after)
     {

@@ -1,7 +1,7 @@
 @{
     Name = 'iis'
     Version = '1.0.0'
-    Platform = 'Windows'
+    Platform = 'Windows'; RequiresModules=@('WebAdministration')
     RootModule = 'Plot.Iis.psm1'
     Steps = @{
         start = @{

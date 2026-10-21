@@ -213,6 +213,15 @@ try {
         $path = Join-Path $folder 'package.psd1'
         (Get-Content -LiteralPath $path -Raw).Replace("RootModule='Fixture.a.psm1'", "RootModule='../elsewhere.psm1'") | Set-Content -LiteralPath $path
         Assert-Throws { New-PlotRegistry $auto } '*escapes its package*'
+        if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
+            $caseRoot = Join-Path $testRoot 'case-boundary'
+            $folder = New-TestPackage $caseRoot Case first
+            $null = [IO.Directory]::CreateDirectory((Join-Path $caseRoot 'case'))
+            Copy-Item -LiteralPath (Join-Path $folder 'Fixture.Case.psm1') -Destination (Join-Path $caseRoot 'case/foreign.psm1')
+            $manifestPath = Join-Path $folder 'package.psd1'
+            (Get-Content -LiteralPath $manifestPath -Raw).Replace('Fixture.Case.psm1','../case/foreign.psm1') | Set-Content -LiteralPath $manifestPath
+            Assert-Throws { New-PlotRegistry $caseRoot } '*escapes its package*'
+        }
     }
     Test-Case 'Secret parameters are redacted from failure results' {
         $auto = Join-Path $testRoot 'secret'

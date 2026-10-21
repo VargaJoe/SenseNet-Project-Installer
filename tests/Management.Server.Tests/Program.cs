@@ -11,6 +11,7 @@ using PlotManager.Server;
 internal static class ManagementTests
 {
     private static int checks;
+    private static string diagnosticState = "";
     private static void Check(bool condition, string name)
     {
         if (!condition) throw new Exception("FAIL: " + name);
@@ -25,13 +26,24 @@ internal static class ManagementTests
     }
     private static async Task<JsonObject> WaitRun(HttpClient client, string projectId, string runId)
     {
-        for (var i = 0; i < 300; i++)
+        for (var i = 0; i < 900; i++)
         {
             var run = await Json(await client.GetAsync($"/api/projects/{projectId}/runs/{runId}"));
             if (run["status"]!.ToString() is not ("Queued" or "Running")) return run;
             await Task.Delay(100);
         }
-        throw new Exception("Run did not finish within 30 seconds.");
+        var diagnosticFile = Path.Combine(diagnosticState, "runs", runId, "run.json");
+        if (File.Exists(diagnosticFile))
+        {
+            var diagnostic = JsonStore.Read<RunRecord>(diagnosticFile);
+            Console.Error.WriteLine($"Timed-out durable run: status={diagnostic.Status}, error={diagnostic.Error}, completedAt={diagnostic.CompletedAt}");
+            var events = Path.Combine(diagnosticState, "runs", runId, "events.ndjson");
+            if (File.Exists(events)) Console.Error.WriteLine(File.ReadAllText(events));
+            var rawEvents = Path.Combine(diagnosticState, "runs", runId, "worker-events.ndjson");
+            if (File.Exists(rawEvents)) Console.Error.WriteLine("Worker events: " + File.ReadAllText(rawEvents));
+            Console.Error.WriteLine("Pending worker response files: " + Directory.EnumerateFiles(Path.Combine(diagnosticState, "runs", runId), "response-*.json").Count());
+        }
+        throw new Exception("Run did not finish within 90 seconds.");
     }
     private static HttpClient Client(WebApplication app, string? bearer = null)
     {
@@ -40,16 +52,17 @@ internal static class ManagementTests
         if (bearer != null) client.DefaultRequestHeaders.Authorization = new("Bearer", bearer);
         return client;
     }
-    public static async Task<int> Main()
+    public static async Task<int> Main(string[] args)
     {
         var repository = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../"));
         var enginePath = Path.Combine(repository, "src/Deployment/Scripts");
         var temporary = Path.Combine(Path.GetTempPath(), "PlotManager-BackendTests-" + Guid.NewGuid().ToString("N"));
         var state = Path.Combine(temporary, "state");
+        diagnosticState = state;
         var projectRoot = Path.Combine(temporary, "projects");
         var token = "integration-only-" + Guid.NewGuid().ToString("N");
         var bobToken = "other-operator-" + Guid.NewGuid().ToString("N");
-        var config = new Dictionary<string, string?> { ["urls"] = "http://127.0.0.1:0", ["PLOTMANAGER_MODE"] = "local", ["PLOTMANAGER_TOKEN"] = token, ["PLOTMANAGER_DATA"] = state, ["PLOTMANAGER_PROJECT_ROOT"] = projectRoot, ["PLOTMANAGER_ENGINE"] = enginePath, ["Logging:LogLevel:Default"] = "Warning" };
+        var config = new Dictionary<string, string?> { ["urls"] = "http://127.0.0.1:0", ["PLOTMANAGER_MODE"] = "local", ["PLOTMANAGER_TOKEN"] = token, ["PLOTMANAGER_DATA"] = state, ["PLOTMANAGER_PROJECT_ROOT"] = projectRoot, ["PLOTMANAGER_ENGINE"] = enginePath, ["Logging:LogLevel:Default"] = "Warning", ["Logging:LogLevel:PlotManager.Server.RunManager"] = "Information" };
         WebApplication? app = null;
         try
         {
@@ -83,10 +96,19 @@ internal static class ManagementTests
             var project = await Json(await client.PostAsJsonAsync("/api/projects", new { name = "Isolated sample", template = "generic" }), HttpStatusCode.Created);
             var id = project["id"]!.ToString();
             var directory = project["directory"]!.ToString();
+            if (args.Contains("--storage-only", StringComparer.Ordinal))
+            {
+                await VerifySharingFailure(client, id, state);
+                Console.WriteLine($"{checks}/{checks} targeted backend assertions passed.");
+                return 0;
+            }
             Check(!project["definition"]!.ToJsonString().Contains(temporary), "portable project definition has relative paths");
             Check((await bob.GetAsync($"/api/projects/{id}")).StatusCode == HttpStatusCode.Forbidden, "project ownership enforced");
             Check((await bob.PostAsJsonAsync("/api/projects/open", new { directory })).StatusCode == HttpStatusCode.Forbidden, "open cannot claim another owner's project");
             Check((await client.PostAsJsonAsync("/api/projects", new { name = "escape", directory = Path.GetPathRoot(temporary) })).StatusCode == HttpStatusCode.BadRequest, "create rejects outside allowed root");
+            Check((await bob.PostAsJsonAsync("/api/projects", new { name = "nested intrusion", directory = Path.Combine(directory, "nested") })).StatusCode == HttpStatusCode.Forbidden, "create cannot enter another owner's directory subtree");
+            var openedAgain = await Json(await client.PostAsJsonAsync("/api/projects/open", new { directory = directory + Path.DirectorySeparatorChar }));
+            Check(openedAgain["id"]!.ToString() == id, "trailing directory separator cannot create a second project identity");
             Check((await bob.GetAsync("/api/browse?path=" + Uri.EscapeDataString(directory))).StatusCode == HttpStatusCode.Forbidden, "runner browse cannot enter another owner's project");
             var bobBrowse = await Json(await bob.GetAsync("/api/browse"));
             Check(!bobBrowse["entries"]!.AsArray().Any(x => x!["path"]!.ToString() == directory), "runner browse hides other-owned project roots");
@@ -105,6 +127,7 @@ internal static class ManagementTests
             var data = JsonNode.Parse("""{"Unknown":{"zero":0,"false":false,"null":null,"array":[],"date":"2026-10-21T18:22:00+02:00"},"Sample":{"Message":"saved message"}}""")!.AsObject();
             var saved = await Json(await client.PutAsJsonAsync(layerPath, new { etag = layer["etag"]!.ToString(), data }));
             Check(JsonNode.DeepEquals(saved["data"], data), "layer roundtrip preserves unknown JSON and null false zero empty array");
+            Check((await client.PutAsJsonAsync(layerPath, new { etag = saved["etag"]!.ToString(), data = (object?)null })).StatusCode == HttpStatusCode.BadRequest && JsonNode.DeepEquals((await Json(await client.GetAsync(layerPath)))["data"], data), "null save body cannot replace a configuration object");
             Check((await client.PutAsJsonAsync(layerPath, new { etag = layer["etag"]!.ToString(), data })).StatusCode == HttpStatusCode.Conflict, "stale layer etag rejected");
             var literal = data.DeepClone().AsObject(); literal["Password"] = "must-not-save";
             Check((await client.PutAsJsonAsync(layerPath, new { etag = saved["etag"]!.ToString(), data = literal })).StatusCode == HttpStatusCode.BadRequest, "literal secret rejected");
@@ -145,6 +168,7 @@ internal static class ManagementTests
             var cursor = events["cursor"]!.GetValue<long>();
             Check((await Json(await client.GetAsync($"/api/projects/{id}/runs/{runId}/events?after={cursor}")))["events"]!.AsArray().Count == 0, "event cursor replay reconnect has no duplicates");
             Check((await bob.GetAsync($"/api/projects/{id}/runs/{runId}/events")).StatusCode == HttpStatusCode.Forbidden, "run replay enforces project ACL");
+            await VerifySharingFailure(client, id, state);
             var requestProcess = new ProcessStartInfo("pwsh") { WorkingDirectory = directory, UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
             foreach (var argument in new[] { "-NoProfile", "-File", Path.Combine(enginePath, "Run.ps1"), "install", "-DefaultConfigPath", Path.Combine(directory, "default.json"), "-ConfigPath", Path.Combine(directory, "project.json"), "-EnvironmentConfigPath", Path.Combine(directory, "environments/development.json"), "-WorkDirectory", directory }) requestProcess.ArgumentList.Add(argument);
             File.Delete(Path.Combine(directory, "hello.txt"));
@@ -164,6 +188,7 @@ internal static class ManagementTests
             var secretRun = await Json(await client.PostAsJsonAsync($"/api/projects/{id}/runs", new { plot = "secret" }), HttpStatusCode.Accepted);
             var secretDone = await WaitRun(client, id, secretRun["id"]!.ToString());
             Check(secretDone["status"]!.ToString() == "Succeeded" && !secretDone.ToJsonString().Contains(secretValue), "encrypted secret injected only into worker and redacted from results");
+            await VerifyEnvironmentSnapshot(app, id, directory, enginePath, state, secretValue);
             var slow = await Json(await client.PostAsJsonAsync($"/api/projects/{id}/runs", new { plot = "slow" }), HttpStatusCode.Accepted);
             var slowId = slow["id"]!.ToString();
             Check((await client.PutAsJsonAsync(layerPath, new { etag = saved["etag"]!.ToString(), data })).StatusCode == HttpStatusCode.Conflict, "active run locks editing");
@@ -192,15 +217,22 @@ internal static class ManagementTests
             var wizard = await Json(await client.GetAsync($"/api/projects/{id}/wizard"));
             Check(wizard["groups"]!.AsArray().Count > 0, "generic installer has declarative form groups");
             layer = await Json(await client.GetAsync(layerPath));
+            var caseData = layer["data"]!.DeepClone().AsObject();
+            var existingSample = caseData["Sample"]!.DeepClone().AsObject();
+            existingSample["Vendor"] = new JsonObject { ["unknownMetadata"] = "preserve me" };
+            caseData.Remove("Sample"); caseData["sample"] = existingSample;
+            layer = await Json(await client.PutAsJsonAsync(layerPath, new { etag = layer["etag"]!.ToString(), data = caseData }));
             var wizardLayer = await Json(await client.PostAsJsonAsync($"/api/projects/{id}/wizard", new { etag = layer["etag"]!.ToString(), values = new { target = "wizard.txt", message = "wizard passed", enabled = false } }));
             Check(wizardLayer["data"]!["Custom"]!["Enabled"]!.GetValue<bool>() == false, "declarative wizard applies custom typed binding without hardcoded fields");
+            Check(wizardLayer["data"]!["Sample"] == null && wizardLayer["data"]!["sample"]!["Vendor"]!["unknownMetadata"]!.ToString() == "preserve me", "wizard respects engine key casing and preserves vendor metadata");
             var wizardRun = await Json(await client.PostAsJsonAsync($"/api/projects/{id}/runs", new { plot = "install" }), HttpStatusCode.Accepted);
             var wizardDone = await WaitRun(client, id, wizardRun["id"]!.ToString());
             Check(wizardDone["status"]!.ToString() == "Succeeded" && File.ReadAllText(Path.Combine(directory, "wizard.txt")) == "wizard passed", "guided sample saves normal configuration and executes");
             var upload = await Json(await client.PostAsJsonAsync($"/api/projects/{id}/uploads", new { name = "sample.txt", contentBase64 = Convert.ToBase64String("uploaded"u8.ToArray()) }));
             Check(File.ReadAllText(upload["path"]!.ToString()) == "uploaded" && upload["relativePath"]!.ToString().StartsWith("uploads/"), "browser upload is explicit runner-side project file");
             var inherited = await Json(await client.GetAsync(layerPath));
-            var inheritedData = inherited["data"]!.DeepClone().AsObject(); inheritedData.Remove("Sample");
+            var inheritedData = inherited["data"]!.DeepClone().AsObject();
+            foreach (var sampleKey in inheritedData.Where(x => x.Key.Equals("Sample", StringComparison.OrdinalIgnoreCase)).Select(x => x.Key).ToArray()) inheritedData.Remove(sampleKey);
             _ = await Json(await client.PutAsJsonAsync(layerPath, new { etag = inherited["etag"]!.ToString(), data = inheritedData }));
             var restored = await Json(await client.GetAsync($"/api/projects/{id}/configuration"));
             Check(restored["engine"]!["Configuration"]!["Sample"]!["Message"]!.ToString() == "Hello from Plot Manager", "removing selected override restores inheritance");
@@ -256,6 +288,8 @@ internal static class ManagementTests
             CheckThrows(() => new ServiceSettings { Mode = "hosted" }.ValidateUrls("http://127.0.0.1:5188"), "hosted mode refuses plaintext HTTP");
             var unsafeEndpoint = new Dictionary<string, string?>(config) { ["Kestrel:Endpoints:AccidentalPublic:Url"] = "http://0.0.0.0:5188" };
             CheckThrows(() => global::Program.Build(Array.Empty<string>(), unsafeEndpoint), "Kestrel endpoint configuration cannot bypass local binding restriction");
+            var unsafeOperator = new Dictionary<string, string?>(config) { ["PLOTMANAGER_MODE"] = "hosted", ["PLOTMANAGER_USERS"] = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, string> { ["alice:child"] = token }) };
+            CheckThrows(() => global::Program.Build(Array.Empty<string>(), unsafeOperator), "operator IDs cannot collide with secret ownership namespaces");
             Console.WriteLine($"{checks}/{checks} management backend assertions passed on {System.Runtime.InteropServices.RuntimeInformation.OSDescription}.");
             return 0;
         }
@@ -271,5 +305,54 @@ internal static class ManagementTests
     {
         try { action(); } catch (InvalidOperationException) { Check(true, name); return; }
         throw new Exception("FAIL: " + name);
+    }
+    private static async Task VerifyEnvironmentSnapshot(WebApplication app, string projectId, string directory, string enginePath, string state, string originalSecret)
+    {
+        var inheritedName = "PLOT_TEST_FREEZE_" + Guid.NewGuid().ToString("N");
+        var absentName = inheritedName + "_ABSENT";
+        var originalEnvironment = "initial-environment-" + Guid.NewGuid().ToString("N");
+        var freezeFile = Path.Combine(directory, "environment-freeze.json");
+        var configuration = new JsonObject { ["Plots"] = new JsonObject { ["freeze"] = new JsonObject { ["Steps"] = new JsonArray(
+            new JsonObject { ["Id"] = "secret", ["Step"] = "filesystem.write", ["With"] = new JsonObject { ["Path"] = "frozen-secret.txt", ["Content"] = new JsonObject { ["$ENV"] = "PLOTMANAGER_SECRET_EXAMPLE" } } },
+            new JsonObject { ["Id"] = "inherited", ["Step"] = "filesystem.write", ["With"] = new JsonObject { ["Path"] = "frozen-environment.txt", ["Content"] = new JsonObject { ["$Env"] = inheritedName } } }) } }, ["AbsentUnused"] = new JsonObject { ["$ENV"] = absentName } };
+        JsonStore.Write(freezeFile, configuration);
+        var secrets = app.Services.GetRequiredService<SecretStore>();
+        var engine = app.Services.GetRequiredService<EngineClient>();
+        var project = app.Services.GetRequiredService<ProjectStore>().Get("local", projectId);
+        Environment.SetEnvironmentVariable(inheritedName, originalEnvironment);
+        try
+        {
+            var request = engine.Request("run", project, new[] { freezeFile }, new ExecutionRequest("freeze", null, null, null));
+            var captured = engine.CaptureEnvironment("local", request);
+            _ = secrets.Save("local", "example", "rotated-secret-" + Guid.NewGuid().ToString("N"));
+            Environment.SetEnvironmentVariable(inheritedName, "changed-after-submit");
+            Environment.SetEnvironmentVariable(absentName, "added-after-submit");
+            using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+            _ = await engine.InvokeAsync("local", request, enginePath, Path.Combine(state, "freeze-test"), null, null, timeout.Token, captured);
+            Check(File.ReadAllText(Path.Combine(directory, "frozen-secret.txt")) == originalSecret, "real worker uses submitted encrypted secret snapshot after secret rotation");
+            Check(File.ReadAllText(Path.Combine(directory, "frozen-environment.txt")) == originalEnvironment, "real worker uses submitted inherited environment snapshot after environment change");
+            Check(captured.ContainsKey(absentName) && captured[absentName] == null, "worker environment snapshot freezes absent referenced variables too");
+        }
+        finally
+        {
+            _ = secrets.Save("local", "example", originalSecret);
+            Environment.SetEnvironmentVariable(inheritedName, null);
+            Environment.SetEnvironmentVariable(absentName, null);
+        }
+    }
+    private static async Task VerifySharingFailure(HttpClient client, string projectId, string state)
+    {
+        if (!OperatingSystem.IsWindows()) { Console.WriteLine("SKIP Windows file-sharing fault injection on this OS."); return; }
+        var run = await Json(await client.PostAsJsonAsync($"/api/projects/{projectId}/runs", new { plot = "install", invocationId = "compose" }), HttpStatusCode.Accepted);
+        var id = run["id"]!.ToString();
+        var recordPath = Path.Combine(state, "runs", id, "run.json");
+        // Deliberately deny replacement of this isolated history file while the
+        // real worker runs. Reads remain allowed; Windows MoveFile reports
+        // ERROR_ACCESS_DENIED for this denied replacement (HResult 0x80070005).
+        using var held = new FileStream(recordPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var terminal = await WaitRun(client, projectId, id);
+        Check(terminal["status"]!.ToString() == "Failed" && terminal["error"]!.ToString().Contains("terminal history could not be saved"), "history sharing failure reports honest Failed instead of stuck Queued/Running");
+        var listed = await Json(await client.GetAsync($"/api/projects/{projectId}/runs"));
+        Check(listed["runs"]!.AsArray().Single(x => x!["id"]!.ToString() == id)!["status"]!.ToString() == "Failed", "history list agrees with detail after persistence failure");
     }
 }

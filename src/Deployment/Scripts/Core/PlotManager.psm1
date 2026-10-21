@@ -78,7 +78,8 @@ function Resolve-PackagePath {
     if ([IO.Path]::IsPathRooted($RelativePath)) { throw 'RootModule must be relative to its package.' }
     $rootPath = [IO.Path]::GetFullPath($Root).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
     $path = [IO.Path]::GetFullPath((Join-Path $Root $RelativePath))
-    if (-not $path.StartsWith($rootPath, [StringComparison]::OrdinalIgnoreCase)) { throw 'RootModule escapes its package.' }
+    $comparison = if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
+    if (-not $path.StartsWith($rootPath, $comparison)) { throw 'RootModule escapes its package.' }
     if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or [IO.Path]::GetExtension($path) -ne '.psm1') {
         throw "Package module not found or not a .psm1 file: $path"
     }

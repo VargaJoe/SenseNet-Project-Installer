@@ -33,7 +33,7 @@ public sealed class ServiceSettings
             if (string.IsNullOrWhiteSpace(configured)) throw new InvalidOperationException("Hosted mode requires PLOTMANAGER_USERS JSON with distinct operator names and strong tokens.");
             foreach (var pair in JsonSerializer.Deserialize<Dictionary<string, string>>(configured) ?? new())
             {
-                if (string.IsNullOrWhiteSpace(pair.Key) || pair.Value.Length < 32) throw new InvalidOperationException("Operator tokens must have at least 32 characters.");
+                if (!System.Text.RegularExpressions.Regex.IsMatch(pair.Key, "^[A-Za-z0-9_-]{1,64}$") || string.IsNullOrEmpty(pair.Value) || pair.Value.Length < 32) throw new InvalidOperationException("Operator IDs must contain 1-64 letters, digits, underscores or hyphens; tokens must have at least 32 characters.");
                 users.Add(pair.Key, pair.Value);
             }
             if (users.Count == 0 || users.Values.Distinct().Count() != users.Count) throw new InvalidOperationException("Hosted operator tokens must be nonempty and unique.");
@@ -91,7 +91,7 @@ public static class SafePaths
     public static string Within(string root, string path)
     {
         var fullRoot = Path.TrimEndingDirectorySeparator(Path.GetFullPath(root));
-        var full = Path.GetFullPath(Path.IsPathRooted(path) ? path : Path.Combine(fullRoot, path));
+        var full = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.IsPathRooted(path) ? path : Path.Combine(fullRoot, path)));
         var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         if (!full.Equals(fullRoot, comparison) && !full.StartsWith(fullRoot + Path.DirectorySeparatorChar, comparison)) throw new ApiException(400, "Path is outside the allowed project directory.", "path_outside_root");
         EnsureNoLinks(full);

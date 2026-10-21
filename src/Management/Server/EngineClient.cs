@@ -5,23 +5,29 @@ namespace PlotManager.Server;
 
 public sealed class EngineClient(ServiceSettings settings, SecretStore secrets)
 {
-    public async Task<JsonNode> InvokeAsync(string owner, JsonObject request, string engineDirectory, string scratch, string? eventPath, Action<Process>? started, CancellationToken cancellation)
+    public IReadOnlyDictionary<string, string?> CaptureEnvironment(string owner, JsonObject request)
     {
-        Directory.CreateDirectory(scratch);
-        var requestPath = Path.Combine(scratch, "request-" + Guid.NewGuid().ToString("N") + ".json");
-        var responsePath = Path.Combine(scratch, "response-" + Guid.NewGuid().ToString("N") + ".json");
-        var environment = secrets.EnvironmentFor(owner);
-        var redactions = new List<string>(environment.Values);
+        var environment = secrets.EnvironmentFor(owner).ToDictionary(x => x.Key, x => (string?)x.Value, OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
         var names = SecretStore.ReferencedEnvironment(request);
         if (request["ConfigurationFiles"] is JsonArray files)
             foreach (var file in files)
                 foreach (var name in SecretStore.ReferencedEnvironment(JsonStore.Object(file!.GetValue<string>()))) names.Add(name);
         foreach (var name in names)
         {
-            if (name.StartsWith("PLOTMANAGER_", StringComparison.OrdinalIgnoreCase) && !name.StartsWith("PLOTMANAGER_SECRET_", StringComparison.Ordinal)) throw new ApiException(400, "Service configuration environment variables cannot be used by a project.");
-            var value = environment.GetValueOrDefault(name) ?? System.Environment.GetEnvironmentVariable(name);
-            if (!string.IsNullOrEmpty(value)) redactions.Add(value);
+            if (name.StartsWith("PLOTMANAGER_", StringComparison.OrdinalIgnoreCase) && !name.StartsWith("PLOTMANAGER_SECRET_", StringComparison.OrdinalIgnoreCase)) throw new ApiException(400, "Service configuration environment variables cannot be used by a project.");
+            if (!environment.ContainsKey(name)) environment[name] = System.Environment.GetEnvironmentVariable(name);
         }
+        // Null captures absence too: a newly added variable cannot silently
+        // change a submitted run between preflight and its actual worker.
+        return new System.Collections.ObjectModel.ReadOnlyDictionary<string, string?>(environment);
+    }
+    public async Task<JsonNode> InvokeAsync(string owner, JsonObject request, string engineDirectory, string scratch, string? eventPath, Action<Process>? started, CancellationToken cancellation, IReadOnlyDictionary<string, string?>? environmentSnapshot = null)
+    {
+        Directory.CreateDirectory(scratch);
+        var requestPath = Path.Combine(scratch, "request-" + Guid.NewGuid().ToString("N") + ".json");
+        var responsePath = Path.Combine(scratch, "response-" + Guid.NewGuid().ToString("N") + ".json");
+        var environment = environmentSnapshot ?? CaptureEnvironment(owner, request);
+        var redactions = environment.Values.Where(x => !string.IsNullOrEmpty(x)).Select(x => x!).ToArray();
         JsonStore.Write(requestPath, request);
         ServiceSettings.PrivateFile(requestPath);
         try
@@ -33,15 +39,35 @@ public sealed class EngineClient(ServiceSettings settings, SecretStore secrets)
             start.ArgumentList.Add("-AutoPath"); start.ArgumentList.Add(Path.Combine(engineDirectory, "Auto"));
             if (eventPath != null) { start.ArgumentList.Add("-EventPath"); start.ArgumentList.Add(eventPath); }
             foreach (var key in start.Environment.Keys.Where(x => x.StartsWith("PLOTMANAGER_", StringComparison.OrdinalIgnoreCase) || x.StartsWith("ASPNETCORE_", StringComparison.OrdinalIgnoreCase)).ToArray()) start.Environment.Remove(key);
-            foreach (var pair in environment) start.Environment[pair.Key] = pair.Value;
+            foreach (var pair in environment)
+            {
+                if (pair.Value == null) start.Environment.Remove(pair.Key);
+                else start.Environment[pair.Key] = pair.Value;
+            }
             using var process = new Process { StartInfo = start };
             try { process.Start(); } catch (System.ComponentModel.Win32Exception) { throw new ApiException(503, "PowerShell 7 is required on the runner. Configure PLOTMANAGER_PWSH.", "engine_unavailable"); }
             started?.Invoke(process);
-            var stdout = process.StandardOutput.BaseStream.CopyToAsync(Stream.Null);
-            var stderr = process.StandardError.BaseStream.CopyToAsync(Stream.Null);
+            // Pipe readers must be cancellable too. A descendant can inherit a
+            // pipe handle even after the worker exits; waiting for EOF alone
+            // would leave cancellation and the project lock stuck indefinitely.
+            var stdout = process.StandardOutput.BaseStream.CopyToAsync(Stream.Null, cancellation);
+            var stderr = process.StandardError.BaseStream.CopyToAsync(Stream.Null, cancellation);
             using var registration = cancellation.Register(() => { try { if (!process.HasExited) process.Kill(true); } catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception) { } });
-            await process.WaitForExitAsync(CancellationToken.None);
-            await Task.WhenAll(stdout, stderr);
+            try
+            {
+                await process.WaitForExitAsync(cancellation);
+                await Task.WhenAll(stdout, stderr).WaitAsync(cancellation);
+            }
+            catch (OperationCanceledException)
+            {
+                // Only report cancellation after the owned worker really exits.
+                // Kill(true) covers its current descendants; external services
+                // and detached operations retain the documented no-rollback rule.
+                try { if (!process.HasExited) process.Kill(true); } catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception) { }
+                await process.WaitForExitAsync(CancellationToken.None);
+                try { await Task.WhenAll(stdout, stderr); } catch (OperationCanceledException) { } catch (IOException) { }
+                throw;
+            }
             cancellation.ThrowIfCancellationRequested();
             if (!File.Exists(responsePath)) throw new ApiException(400, "Engine request failed before producing a structured response.", "engine_error");
             JsonNode result;
