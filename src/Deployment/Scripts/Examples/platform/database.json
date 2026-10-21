@@ -1,0 +1,107 @@
+{
+  "Values": {
+    "ConnectionString": {
+      "$env": "PLOT_SQL_CONNECTION"
+    },
+    "Database": "PlotExample",
+    "RestoredDatabase": "PlotExampleRestored",
+    "BackupPath": "C:\\SqlBackups\\PlotExample.bak",
+    "Moves": {
+      "PlotExample": "C:\\SqlData\\PlotExampleRestored.mdf",
+      "PlotExample_log": "C:\\SqlData\\PlotExampleRestored_log.ldf"
+    }
+  },
+  "Plots": {
+    "check": [
+      {
+        "Step": "sqlserver.wait",
+        "With": {}
+      }
+    ],
+    "create": [
+      {
+        "Step": "sqlserver.create",
+        "With": {
+          "Database": {
+            "$ref": "settings.Values.Database"
+          }
+        }
+      }
+    ],
+    "backup": [
+      {
+        "Step": "sqlserver.backup",
+        "With": {
+          "Database": {
+            "$ref": "settings.Values.Database"
+          },
+          "Path": {
+            "$ref": "settings.Values.BackupPath"
+          }
+        }
+      }
+    ],
+    "restore": [
+      {
+        "Step": "sqlserver.restore",
+        "With": {
+          "Database": {
+            "$ref": "settings.Values.RestoredDatabase"
+          },
+          "Path": {
+            "$ref": "settings.Values.BackupPath"
+          },
+          "Moves": {
+            "$ref": "settings.Values.Moves"
+          }
+        }
+      }
+    ],
+    "export-query": [
+      {
+        "Step": "sqlserver.query",
+        "With": {
+          "Query": "SELECT name FROM sys.databases ORDER BY name;"
+        },
+        "Id": "query"
+      },
+      {
+        "Step": "json.write",
+        "With": {
+          "Path": "databases.json",
+          "Value": {
+            "$ref": "steps.query.Output"
+          }
+        },
+        "Id": "save"
+      }
+    ]
+  },
+  "StepDefaults": {
+    "sqlserver.wait": {
+      "ConnectionString": {
+        "$ref": "settings.Values.ConnectionString"
+      }
+    },
+    "sqlserver.create": {
+      "ConnectionString": {
+        "$ref": "settings.Values.ConnectionString"
+      }
+    },
+    "sqlserver.backup": {
+      "ConnectionString": {
+        "$ref": "settings.Values.ConnectionString"
+      }
+    },
+    "sqlserver.restore": {
+      "ConnectionString": {
+        "$ref": "settings.Values.ConnectionString"
+      }
+    },
+    "sqlserver.query": {
+      "ConnectionString": {
+        "$ref": "settings.Values.ConnectionString"
+      }
+    }
+  }
+}

@@ -23,7 +23,7 @@ flowchart LR
 
 The output reference check cannot know a future runtime value's shape. A producer can succeed and a consuming step still fail validation; the result records that consuming invocation as failed. There is no automatic rollback, retry or parallel execution.
 
-Use `Merge-PlotSettings` explicitly when assembling multiple configuration files through the module API. The CLI reads one complete configuration file, avoiding implicit dependence on historical settings.
+The CLI deep-merges explicit default, project and environment files, in that order. `Read-PlotConfiguration -Path` accepts an ordered array of files through the module API; `Merge-PlotSettings -Layers` merges in-memory objects. The resulting configuration feeds the invocation parameter layers. See [configuration](settings.md).
 
 ## Module API
 
@@ -51,10 +51,10 @@ The old backup-all script's parse errors were repaired. Legacy environment overl
 
 The previous unconnected Core-Helpers.ps1/System-Steps.ps1 prototypes have been replaced by the engine and IIS package; they are no longer competing function definitions.
 
-The historical GUI/HTTP listener is not part of this runtime and has not been modernized. Existing caller integrations must choose the new CLI/API contract or explicitly use legacy mode.
+The historical GUI/HTTP listener is not part of this runtime and has not been modernized. A new local Windows Forms host and structured catalog/plan/run bridge use the native engine; see [local integration](local-integration.md). Existing caller integrations must choose the new CLI/API contract or explicitly use legacy mode.
 
 ## Validation
 
-The dependency-free suite in tests covers real temporary-file composition, repeated calls, configuration isolation, module isolation, duplicate rejection, parameter/reference validation, dependency errors, CLI exit codes and IIS mocks. Real IIS, SQL Server, Docker, deployments and GUI are outside these tests.
+The suite in tests covers layered CLI files, ZIP roundtrips, directory operations, JSON/XML transformations, the complete layered artifact example, real temporary-file composition, repeated calls, configuration isolation, module isolation, duplicate rejection, parameter/reference validation, dependency errors, CLI exit codes and IIS mocks. The operational suite adds process argument/timeout checks, local HTTP/TCP servers, real local Git repositories and build/Docker adapter contract tests. The default suite also covers SQL/IIS/Compose provider contracts and the local integration bridge. An opt-in isolated SQL Server/Compose test performs real database backup/restore and container lifecycle checks; see [testing](../tests/README.md). Real IIS deployment and visual GUI acceptance remain manual. Git must be on PATH.
 
 No corporate repository code or configuration is required by the new engine or its native packages.

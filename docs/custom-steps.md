@@ -36,7 +36,7 @@ The canonical step ID is `example.greet`. Package names, canonical IDs and alias
 
 Name and step keys start with a letter and contain letters, numbers or hyphens. Version must parse as a .NET Version. RootModule must identify a psm1 file inside the package. Optional Platform is Any or Windows.
 
-Dependencies express installed-package requirements and import order. They do not grant access to another module's private functions. Compose cross-package operations in the plot and pass results explicitly.
+Dependencies express installed-package requirements and import order. A step also receives `Context.Dependencies`: canonical step IDs from its directly declared dependencies, each containing `Command` (the isolated exported function object) and a fresh `Defaults` map. This does not expose private functions or inject globals. See the Git/build/Docker adapters for calling `process.run`. Adapters supply the complete settings map, check their own inputs, and honor ShouldProcess before calling; direct dependency calls do not run engine preflight or create additional plot result entries. Prefer separate plot invocations when operators need separate results or configuration layers.
 
 ## Module
 
@@ -54,7 +54,7 @@ Export-ModuleMember -Function Get-ExampleGreeting
 
 The exported command must accept Settings and Context. The registry invokes its function object, so separate modules can use the same internal function names. Do not export or define global functions or variables.
 
-Context provides RunId, InvocationId, PackageRoot and WorkDirectory. Settings contains only the resolved, validated parameters for this invocation.
+Context provides RunId, InvocationId, PackageRoot, WorkDirectory and Dependencies. A dependency command receives the caller's context; resource-owning dependencies should use their own module PSScriptRoot. Settings contains only the resolved, validated parameters for this invocation.
 
 Return data on the success stream. Throw on failure. Use Write-Verbose/Write-Information for diagnostics, and never print settings or credentials wholesale. If an external executable is used, inspect LASTEXITCODE immediately and throw on failure; a native nonzero exit is not automatically a PowerShell exception on all supported runtimes.
 

@@ -1,0 +1,88 @@
+{
+  "StepDefaults": {
+    "compose.config": {
+      "ProjectName": "plot-example",
+      "Directory": ".",
+      "Files": [
+        "compose.yaml"
+      ]
+    },
+    "compose.up": {
+      "ProjectName": "plot-example",
+      "Directory": ".",
+      "Files": [
+        "compose.yaml"
+      ]
+    },
+    "compose.ps": {
+      "ProjectName": "plot-example",
+      "Directory": ".",
+      "Files": [
+        "compose.yaml"
+      ]
+    },
+    "compose.logs": {
+      "ProjectName": "plot-example",
+      "Directory": ".",
+      "Files": [
+        "compose.yaml"
+      ]
+    },
+    "compose.down": {
+      "ProjectName": "plot-example",
+      "Directory": ".",
+      "Files": [
+        "compose.yaml"
+      ]
+    }
+  },
+  "Plots": {
+    "validate": [
+      {
+        "Step": "compose.config",
+        "With": {
+          "Arguments": [
+            "--quiet"
+          ]
+        }
+      }
+    ],
+    "up": [
+      {
+        "Step": "compose.up",
+        "With": {
+          "Arguments": [
+            "--wait",
+            "--wait-timeout",
+            "30"
+          ]
+        }
+      },
+      {
+        "Step": "compose.ps",
+        "With": {}
+      }
+    ],
+    "status": [
+      {
+        "Step": "compose.ps",
+        "With": {}
+      },
+      {
+        "Step": "compose.logs",
+        "With": {
+          "Arguments": [
+            "--tail",
+            "100"
+          ]
+        }
+      }
+    ],
+    "down": [
+      {
+        "Step": "compose.down",
+        "With": {}
+      }
+    ]
+  }
+}
