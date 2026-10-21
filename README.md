@@ -4,6 +4,8 @@ Plot Manager composes scriptable tasks from small, parameterized steps. A plot d
 
 The repository's historical name, **SenseNet-Project-Installer**, describes its first use case. SenseNet installation is one of the retained legacy workflows; it is not a restriction on the engine.
 
+Documentation: [guide index](docs/README.md), [component and migration map](docs/migration-map.md).
+
 ## Run a plot
 
 Requires PowerShell 5.1 or PowerShell 7. The engine, text package and filesystem package do not require administrator privileges or external modules. IIS steps require Windows and WebAdministration when executed.
