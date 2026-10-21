@@ -55,13 +55,54 @@ public sealed class SecretStore(ServiceSettings settings, IDataProtectionProvide
         Walk(value);
         return names;
     }
+    public static JsonNode RedactEngineResponse(string operation, JsonNode response, IEnumerable<string> secretValues)
+    {
+        var tokens = secretValues.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToArray();
+        var result = response.DeepClone();
+        if (result is not JsonObject root) return result;
+        if (root["Error"] != null) root["Error"] = Redact(root["Error"], tokens);
+        if (operation == "plan")
+        {
+            if (root["Steps"] is JsonArray steps)
+                foreach (var step in steps.OfType<JsonObject>())
+                    if (step["Settings"] is JsonObject parameters)
+                        foreach (var name in parameters.Select(x => x.Key).ToArray()) parameters[name] = Redact(parameters[name], tokens);
+            if (root["Configuration"] != null) root["Configuration"] = RedactConfiguration(root["Configuration"], tokens);
+        }
+        else if (operation == "run" && root["Steps"] is JsonArray steps)
+        {
+            foreach (var step in steps.OfType<JsonObject>())
+            {
+                if (step["Output"] != null) step["Output"] = Redact(step["Output"], tokens);
+                if (step["Error"] != null) step["Error"] = Redact(step["Error"], tokens);
+            }
+        }
+        // Catalog schemas, raw inspection, IDs, statuses, provenance and paths
+        // are protocol/identifier metadata. Redacting them changes semantics.
+        return result;
+    }
+    private static JsonNode? RedactConfiguration(JsonNode? value, IEnumerable<string> tokens)
+    {
+        if (value is JsonObject obj)
+        {
+            // Directive names identify environment/settings inputs, not values.
+            if (obj.Count == 1 && obj.Any(x => x.Key.Equals("$env", StringComparison.OrdinalIgnoreCase) || x.Key.Equals("$ref", StringComparison.OrdinalIgnoreCase))) return obj.DeepClone();
+            var copy = new JsonObject();
+            foreach (var item in obj) copy[item.Key] = RedactConfiguration(item.Value, tokens);
+            return copy;
+        }
+        if (value is JsonArray array) return new JsonArray(array.Select(item => RedactConfiguration(item, tokens)).ToArray());
+        return Redact(value, tokens);
+    }
     public static JsonNode? Redact(JsonNode? value, IEnumerable<string> secretValues)
     {
         var tokens = secretValues.Where(x => !string.IsNullOrEmpty(x)).Distinct().OrderByDescending(x => x.Length).ToArray();
+        var matcher = tokens.Length == 0 ? null : new Regex(@"(?i:\[redacted\])|(?<secret>" + string.Join("|", tokens.Select(Regex.Escape)) + ")", RegexOptions.CultureInvariant);
         string Text(string text)
         {
-            foreach (var token in tokens) text = text.Replace(token, "[REDACTED]", StringComparison.Ordinal);
-            return text;
+            // Native responses may already contain the redaction marker. Do
+            // not repeatedly mask its letters when a secret is one character.
+            return matcher == null ? text : matcher.Replace(text, match => match.Groups["secret"].Success ? "[REDACTED]" : match.Value);
         }
         JsonNode? Walk(JsonNode? node)
         {

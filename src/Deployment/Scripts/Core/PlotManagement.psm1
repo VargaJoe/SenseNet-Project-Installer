@@ -123,25 +123,43 @@ function Add-ManagedSecretStrings {
 }
 
 function Protect-ManagedValue {
-    param($Value,[Collections.Generic.HashSet[string]]$Secrets)
+    param($Value,[Collections.Generic.HashSet[string]]$Secrets,[switch]$PreserveKeys,[switch]$PreserveDirectives)
     if ($null -eq $Value) { return $null }
     if ($Value -is [Collections.IDictionary]) {
+        # Raw references name configuration/environment entries; they are not
+        # evaluated secret data. Never corrupt a binding while displaying it.
+        if ($PreserveDirectives -and ($Value.Contains('$env') -or $Value.Contains('$ref'))) { return Copy-PlotValue $Value }
         $copy=@{}
-        foreach ($key in $Value.Keys) { $copy[$key]=Protect-ManagedValue $Value[$key] $Secrets }
+        foreach ($key in $Value.Keys) {
+            $name=[string]$key
+            if (-not $PreserveKeys) { $name=Protect-ManagedValue $name $Secrets }
+            $unique=$name; $suffix=1
+            while ($copy.ContainsKey($unique)) { $unique=$name+'#'+$suffix; $suffix++ }
+            $copy[$unique]=Protect-ManagedValue $Value[$key] $Secrets -PreserveKeys:$PreserveKeys -PreserveDirectives:$PreserveDirectives
+        }
         return $copy
     }
     if ($Value.GetType() -eq [Management.Automation.PSCustomObject]) {
         $copy=@{}
-        foreach ($property in $Value.PSObject.Properties) { $copy[$property.Name]=Protect-ManagedValue $property.Value $Secrets }
+        foreach ($property in $Value.PSObject.Properties) {
+            $name=$property.Name
+            if (-not $PreserveKeys) { $name=Protect-ManagedValue $name $Secrets }
+            $unique=$name; $suffix=1
+            while ($copy.ContainsKey($unique)) { $unique=$name+'#'+$suffix; $suffix++ }
+            $copy[$unique]=Protect-ManagedValue $property.Value $Secrets -PreserveKeys:$PreserveKeys -PreserveDirectives:$PreserveDirectives
+        }
         return $copy
     }
     if ($Value -is [array]) {
         $items=[Collections.Generic.List[object]]::new()
-        foreach ($item in $Value) { $items.Add((Protect-ManagedValue $item $Secrets)) }
+        foreach ($item in $Value) { $items.Add((Protect-ManagedValue $item $Secrets -PreserveKeys:$PreserveKeys -PreserveDirectives:$PreserveDirectives)) }
         return ,$items.ToArray()
     }
     if ($Value -is [string]) {
-        foreach ($secret in ($Secrets | Sort-Object Length -Descending)) { $Value=$Value.Replace($secret,'[redacted]') }
+        $tokens=@($Secrets | Sort-Object Length -Descending | ForEach-Object { [regex]::Escape($_) })
+        if ($tokens.Count) { $Value=[regex]::Replace($Value,($tokens -join '|'),'[redacted]') }
+    } elseif ($Secrets.Contains([Convert]::ToString($Value,[Globalization.CultureInfo]::InvariantCulture))) {
+        return '[redacted]'
     }
     return $Value
 }
@@ -175,7 +193,9 @@ function Invoke-ManagedPlotRequest {
     }
     $registry=$null
     try {
-        if ($Request.Operation -eq 'inspect') { return Protect-ManagedValue $info $secrets }
+        # Inspect contains raw configuration references and source paths, never
+        # their evaluated values. Protocol metadata must not be substring-masked.
+        if ($Request.Operation -eq 'inspect') { return $info }
         $registry=New-PlotRegistry $AutoPath
         if ($Request.Operation -eq 'catalog') { return Get-ManagedCatalog $registry }
         if (-not $Request.ContainsKey('Plot')) { throw 'Plot is required.' }
@@ -191,9 +211,12 @@ function Invoke-ManagedPlotRequest {
         if ($Request.Operation -eq 'plan') {
             $items=@(foreach ($item in $plan) {
                 $origins=Get-ManagedOrigins $item $info.Configuration $info.Sources $Request.Plot $item.Index
-                [pscustomobject]@{Id=$item.Id;Step=$item.Step.Id;Settings=$item.Settings;Sources=$item.Sources;Origins=$origins}
+                $safeSettings=@{}
+                foreach ($key in $item.Settings.Keys) { $safeSettings[$key]=Protect-ManagedValue $item.Settings[$key] $secrets }
+                [pscustomobject]@{Id=$item.Id;Step=$item.Step.Id;Settings=$safeSettings;Sources=$item.Sources;Origins=$origins}
             })
-            return Protect-ManagedValue ([pscustomobject]@{ProtocolVersion=1;Steps=@($items);Configuration=$info.Configuration;ConfigurationSources=$info.Sources}) $secrets
+            $safeConfiguration=Protect-ManagedValue $info.Configuration $secrets -PreserveKeys -PreserveDirectives
+            return [pscustomobject]@{ProtocolVersion=1;Steps=@($items);Configuration=$safeConfiguration;ConfigurationSources=$info.Sources}
         }
         $directory=(Get-Location).Path; if ($Request.ContainsKey('WorkDirectory')) { $directory=$Request.WorkDirectory }
         if (-not [IO.Directory]::Exists($directory)) { throw 'WorkDirectory must exist.' }
@@ -201,7 +224,11 @@ function Invoke-ManagedPlotRequest {
         if ($Request.ContainsKey('InvocationId')) { $args.InvocationId=$Request.InvocationId }
         $preview=$Request.ContainsKey('WhatIf') -and $Request.WhatIf
         $result=Invoke-Plot @args -WhatIf:$preview
-        return Protect-ManagedValue $result $secrets
+        foreach ($item in $result.Steps) {
+            $item.Output=Protect-ManagedValue $item.Output $secrets
+            $item.Error=Protect-ManagedValue $item.Error $secrets
+        }
+        return $result
     } finally { if ($registry) { Remove-PlotRegistry $registry } }
 }
 Export-ModuleMember -Function Invoke-ManagedPlotRequest,Get-ManagedConfiguration

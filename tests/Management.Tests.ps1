@@ -105,3 +105,38 @@ Test-Case 'Managed catalog contains all native schemas platforms and output meta
     Assert-True ($text.Outputs.ContainsKey('Text'))
     Assert-True ($null -ne $text.Description)
 }
+Test-Case 'Managed redaction preserves protocol status identifiers and provenance with short secrets' {
+    $env:PLOTMANAGER_SHORT_SECRET='a'
+    $env:PLOTMANAGER_STATUS_SECRET='Failed'
+    try {
+        $config=@{Bindings=@{Letter=@{'$env'='PLOTMANAGER_SHORT_SECRET'};Status=@{'$env'='PLOTMANAGER_STATUS_SECRET'}};Plots=@{
+            a=@(@{Id='a';Step='text.join';With=@{Items=@(@{'$env'='PLOTMANAGER_SHORT_SECRET'})}})
+            failure=@(@{Id='Failed';Step='filesystem.read';With=@{Path='absent-secret-regression.txt'}})
+        }}
+        $file=Join-Path $managementRoot 'protocol-secret.json'
+        $config | ConvertTo-Json -Depth 15 | Set-Content -LiteralPath $file -Encoding utf8
+        $inspect=Invoke-ManagedPlotRequest @{Operation='inspect';ConfigurationFiles=@($file)}
+        Assert-Equal $inspect.Layers[0].Path $file
+        Assert-Equal $inspect.Configuration.Bindings.Letter['$env'] 'PLOTMANAGER_SHORT_SECRET'
+        $plan=Invoke-ManagedPlotRequest @{Operation='plan';ConfigurationFiles=@($file);Plot='a'}
+        Assert-Equal $plan.Steps[0].Id 'a'
+        Assert-Equal $plan.Steps[0].Step 'text.join'
+        Assert-Equal $plan.Steps[0].Origins.Items.File $file
+        Assert-Equal $plan.Steps[0].Settings.Items[0] '[redacted]'
+        $result=Invoke-ManagedPlotRequest @{Operation='run';ConfigurationFiles=@($file);Plot='a';WorkDirectory=$managementRoot}
+        Assert-Equal $result.Status 'Succeeded'
+        Assert-Equal $result.Plot 'a'
+        Assert-Equal $result.Steps[0].Output.Text '[redacted]'
+        $failed=Invoke-ManagedPlotRequest @{Operation='run';ConfigurationFiles=@($file);Plot='failure';WorkDirectory=$managementRoot}
+        Assert-Equal $failed.Status 'Failed'
+        Assert-Equal $failed.Steps[0].Status 'Failed'
+        Assert-Equal $failed.Steps[0].Id 'Failed'
+        $requestFile=Join-Path $managementRoot 'protocol-request.json'
+        $responseFile=Join-Path $managementRoot 'protocol-response.json'
+        @{Operation='run';ConfigurationFiles=@($file);Plot='failure';WorkDirectory=$managementRoot} | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $requestFile -Encoding utf8
+        & (Get-Process -Id $PID).Path -NoProfile -File (Join-Path $scriptsPath 'Invoke-ManagedRequest.ps1') -RequestPath $requestFile -ResponsePath $responseFile
+        Assert-Equal $LASTEXITCODE 1
+        $response=ConvertFrom-PlotJsonText ([IO.File]::ReadAllText($responseFile))
+        Assert-Equal $response.Status 'Failed'
+    } finally { Remove-Item Env:PLOTMANAGER_SHORT_SECRET; Remove-Item Env:PLOTMANAGER_STATUS_SECRET }
+}

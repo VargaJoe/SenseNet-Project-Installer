@@ -7,7 +7,9 @@ public sealed class EngineClient(ServiceSettings settings, SecretStore secrets)
 {
     public IReadOnlyDictionary<string, string?> CaptureEnvironment(string owner, JsonObject request)
     {
-        var environment = secrets.EnvironmentFor(owner).ToDictionary(x => x.Key, x => (string?)x.Value, OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+        var comparer = OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        var availableSecrets = new Dictionary<string, string>(secrets.EnvironmentFor(owner), comparer);
+        var environment = new Dictionary<string, string?>(comparer);
         var names = SecretStore.ReferencedEnvironment(request);
         if (request["ConfigurationFiles"] is JsonArray files)
             foreach (var file in files)
@@ -15,7 +17,7 @@ public sealed class EngineClient(ServiceSettings settings, SecretStore secrets)
         foreach (var name in names)
         {
             if (name.StartsWith("PLOTMANAGER_", StringComparison.OrdinalIgnoreCase) && !name.StartsWith("PLOTMANAGER_SECRET_", StringComparison.OrdinalIgnoreCase)) throw new ApiException(400, "Service configuration environment variables cannot be used by a project.");
-            if (!environment.ContainsKey(name)) environment[name] = System.Environment.GetEnvironmentVariable(name);
+            if (!environment.ContainsKey(name)) environment[name] = availableSecrets.TryGetValue(name, out var secret) ? secret : System.Environment.GetEnvironmentVariable(name);
         }
         // Null captures absence too: a newly added variable cannot silently
         // change a submitted run between preflight and its actual worker.
@@ -73,8 +75,15 @@ public sealed class EngineClient(ServiceSettings settings, SecretStore secrets)
             JsonNode result;
             try { result = JsonNode.Parse(File.ReadAllText(responsePath)) ?? throw new FormatException(); }
             catch (Exception ex) when (ex is System.Text.Json.JsonException or FormatException) { throw new ApiException(500, "Engine returned an invalid structured response.", "engine_error"); }
-            var sanitized = SecretStore.Redact(result, redactions)!;
-            if ((process.ExitCode != 0 && sanitized["Status"] == null) || sanitized["Error"] != null)
+            var operation = request["Operation"]?.GetValue<string>() ?? "";
+            var nativeStatus = result["Status"]?.GetValue<string>();
+            var nativeError = result["Error"];
+            var failedRun = operation == "run" && nativeStatus == "Failed" && result["Steps"] is JsonArray;
+            var sanitized = SecretStore.RedactEngineResponse(operation, result, redactions);
+            // Decisions use native protocol fields, never sanitized user data.
+            // A failed step is a valid structured run result; a failed bridge or
+            // preflight remains an error before any operation is scheduled.
+            if ((process.ExitCode != 0 && !failedRun) || nativeError != null)
                 throw new ApiException(400, sanitized["Error"]?.ToString() ?? "The engine rejected this request.", "engine_error");
             return sanitized;
         }

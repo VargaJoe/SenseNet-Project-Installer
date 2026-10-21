@@ -185,7 +185,8 @@ verification as a default workaround.
 
 ## Frontend development and checks
 
-Node.js 22 LTS is the reproducible build prerequisite. Run from
+The build was verified with Node.js 20.20.0 (the Vite toolchain requires at least
+20.19 in the Node 20 line). Run from
 `src/Management/Web`:
 
 ```powershell

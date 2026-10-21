@@ -96,6 +96,12 @@ internal static class ManagementTests
             var project = await Json(await client.PostAsJsonAsync("/api/projects", new { name = "Isolated sample", template = "generic" }), HttpStatusCode.Created);
             var id = project["id"]!.ToString();
             var directory = project["directory"]!.ToString();
+            if (args.Contains("--secret-protocol-only", StringComparer.Ordinal))
+            {
+                await VerifySecretProtocol(app, client, id, directory);
+                Console.WriteLine($"{checks}/{checks} targeted secret protocol assertions passed.");
+                return 0;
+            }
             if (args.Contains("--storage-only", StringComparer.Ordinal))
             {
                 await VerifySharingFailure(client, id, state);
@@ -292,6 +298,7 @@ internal static class ManagementTests
             CheckThrows(() => global::Program.Build(Array.Empty<string>(), unsafeEndpoint), "Kestrel endpoint configuration cannot bypass local binding restriction");
             var unsafeOperator = new Dictionary<string, string?>(config) { ["PLOTMANAGER_MODE"] = "hosted", ["PLOTMANAGER_USERS"] = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, string> { ["alice:child"] = token }) };
             CheckThrows(() => global::Program.Build(Array.Empty<string>(), unsafeOperator), "operator IDs cannot collide with secret ownership namespaces");
+            await VerifySecretProtocol(app, client, id, directory);
             Console.WriteLine($"{checks}/{checks} management backend assertions passed on {System.Runtime.InteropServices.RuntimeInformation.OSDescription}.");
             return 0;
         }
@@ -307,6 +314,62 @@ internal static class ManagementTests
     {
         try { action(); } catch (InvalidOperationException) { Check(true, name); return; }
         throw new Exception("FAIL: " + name);
+    }
+    private static async Task VerifySecretProtocol(WebApplication app, HttpClient client, string id, string directory)
+    {
+        var secrets = app.Services.GetRequiredService<SecretStore>();
+        var engine = app.Services.GetRequiredService<EngineClient>();
+        var layerPath = $"/api/projects/{id}/layers/project";
+        var original = await Json(await client.GetAsync(layerPath));
+        var fixture = Path.Combine(directory, "secret-payload.json");
+        try
+        {
+            _ = secrets.Save("local", "short_unused", "a");
+            _ = secrets.Save("local", "failure_unused", "Failed");
+            var capturedCatalog = engine.CaptureEnvironment("local", new JsonObject { ["Operation"] = "catalog" });
+            Check(capturedCatalog.Count == 0, "unused owner secrets are not injected or used to redact catalog metadata");
+            var catalog = (await Json(await client.GetAsync("/api/catalog")))["engine"]!.AsObject();
+            var join = catalog["Steps"]!.AsArray().Single(x => x!["Id"]!.ToString() == "text.join")!;
+            Check(join["Package"]!.ToString() == "text" && join["Parameters"]!["Items"]!["Type"]!.ToString() == "array", "one-character unused secret leaves catalog control keys and schema types intact");
+
+            _ = secrets.Save("local", "short_used", "a");
+            _ = secrets.Save("local", "number_used", "7");
+            _ = secrets.Save("local", "failure_used", "Failed");
+            JsonStore.Write(fixture, new JsonObject { ["a"] = "a", ["number"] = 7 });
+            var data = JsonNode.Parse("""
+                {"NumberInput":{"$env":"PLOTMANAGER_SECRET_NUMBER_USED"},"FailureInput":{"$env":"PLOTMANAGER_SECRET_FAILURE_USED"},"Plots":{"safely-redacted":{"Steps":[{"Id":"start","Step":"text.join","With":{"Items":[{"$env":"PLOTMANAGER_SECRET_SHORT_USED"}],"Separator":""}},{"Id":"data","Step":"json.read","With":{"Path":"secret-payload.json"}}]},"actually-fails":{"Steps":[{"Id":"failure","Step":"process.run","With":{"FilePath":"pwsh","Arguments":["-NoProfile","-NonInteractive","-Command","exit 9"],"TimeoutSeconds":15}}]}}}
+                """)!.AsObject();
+            _ = await Json(await client.PutAsJsonAsync(layerPath, new { etag = original["etag"]!.ToString(), data }));
+            var project = app.Services.GetRequiredService<ProjectStore>().Get("local", id);
+            var request = engine.Request("plan", project, new[] { Path.Combine(directory, "project.json") }, new ExecutionRequest("safely-redacted", null, null, null));
+            var captured = engine.CaptureEnvironment("local", request);
+            Check(captured.ContainsKey("PLOTMANAGER_SECRET_SHORT_USED") && captured.ContainsKey("PLOTMANAGER_SECRET_NUMBER_USED") && !captured.ContainsKey("PLOTMANAGER_SECRET_SHORT_UNUSED"), "worker snapshot includes only referenced owner secrets");
+            var inspect = (await Json(await client.GetAsync($"/api/projects/{id}/configuration")))["engine"]!;
+            Check(inspect["Configuration"]!["Plots"]!["safely-redacted"]!["Steps"]![0]!["Id"]!.ToString() == "start" && inspect["Sources"]!["Plots.safely-redacted.Steps"]!.ToString() == Path.Combine(directory, "project.json"), "used one-character secret leaves raw inspection identifiers and file origins intact");
+            var plan = (await Json(await client.PostAsJsonAsync($"/api/projects/{id}/plan", new { plot = "safely-redacted" })))["engine"]!;
+            Check(plan["Steps"]![0]!["Id"]!.ToString() == "start" && plan["Steps"]![0]!["Settings"]!["Separator"] != null, "plan preserves invocation IDs and top-level parameter names");
+            Check(plan["Steps"]![0]!["Settings"]!["Items"]![0]!.ToString().Equals("[redacted]", StringComparison.OrdinalIgnoreCase), "evaluated secret settings are masked once without corrupting the marker");
+            Check(plan["Steps"]![0]!["Origins"]!["Items"]!["File"]!.ToString() == Path.Combine(directory, "project.json") && plan["Configuration"]!["NumberInput"]!["$env"]!.ToString() == "PLOTMANAGER_SECRET_NUMBER_USED", "plan provenance and atomic directive identifiers are preserved");
+            var run = await Json(await client.PostAsJsonAsync($"/api/projects/{id}/runs", new { plot = "safely-redacted" }), HttpStatusCode.Accepted);
+            var done = await WaitRun(client, id, run["id"]!.ToString());
+            Check(done["status"]!.ToString() == "Succeeded" && done["engine"]!["Status"]!.ToString() == "Succeeded" && done["engine"]!["Steps"]![0]!["Id"]!.ToString() == "start", "used short secrets preserve actual successful run control fields");
+            Check(done["engine"]!["Steps"]![0]!["Output"]!["Text"]!.ToString().Equals("[redacted]", StringComparison.OrdinalIgnoreCase), "real worker secret output is redacted without damaging output field names");
+            var output = done["engine"]!["Steps"]![1]!["Output"]!.AsObject().Select(x => x.Value).OfType<JsonObject>().Single();
+            Check(!output.ContainsKey("a") && output.Any(x => x.Key.Equals("[redacted]", StringComparison.OrdinalIgnoreCase)) && output["number"]!.ToString().Equals("[redacted]", StringComparison.OrdinalIgnoreCase), "real worker payload dictionary keys and numeric secret scalars remain redacted");
+            var failedRun = await Json(await client.PostAsJsonAsync($"/api/projects/{id}/runs", new { plot = "actually-fails" }), HttpStatusCode.Accepted);
+            var failed = await WaitRun(client, id, failedRun["id"]!.ToString());
+            Check(failed["status"]!.ToString() == "Failed" && failed["engine"]!["Status"]!.ToString() == "Failed" && failed["engine"]!["Steps"]![0]!["Status"]!.ToString() == "Failed", "a secret equal to Failed cannot turn an actual failed step into successful history");
+            var unexpected = new JsonObject { ["Status"] = "Failed", ["Error"] = "a Failed 7" };
+            var sanitized = SecretStore.RedactEngineResponse("run", unexpected, new[] { "a", "Failed", "7" });
+            Check(sanitized["Status"]!.ToString() == "Failed" && sanitized["Error"]!.ToString().Split("[REDACTED]").Length == 4, "general engine errors mask values while preserving authoritative failure control");
+        }
+        finally
+        {
+            foreach (var name in new[] { "short_unused", "failure_unused", "short_used", "number_used", "failure_used" }) secrets.Delete("local", name);
+            var current = await Json(await client.GetAsync(layerPath));
+            _ = await Json(await client.PutAsJsonAsync(layerPath, new { etag = current["etag"]!.ToString(), data = original["data"]!.DeepClone() }));
+            if (File.Exists(fixture)) File.Delete(fixture);
+        }
     }
     private static async Task VerifyEnvironmentSnapshot(WebApplication app, string projectId, string directory, string enginePath, string state, string originalSecret)
     {
