@@ -132,6 +132,7 @@ try {
             @{Step='iis.status';With=@{WebsiteName='demo'}},
             @{Step='web.offline';With=@{Directory=$testRoot}}
         )) {
+            if ($case.Step -like 'iis.*' -and [Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) { continue }
             $plan=Get-PlotPlan $registry (New-Config @(@{Step=$case.Step;With=$case.With})) demo
             $null=& $plan[0].Step.Command -Settings $plan[0].Settings -Context $context -WhatIf
         }
@@ -216,7 +217,10 @@ Test-Case 'Platform scenarios preflight supported targets and reject Windows-onl
         foreach ($file in @('compose.json','database.json','iis.json')) {
             $config=Read-PlotConfiguration (Join-Path $scriptsPath ('Examples/platform/'+$file))
             if ($file -eq 'iis.json' -and [Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
-                foreach ($name in $config.Plots.Keys) { Assert-Throws { Get-PlotPlan $registry $config $name } '*requires Windows*' }
+                foreach ($name in $config.Plots.Keys) {
+                    if (@($config.Plots[$name] | Where-Object { $_.Step -like 'iis.*' }).Count) { Assert-Throws { Get-PlotPlan $registry $config $name } '*requires Windows*' }
+                    else { Assert-True ((Get-PlotPlan $registry $config $name).Count -gt 0); Assert-Equal (Invoke-Plot $registry $config $name -WhatIf).Status 'Skipped' }
+                }
                 continue
             }
             foreach ($name in $config.Plots.Keys) { Assert-True ((Get-PlotPlan $registry $config $name).Count -gt 0); Assert-Equal (Invoke-Plot $registry $config $name -WhatIf).Status 'Skipped' }
