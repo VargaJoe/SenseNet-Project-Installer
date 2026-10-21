@@ -1,9 +1,28 @@
 import { fireEvent, render, screen, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ParameterField } from "./components";
+import { parseObject } from "./model";
+import { stringifyJson } from "./json";
 
 afterEach(cleanup);
 describe("schema-driven parameters", () => {
+  it("edits an unsafe numeric scalar as exact JSON instead of exposing wrapper fields or rounding", () => {
+    const change = vi.fn();
+    const value = parseObject('{"precise":9007199254740993}').precise;
+    render(
+      <ParameterField
+        name="Precise"
+        schema={{ Type: "int" }}
+        value={value}
+        onChange={change}
+      />,
+    );
+    const editor = screen.getByLabelText("Precise JSON value");
+    expect(editor).toHaveValue("9007199254740993");
+    fireEvent.change(editor, { target: { value: "9007199254740995" } });
+    fireEvent.blur(editor);
+    expect(stringifyJson(change.mock.calls[0][0])).toBe("9007199254740995");
+  });
   it("makes inherited values, explicit null and false separate choices", () => {
     const change = vi.fn();
     const { rerender } = render(

@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError, post, put, segment, takeBootstrapToken } from "./api";
 import {
+  isLosslessNumber,
+  numberInput,
+  parseJson,
+  stringifyJson,
+} from "./json";
+import {
   Badge,
   Empty,
   JsonEditor,
@@ -20,6 +26,8 @@ import {
   object,
   parseObject,
   plotNames,
+  ownsPlotSteps,
+  plotSource,
   plotSteps,
   pretty,
   removeOverride,
@@ -169,15 +177,36 @@ export default function App() {
 
   const loadConfiguration = useCallback(async () => {
     if (!pid) return;
-    const result = await api<{ engine: EngineConfiguration }>(
-      `${pid}/configuration?environment=${segment(environment)}`,
+    const [result, available] = await Promise.all([
+      api<{ engine: EngineConfiguration }>(
+        `${pid}/configuration?environment=${segment(environment)}`,
+      ),
+      api<{ layers: LayerInfo[] }>(
+        `${pid}/layers?environment=${segment(environment)}`,
+      ),
+    ]);
+    const documents = await Promise.all(
+      available.layers.map((item) =>
+        api<Layer>(`${pid}/layers/${segment(item.id)}`),
+      ),
     );
     if (
       currentLocation.current.pid !== pid ||
       currentLocation.current.environment !== environment
     )
       return;
-    setConfiguration(result.engine);
+    const nativeLayers = Array.isArray(result.engine.Layers)
+      ? result.engine.Layers
+      : [];
+    const rawLayers = documents.map((document, index) => {
+      const source = nativeLayers[index];
+      if (!object(source) || typeof source.Path !== "string")
+        throw new Error(
+          "The engine did not identify this configuration source file. Reload before editing inherited steps.",
+        );
+      return { ...document, file: source.Path };
+    });
+    setConfiguration({ ...result.engine, RawLayers: rawLayers });
     setPlan(undefined);
     setWizardPlan(undefined);
     setPlot((previous) =>
@@ -268,7 +297,7 @@ export default function App() {
   }, [dirty]);
 
   useEffect(() => {
-    if (!run || !pid) return;
+    if (!run || !pid || !session?.authenticated) return;
     const runId = run.id,
       expectedGeneration = generation.current;
     updateQuery("run", runId);
@@ -303,6 +332,13 @@ export default function App() {
         if (active(record)) timer = setTimeout(poll, 1000);
       } catch (e) {
         if (disposed) return;
+        if (e instanceof ApiError && e.status === 401) {
+          setError(
+            "Your session expired. Sign in again to reconnect to the saved run.",
+          );
+          setSession({ authenticated: false, user: "", mode: "" });
+          return;
+        }
         setConnection(
           `Connection interrupted. Retrying from cursor ${cursor}: ${errText(e)}`,
         );
@@ -314,7 +350,7 @@ export default function App() {
       disposed = true;
       clearTimeout(timer);
     };
-  }, [run?.id, pid]);
+  }, [run?.id, pid, session?.authenticated]);
 
   const chooseProject = (p: Project) => {
     if (
@@ -337,7 +373,11 @@ export default function App() {
     )
       return;
     setEnvironment(value);
-    if (layerId.startsWith("environment:")) setLayerId(`environment:${value}`);
+    if (layerId.startsWith("environment:")) {
+      setLayer(undefined);
+      setDraft("{}");
+      setLayerId(value ? `environment:${value}` : "project");
+    }
   };
   const changeLayer = (value: string) => {
     if (
@@ -399,17 +439,15 @@ export default function App() {
   } catch (e) {
     draftError = errText(e);
   }
+  const exactPlotSource =
+    draftObject && ownsPlotSteps(draftObject, plot)
+      ? draftObject
+      : configuration
+        ? plotSource(configuration, plot)
+        : undefined;
   let steps: Invocation[] = [];
   try {
-    steps = plotSteps(
-      draftObject &&
-        plotNames(draftObject).some(
-          (name) => name.toLowerCase() === plot.toLowerCase(),
-        )
-        ? draftObject
-        : effective,
-      plot,
-    );
+    steps = plotSteps(exactPlotSource ?? {}, plot);
   } catch (e) {
     draftError ||= errText(e);
   }
@@ -417,7 +455,17 @@ export default function App() {
   const selectedSchema = catalog.find((step) => step.Id === selected?.Step);
   const editSteps = (next: Invocation[]) => {
     if (!draftObject) return;
-    setDraft(pretty(setPlotSteps(draftObject, effective, plot, next)));
+    if (!exactPlotSource && plotNames(effective).includes(plot)) {
+      setError(
+        "The engine source array is not loaded. Reload configuration before changing inherited steps.",
+      );
+      return;
+    }
+    setDraft(
+      pretty(
+        setPlotSteps(draftObject, exactPlotSource ?? effective, plot, next),
+      ),
+    );
     setPlan(undefined);
   };
   const updateInvocation = (next: Invocation) =>
@@ -2258,7 +2306,7 @@ function WizardInput({
           }}
           onBlur={() => {
             try {
-              const parsed: Json = JSON.parse(text);
+              const parsed = parseJson<Json>(text);
               if (
                 field.type === "array"
                   ? !Array.isArray(parsed)
@@ -2275,7 +2323,9 @@ function WizardInput({
       ) : (
         <input
           value={
-            typeof value === "string" || typeof value === "number"
+            typeof value === "string" ||
+            typeof value === "number" ||
+            isLosslessNumber(value)
               ? String(value)
               : ""
           }
@@ -2288,7 +2338,7 @@ function WizardInput({
               field.type === "int" || field.type === "number"
                 ? e.target.value === ""
                   ? undefined
-                  : Number(e.target.value)
+                  : numberInput(e.target.value)
                 : e.target.value,
             )
           }
@@ -2486,7 +2536,7 @@ function SecretsPanel({
                 setName("");
                 await refresh();
                 onSuccess(
-                  `Secret stored locally. Use ${JSON.stringify(result.reference)} in a parameter.`,
+                  `Secret stored locally. Use ${stringifyJson(result.reference)} in a parameter.`,
                 );
               } catch (error) {
                 onError(errText(error));
@@ -2538,7 +2588,7 @@ function SecretsPanel({
                 <tr key={secret.name}>
                   <td>{secret.name}</td>
                   <td>
-                    <code>{JSON.stringify(secret.reference)}</code>
+                    <code>{stringifyJson(secret.reference)}</code>
                   </td>
                   <td>
                     <button

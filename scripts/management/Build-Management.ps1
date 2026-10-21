@@ -3,6 +3,7 @@
 param(
     [ValidateSet('win-x64','linux-x64')][string]$Runtime = $(if ($IsWindows) { 'win-x64' } else { 'linux-x64' }),
     [switch]$Desktop,
+    [switch]$WindowsCross,
     [switch]$SkipWebInstall
 )
 $ErrorActionPreference = 'Stop'
@@ -30,8 +31,16 @@ function Reset-GeneratedDirectory([string]$Path) {
 foreach ($command in @('dotnet','node','npm','pwsh')) {
     if (-not (Get-Command $command -ErrorAction SilentlyContinue)) { throw "Required tool is missing: $command" }
 }
-if ($Desktop -and (($IsWindows -and $Runtime -ne 'win-x64') -or ($IsLinux -and $Runtime -ne 'linux-x64'))) {
+if ($WindowsCross -and (-not $Desktop -or -not $IsLinux -or $Runtime -ne 'win-x64')) {
+    throw '-WindowsCross is supported only on Linux with -Desktop -Runtime win-x64.'
+}
+if ($Desktop -and -not $WindowsCross -and (($IsWindows -and $Runtime -ne 'win-x64') -or ($IsLinux -and $Runtime -ne 'linux-x64'))) {
     throw 'Desktop installers must be built on the matching target OS; this script does not cross-compile Tauri.'
+}
+if ($WindowsCross) {
+    foreach ($command in @('cargo-xwin','clang','lld-link','llvm-rc','makensis')) {
+        if (-not (Get-Command $command -ErrorAction SilentlyContinue)) { throw "Windows cross-build tool is missing: $command" }
+    }
 }
 if ($Desktop -and -not (Get-Command cargo -ErrorAction SilentlyContinue)) {
     throw 'Desktop builds require Rust, its native compiler/linker and target WebView development dependencies. See docs/management-deployment.md.'
@@ -65,9 +74,16 @@ if ($Desktop) {
     Push-Location $desktopRoot
     try {
         Invoke-Checked npm @('ci')
-        $bundle = if ($IsWindows) { 'nsis' } else { 'deb' }
-        Invoke-Checked npm @('run','build','--','--bundles',$bundle,'--','--locked')
+        if ($WindowsCross) {
+            Invoke-Checked npm @('run','build','--','--runner','cargo-xwin','--target','x86_64-pc-windows-msvc','--bundles','nsis','--','--locked')
+        } else {
+            $bundle = if ($IsWindows) { 'nsis' } else { 'deb' }
+            Invoke-Checked npm @('run','build','--','--bundles',$bundle,'--','--locked')
+        }
     } finally { Pop-Location }
 }
 Write-Host "Published shared UI, self-contained service and engine to $output"
-if ($Desktop) { Write-Host "Desktop installer: $(Join-Path $desktopRoot 'src-tauri/target/release/bundle')" }
+if ($Desktop) {
+    $bundlePath = if ($WindowsCross) { 'src-tauri/target/x86_64-pc-windows-msvc/release/bundle' } else { 'src-tauri/target/release/bundle' }
+    Write-Host "Desktop installer: $(Join-Path $desktopRoot $bundlePath)"
+}

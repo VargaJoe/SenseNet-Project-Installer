@@ -7,7 +7,10 @@ use std::{
     net::{Ipv4Addr, TcpListener},
     path::PathBuf,
     process::{Child, Command, Stdio},
-    sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
     thread,
     time::{Duration, Instant},
 };
@@ -24,17 +27,26 @@ struct LocalService {
 
 impl LocalService {
     fn stop(&self) {
-        if self.stopping.swap(true, Ordering::SeqCst) { return; }
+        if self.stopping.swap(true, Ordering::SeqCst) {
+            return;
+        }
         let client = reqwest::blocking::Client::builder()
-            .timeout(Duration::from_secs(2)).no_proxy().build();
+            .timeout(Duration::from_secs(2))
+            .no_proxy()
+            .build();
         if let Ok(client) = client {
-            let _ = client.post(format!("{}/api/lifecycle/shutdown", self.origin))
-                .bearer_auth(&self.token).header("X-Plot-Request", "1").send();
+            let _ = client
+                .post(format!("{}/api/lifecycle/shutdown", self.origin))
+                .bearer_auth(&self.token)
+                .header("X-Plot-Request", "1")
+                .send();
         }
         if let Ok(mut child) = self.child.lock() {
             let deadline = Instant::now() + Duration::from_secs(5);
             while Instant::now() < deadline {
-                if child.try_wait().ok().flatten().is_some() { return; }
+                if child.try_wait().ok().flatten().is_some() {
+                    return;
+                }
                 thread::sleep(Duration::from_millis(100));
             }
             // Only this instance's process tree is stopped. A forced stop is not rollback.
@@ -43,10 +55,15 @@ impl LocalService {
                 use std::os::windows::process::CommandExt;
                 let _ = Command::new("taskkill")
                     .args(["/PID", &child.id().to_string(), "/T", "/F"])
-                    .creation_flags(0x08000000).stdout(Stdio::null()).stderr(Stdio::null()).status();
+                    .creation_flags(0x08000000)
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
+                    .status();
             }
             #[cfg(unix)]
-            unsafe { libc::kill(-(child.id() as i32), libc::SIGKILL); }
+            unsafe {
+                libc::kill(-(child.id() as i32), libc::SIGKILL);
+            }
             let _ = child.kill();
             let _ = child.wait();
         }
@@ -54,13 +71,22 @@ impl LocalService {
 }
 
 impl Drop for LocalService {
-    fn drop(&mut self) { self.stop(); }
+    fn drop(&mut self) {
+        self.stop();
+    }
 }
 
 fn start_service(app: &tauri::App, smoke: bool) -> Result<Arc<LocalService>, Box<dyn Error>> {
     let mut probe = Command::new("pwsh");
-    probe.args(["-NoProfile", "-NonInteractive", "-Command", "if ($PSVersionTable.PSVersion.Major -lt 7) { exit 1 }"])
-        .stdout(Stdio::null()).stderr(Stdio::null());
+    probe
+        .args([
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            "if ($PSVersionTable.PSVersion.Major -lt 7) { exit 1 }",
+        ])
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
     #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
@@ -73,14 +99,30 @@ fn start_service(app: &tauri::App, smoke: bool) -> Result<Arc<LocalService>, Box
     let resources = app.path().resource_dir()?;
     let data = if smoke {
         PathBuf::from(std::env::var("PLOTMANAGER_DESKTOP_SMOKE_DATA")?)
-    } else { app.path().app_local_data_dir()? };
+    } else {
+        app.path().app_local_data_dir()?
+    };
+    let project_root = if !smoke {
+        std::env::var_os("PLOTMANAGER_DESKTOP_PROJECT_ROOT")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| data.join("projects"))
+    } else {
+        data.join("projects")
+    };
+    if !project_root.is_absolute() {
+        return Err("PLOTMANAGER_DESKTOP_PROJECT_ROOT must be an absolute runner-side directory.".into());
+    }
     fs::create_dir_all(&data)?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(&data, fs::Permissions::from_mode(0o700))?;
     }
-    let executable: PathBuf = resources.join("service").join(if cfg!(windows) { "PlotManager.Server.exe" } else { "PlotManager.Server" });
+    let executable: PathBuf = resources.join("service").join(if cfg!(windows) {
+        "PlotManager.Server.exe"
+    } else {
+        "PlotManager.Server"
+    });
     if !executable.is_file() || !resources.join("engine/Invoke-ManagedRequest.ps1").is_file() {
         return Err("The bundled service or native engine is missing. Rebuild with Build-Management.ps1 -Desktop.".into());
     }
@@ -92,15 +134,18 @@ fn start_service(app: &tauri::App, smoke: bool) -> Result<Arc<LocalService>, Box
     rand::rngs::OsRng.fill_bytes(&mut token_bytes);
     let token: String = token_bytes.iter().map(|b| format!("{b:02x}")).collect();
     let mut command = Command::new(executable);
-    command.current_dir(resources.join("service"))
+    command
+        .current_dir(resources.join("service"))
         .env("ASPNETCORE_URLS", &origin)
         .env("PLOTMANAGER_MODE", "local")
         .env("PLOTMANAGER_TOKEN", &token)
         .env("PLOTMANAGER_DATA", &data)
-        .env("PLOTMANAGER_PROJECT_ROOT", data.join("projects"))
+        .env("PLOTMANAGER_PROJECT_ROOT", project_root)
         .env("PLOTMANAGER_ENGINE", resources.join("engine"))
         .env("PLOTMANAGER_PARENT_PID", std::process::id().to_string())
-        .stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null());
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
     #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
@@ -112,13 +157,28 @@ fn start_service(app: &tauri::App, smoke: bool) -> Result<Arc<LocalService>, Box
         command.process_group(0);
     }
     drop(socket);
-    let service = Arc::new(LocalService { child: Mutex::new(command.spawn()?), origin, token, stopping: AtomicBool::new(false) });
-    let client = reqwest::blocking::Client::builder().timeout(Duration::from_millis(500)).no_proxy().build()?;
+    let service = Arc::new(LocalService {
+        child: Mutex::new(command.spawn()?),
+        origin,
+        token,
+        stopping: AtomicBool::new(false),
+    });
+    let client = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_millis(500))
+        .no_proxy()
+        .build()?;
     let deadline = Instant::now() + Duration::from_secs(30);
     loop {
         // Readiness requires our unpredictable credential, not merely an unrelated open port.
-        if client.get(format!("{}/api/runner", service.origin)).bearer_auth(&service.token).send()
-            .map(|response| response.status().is_success()).unwrap_or(false) { break; }
+        if client
+            .get(format!("{}/api/runner", service.origin))
+            .bearer_auth(&service.token)
+            .send()
+            .map(|response| response.status().is_success())
+            .unwrap_or(false)
+        {
+            break;
+        }
         if service.child.lock().unwrap().try_wait()?.is_some() {
             return Err("The local service exited during startup. Check its prerequisites and data-directory permissions.".into());
         }
@@ -207,9 +267,14 @@ fn main() {
     match builder.build(tauri::generate_context!()) {
         Ok(app) => app.run(|handle, event| {
             if let tauri::RunEvent::Exit = event {
-                if let Some(service) = handle.try_state::<Arc<LocalService>>() { service.stop(); }
+                if let Some(service) = handle.try_state::<Arc<LocalService>>() {
+                    service.stop();
+                }
             }
         }),
-        Err(error) => { eprintln!("Plot Manager desktop initialization failed: {error}"); std::process::exit(1); }
+        Err(error) => {
+            eprintln!("Plot Manager desktop initialization failed: {error}");
+            std::process::exit(1);
+        }
     }
 }

@@ -4,6 +4,30 @@ param([Parameter(Mandatory)][string]$Installer)
 $ErrorActionPreference = 'Stop'
 if (-not $IsWindows) { throw 'This helper is for the unsigned Windows NSIS package on a disposable Windows test machine.' }
 $Installer = (Resolve-Path -LiteralPath $Installer).Path
+# NSIS uses a stable application identity and standard shortcut names even when
+# /D points at our temporary folder. Refuse to replace an existing installation.
+$identityPattern = '(?i)(?:plot[ _-]*manager|io\.github\.vargajoe\.plotmanager)'
+foreach ($registryRoot in @(
+    'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall',
+    'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall',
+    'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
+)) {
+    if (-not (Test-Path -LiteralPath $registryRoot)) { continue }
+    foreach ($registration in Get-ChildItem -LiteralPath $registryRoot -ErrorAction Stop) {
+        $properties = Get-ItemProperty -LiteralPath $registration.PSPath -ErrorAction Stop
+        $displayProperty = $properties.PSObject.Properties['DisplayName']
+        $displayName = if ($displayProperty) { [string]$displayProperty.Value } else { '' }
+        if ($registration.PSChildName -match $identityPattern -or $displayName -match $identityPattern) {
+            throw "Existing Plot Manager registration prevents isolated installer smoke: $($registration.Name). Use a clean test VM or verify the extracted executable separately."
+        }
+    }
+}
+foreach ($folder in @('Programs', 'CommonPrograms', 'DesktopDirectory', 'CommonDesktopDirectory')) {
+    $location = [Environment]::GetFolderPath($folder)
+    if (-not $location -or -not (Test-Path -LiteralPath $location)) { continue }
+    $existing = Get-ChildItem -LiteralPath $location -Force -ErrorAction Stop | Where-Object Name -Match $identityPattern | Select-Object -First 1
+    if ($existing) { throw "Existing Plot Manager shortcut or menu directory prevents installer smoke: $($existing.FullName). Use a clean test VM or verify the extracted executable separately." }
+}
 $testRoot = Join-Path ([IO.Path]::GetTempPath()) ('plot-manager-install-' + [guid]::NewGuid().ToString('N'))
 $installed = Join-Path $testRoot 'application'
 New-Item -ItemType Directory -Path $testRoot | Out-Null

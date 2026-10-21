@@ -27,7 +27,12 @@ New-Item -ItemType Directory -Path $DataDirectory -Force | Out-Null
 if (-not $IsWindows) { & chmod 700 $DataDirectory; if ($LASTEXITCODE) { throw 'Cannot restrict data directory permissions.' } }
 
 $token = $env:PLOTMANAGER_TOKEN
-if (-not $token) { $token = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32)).ToLowerInvariant() }
+if (-not $token) {
+    $bytes = [byte[]]::new(32)
+    $random = [Security.Cryptography.RandomNumberGenerator]::Create()
+    try { $random.GetBytes($bytes) } finally { $random.Dispose() }
+    $token = [BitConverter]::ToString($bytes).Replace('-', '').ToLowerInvariant()
+}
 if ($NoBrowser -and -not $env:PLOTMANAGER_TOKEN) { throw '-NoBrowser requires a caller-supplied PLOTMANAGER_TOKEN so the login credential is known without printing or saving it.' }
 $socket = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, $Port)
 $socket.Start()

@@ -9,7 +9,7 @@ There is no separate desktop configuration resolver. See [API and ownership](man
 
 | Mode | Required on the execution machine |
 | --- | --- |
-| Windows desktop | Windows x64, PowerShell 7 (`pwsh` on PATH), Microsoft WebView2 |
+| Windows desktop | Windows 10/11 x64, PowerShell 7 (`pwsh` on PATH), Microsoft WebView2 |
 | Linux desktop | Ubuntu 24.04 x64 graphical session, PowerShell 7 on PATH, GTK 3 / WebKitGTK 4.1; the `.deb` declares system libraries |
 | Published local/hosted service | Windows x64 or Ubuntu 24.04 x64, PowerShell 7 on PATH; the published service includes .NET 8 |
 | Source build | .NET 8 SDK, Node 20, npm; desktop additionally Rust 1.99.1 and platform compiler/WebView development packages |
@@ -82,12 +82,29 @@ below and execute `service/PlotManager.Server` (Windows: `.exe`).
 ```
 
 The Rust toolchain is pinned in `src/Desktop/rust-toolchain.toml`. Cargo and npm
-lock files constrain dependency resolution. Builds use the matching host OS;
+lock files constrain dependency resolution. Standard builds use the matching host OS;
 cross-compiling the Linux package on Windows is not supported. The output is:
 
 - Windows: `src/Desktop/src-tauri/target/release/bundle/nsis/*-setup.exe`.
 - Ubuntu: `src/Desktop/src-tauri/target/release/bundle/deb/*.deb`; install with
   `sudo apt install ./<package>.deb`, then launch **Plot Manager** from the app menu.
+
+If native Windows build tooling or CI is unavailable, Tauri also documents a Linux
+NSIS cross-build fallback using `cargo-xwin` and the MSVC Windows target. On an
+isolated Linux build machine, install `llvm`, `lld`, `clang` and `nsis`, run
+`rustup target add x86_64-pc-windows-msvc`, and
+`cargo install --locked --version 0.23.1 cargo-xwin`. Then run:
+
+```powershell
+./scripts/management/Build-Management.ps1 -Runtime win-x64 -Desktop -WindowsCross
+```
+
+This still builds the Tauri Windows application and its self-contained Windows
+backend. Its installer is under
+`src/Desktop/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/`.
+`cargo-xwin` obtains the Microsoft SDK/CRT under its documented Microsoft licensing
+terms. Cross-build success must be followed by actual Windows installation and
+native smoke; running it under Wine alone does not establish Windows behavior.
 
 Tauri bundles the self-contained local service, compiled client and native engine.
 At startup it verifies `pwsh`, creates private per-user application storage, binds
@@ -106,6 +123,16 @@ Do not close desktop while an operation should continue: use the long-lived loca
 browser or hosted service mode for that workflow. Each desktop launch starts its
 own service instance and credential; do not share one desktop data directory across
 simultaneous instances.
+
+The default allowed project root is that desktop instance's private `projects/`
+directory. To open existing projects elsewhere, explicitly set the machine-local
+`PLOTMANAGER_DESKTOP_PROJECT_ROOT` to an absolute directory before launching, for
+example `$env:PLOTMANAGER_DESKTOP_PROJECT_ROOT = 'D:\Projects'` on Windows or
+`PLOTMANAGER_DESKTOP_PROJECT_ROOT="$HOME/projects" plot-manager` on Linux. Open an
+existing `plot-project.json` project using the runner-side directory picker beneath
+that root. The choice belongs to the launcher machine, not the portable project
+definition. Backend ownership/path/link checks still apply, and smoke tests always
+use their isolated project root regardless of this setting.
 
 ## Authenticated HTTPS server
 
@@ -212,7 +239,9 @@ token-fragment removal, shuts down its own service and writes a JSON evidence fi
 with OS and executable SHA-256. It is an execution smoke test, not a complete visual
 desktop acceptance test. The Windows helper also silently installs and uninstalls
 its package in an owned temporary directory. It is intended for clean test VMs,
-because NSIS registration belongs to the application identity. Installer build
+because NSIS registration belongs to the application identity. It refuses to run
+if an existing Plot Manager uninstall registration, standard shortcut or menu
+directory is found, rather than overwriting an existing installation. Installer build
 success, installed-package execution smoke and manual GUI acceptance are separate claims.
 
 `.github/workflows/management.yml` runs the engine, backend, frontend, real browser

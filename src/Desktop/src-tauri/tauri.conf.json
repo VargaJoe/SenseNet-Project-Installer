@@ -30,7 +30,7 @@
       "nsis": { "installMode": "currentUser", "displayLanguageSelector": false }
     },
     "linux": {
-      "deb": { "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0", "libssl3", "libicu74"] }
+      "deb": { "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0", "libssl3", "libicu74 | libicu78"] }
     }
   }
 }

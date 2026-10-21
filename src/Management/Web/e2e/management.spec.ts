@@ -32,7 +32,9 @@ test("fresh wizard, real full/single execution, reorder preflight, typed layer r
   await expect(page.getByTestId("management-ready")).toBeVisible();
   expect(new URL(page.url()).hash).toBe("");
   const cookies = await context.cookies();
-  expect(cookies.find((c) => c.name === "PlotManager.Session")).toMatchObject({
+  expect(
+    cookies.find((c) => c.name.startsWith("PlotManager.Session.")),
+  ).toMatchObject({
     httpOnly: true,
     sameSite: "Strict",
   });
@@ -99,7 +101,13 @@ test("fresh wizard, real full/single execution, reorder preflight, typed layer r
     empty: [],
     unknown: { retained: true },
   };
-  await editor.fill(JSON.stringify(layerData, null, 2));
+  // Seed exact raw tokens without parsing them through the test's native Number.
+  await editor.fill(
+    JSON.stringify(layerData, null, 2).replace(
+      /\}\s*$/,
+      ',"Precise":{"integer":9007199254740993,"decimal":0.12345678901234567890123456789}}',
+    ),
+  );
   await page.getByRole("button", { name: "Save layer", exact: true }).click();
   await expect(
     page.getByRole("status").filter({ hasText: "Saved only" }),
@@ -127,6 +135,14 @@ test("fresh wizard, real full/single execution, reorder preflight, typed layer r
     .getByRole("button", { name: "Move save later", exact: true })
     .click();
   await page.getByRole("button", { name: "Save layer", exact: true }).click();
+  const preciseResponse = await page.request.get(
+    `/api/projects/${projectId}/layers/project`,
+  );
+  const preciseRaw = await preciseResponse.text();
+  expect(preciseRaw).toMatch(/"integer"\s*:\s*9007199254740993/);
+  expect(preciseRaw).toMatch(
+    /"decimal"\s*:\s*0\.12345678901234567890123456789/,
+  );
   await page.locator(".invocation-main").filter({ hasText: "compose" }).click();
   await page
     .getByRole("button", { name: "Run invocation", exact: true })
@@ -179,7 +195,8 @@ test("opens a blank portable project without a wizard or environment layer", asy
   await expect(page.getByTestId("management-ready")).toBeVisible();
   await expect(page.getByLabel("Active environment")).toHaveValue("");
   await page
-    .getByRole("button", { name: "Guided setup", exact: false })
+    .getByRole("navigation", { name: "Main navigation" })
+    .getByRole("button", { name: "Guided setup", exact: true })
     .click();
   await expect(
     page.getByRole("heading", { name: "No guided form in this project" }),

@@ -10,6 +10,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "lossless-json": "4.3.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

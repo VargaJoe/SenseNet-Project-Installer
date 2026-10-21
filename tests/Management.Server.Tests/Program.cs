@@ -193,7 +193,9 @@ internal static class ManagementTests
             var slowId = slow["id"]!.ToString();
             Check((await client.PutAsJsonAsync(layerPath, new { etag = saved["etag"]!.ToString(), data })).StatusCode == HttpStatusCode.Conflict, "active run locks editing");
             Check((await client.PostAsJsonAsync($"/api/projects/{id}/runs", new { plot = "install" })).StatusCode == HttpStatusCode.Conflict, "active run locks conflicting execution");
-            for (var i = 0; i < 150 && !File.Exists(Path.Combine(directory, "managed-child.pid")); i++) await Task.Delay(100);
+            // A portable runtime on mounted storage starts both the managed
+            // worker and its package child. Wait for readiness, not a 15s SLA.
+            for (var i = 0; i < 600 && !File.Exists(Path.Combine(directory, "managed-child.pid")); i++) await Task.Delay(100);
             Check(File.Exists(Path.Combine(directory, "managed-child.pid")), "cancellation test reaches actual package child process");
             var childPid = int.Parse(File.ReadAllText(Path.Combine(directory, "managed-child.pid")).Trim());
             using (var reconnect = Client(app, token))

@@ -1,5 +1,11 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { pretty, object, type Json, type Parameter } from "./model";
+import {
+  isLosslessNumber,
+  numberInput,
+  parseJson,
+  stringifyJson,
+} from "./json";
 
 export function Notice({
   children,
@@ -85,6 +91,7 @@ type ValueMode = "inherit" | "value" | "json" | "reference" | "secret" | "null";
 function modeOf(value: Json | undefined): ValueMode {
   if (value === undefined) return "inherit";
   if (value === null) return "null";
+  if (isLosslessNumber(value)) return "json";
   if (object(value) && typeof value.$ref === "string") return "reference";
   if (object(value) && typeof value.$env === "string") return "secret";
   if (typeof value === "object") return "json";
@@ -175,7 +182,7 @@ export function ParameterField({
           <span className="muted inherited">
             Engine supplies inherited value
             {Object.hasOwn(schema, "Default") && !schema.Secret
-              ? ` (step default: ${JSON.stringify(schema.Default)})`
+              ? ` (step default: ${stringifyJson(schema.Default)})`
               : ""}
             .
           </span>
@@ -222,12 +229,12 @@ export function ParameterField({
           (schema.ValidateSet ? (
             <select
               id={`${id}-value`}
-              value={JSON.stringify(value)}
-              onChange={(e) => onChange(JSON.parse(e.target.value))}
+              value={stringifyJson(value)}
+              onChange={(e) => onChange(parseJson<Json>(e.target.value))}
               disabled={disabled}
             >
               {schema.ValidateSet.map((v) => (
-                <option key={JSON.stringify(v)} value={JSON.stringify(v)}>
+                <option key={stringifyJson(v)} value={stringifyJson(v)}>
                   {String(v)}
                 </option>
               ))}
@@ -256,7 +263,16 @@ export function ParameterField({
               }
               onChange={(e) => {
                 if (schema.Type === "int") {
-                  if (e.target.value !== "") onChange(Number(e.target.value));
+                  if (e.target.value !== "") {
+                    try {
+                      onChange(numberInput(e.target.value));
+                      setError("");
+                    } catch {
+                      setError(
+                        "Enter a complete JSON number. The last valid value is retained.",
+                      );
+                    }
+                  }
                 } else onChange(e.target.value);
               }}
               disabled={disabled}
@@ -277,7 +293,7 @@ export function ParameterField({
           }}
           onBlur={() => {
             try {
-              onChange(JSON.parse(text));
+              onChange(parseJson<Json>(text));
               setError("");
             } catch {
               setError(

@@ -1,12 +1,28 @@
+import {
+  isLosslessNumber,
+  parseJson,
+  stringifyJson,
+  type LosslessNumber,
+} from "./json";
+
 export type Json =
-  null | boolean | number | string | Json[] | { [key: string]: Json };
+  | null
+  | boolean
+  | number
+  | LosslessNumber
+  | string
+  | Json[]
+  | { [key: string]: Json };
 export type JsonObject = { [key: string]: Json };
 export const object = (v: unknown): v is JsonObject =>
-  v !== null && typeof v === "object" && !Array.isArray(v);
-export const pretty = (value: unknown) => JSON.stringify(value, null, 2);
-export const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value));
+  v !== null &&
+  typeof v === "object" &&
+  !Array.isArray(v) &&
+  !isLosslessNumber(v);
+export const pretty = (value: unknown) => stringifyJson(value, 2) ?? "";
+export const clone = <T>(value: T): T => parseJson<T>(stringifyJson(value)!);
 export function parseObject(text: string): JsonObject {
-  const value: unknown = JSON.parse(text);
+  const value: unknown = parseJson(text);
   if (!object(value)) throw new Error("The document must be a JSON object.");
   return value;
 }
@@ -68,6 +84,7 @@ export interface EngineConfiguration {
   Configuration: JsonObject;
   Sources: JsonObject;
   Layers?: Json;
+  RawLayers?: (Layer & { file: string })[];
 }
 export interface PlanStep {
   Id: string;
@@ -162,6 +179,27 @@ export function plotNames(config: JsonObject): string[] {
   const plots = member(config, "Plots");
   return object(plots) ? Object.keys(plots) : [];
 }
+export function ownsPlotSteps(config: JsonObject, name: string): boolean {
+  const plots = member(config, "Plots");
+  const plot = object(plots) ? member(plots, name) : undefined;
+  return (
+    Array.isArray(plot) || (object(plot) && member(plot, "Steps") !== undefined)
+  );
+}
+// The engine reports the winning array's file. Select that exact raw source;
+// no client-side merging or copying of engine-rounded numeric metadata.
+export function plotSource(
+  info: EngineConfiguration,
+  name: string,
+): JsonObject | undefined {
+  const plots = member(info.Configuration, "Plots");
+  const plot = object(plots) ? member(plots, name) : undefined;
+  const path = object(plot) ? `Plots.${name}.Steps` : `Plots.${name}`;
+  const file = member(info.Sources, path);
+  return typeof file === "string"
+    ? info.RawLayers?.find((layer) => layer.file === file)?.data
+    : undefined;
+}
 export function plotSteps(config: JsonObject, name: string): Invocation[] {
   const declaredPlots = member(config, "Plots");
   const plots = object(declaredPlots) ? declaredPlots : {};
@@ -215,12 +253,16 @@ export function setPlotSteps(
   const effectivePlots = object(declaredEffectivePlots)
     ? declaredEffectivePlots
     : {};
-  const original = member(plots, name) ?? member(effectivePlots, name);
-  const declaredOriginalSteps = object(original)
-    ? member(original, "Steps")
+  const localOriginal = member(plots, name);
+  const original = localOriginal ?? member(effectivePlots, name);
+  const sourceOriginal = ownsPlotSteps(layer, name)
+    ? localOriginal
+    : member(effectivePlots, name);
+  const declaredOriginalSteps = object(sourceOriginal)
+    ? member(sourceOriginal, "Steps")
     : undefined;
-  const originalSteps = Array.isArray(original)
-    ? original
+  const originalSteps = Array.isArray(sourceOriginal)
+    ? sourceOriginal
     : Array.isArray(declaredOriginalSteps)
       ? declaredOriginalSteps
       : [];
@@ -243,7 +285,11 @@ export function setPlotSteps(
       }
     return result;
   });
-  const nextPlot: Json = object(original) ? clone(original) : sourceSteps;
+  const nextPlot: Json = object(original)
+    ? object(localOriginal)
+      ? clone(localOriginal)
+      : {}
+    : sourceSteps;
   if (object(nextPlot)) setMember(nextPlot, "Steps", sourceSteps);
   setMember(plots, name, nextPlot);
   return next;
@@ -252,7 +298,8 @@ export function invocationId(step: string, ids: string[]): string {
   const base =
     step.replace(/[^a-zA-Z0-9_-]/g, "_").replace(/^[^a-zA-Z]+/, "") || "step";
   let n = 1;
-  while (ids.includes(`${base}_${n}`)) n++;
+  const occupied = new Set(ids.map((id) => id.toLowerCase()));
+  while (occupied.has(`${base}_${n}`.toLowerCase())) n++;
   return `${base}_${n}`;
 }
 export function moveStep(

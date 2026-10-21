@@ -1,6 +1,6 @@
 #Requires -Version 7.0
 [CmdletBinding()]
-param([switch]$SkipBuild, [switch]$SkipBrowser)
+param([switch]$SkipBuild, [switch]$SkipBrowser, [switch]$SkipBackendTests)
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $web = Join-Path $repo 'src/Management/Web'
@@ -16,17 +16,26 @@ try {
         finally { Pop-Location }
         Invoke-Checked dotnet @('build','src/Management/Server/PlotManager.Server.csproj','-c','Release')
     }
-    Invoke-Checked dotnet @('run','--project','tests/Management.Server.Tests/Management.Server.Tests.csproj','--configuration','Release')
+    if (-not $SkipBackendTests) {
+        Invoke-Checked dotnet @('run','--project','tests/Management.Server.Tests/Management.Server.Tests.csproj','--configuration','Release')
+    }
     if ($SkipBrowser) { return }
     $testRoot = Join-Path ([IO.Path]::GetTempPath()) ('plot-manager-browser-' + [guid]::NewGuid().ToString('N'))
     $null = New-Item -ItemType Directory -Path $testRoot
+    # Do not lock the developer's shared build output during a browser session.
+    $testService = Join-Path $testRoot 'service'
+    $null = New-Item -ItemType Directory -Path $testService
+    Copy-Item -Path (Join-Path $repo 'src/Management/Server/bin/Release/net8.0/*') -Destination $testService -Recurse
     $socket = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
     $socket.Start()
     $origin = "http://127.0.0.1:$($socket.LocalEndpoint.Port)"
-    $token = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32)).ToLowerInvariant()
+    $bytes = [byte[]]::new(32)
+    $random = [Security.Cryptography.RandomNumberGenerator]::Create()
+    try { $random.GetBytes($bytes) } finally { $random.Dispose() }
+    $token = [BitConverter]::ToString($bytes).Replace('-', '').ToLowerInvariant()
     $start = [Diagnostics.ProcessStartInfo]::new((Get-Command dotnet).Source)
-    $start.ArgumentList.Add((Join-Path $repo 'src/Management/Server/bin/Release/net8.0/PlotManager.Server.dll'))
-    $start.WorkingDirectory = Join-Path $repo 'src/Management/Server'
+    $start.ArgumentList.Add((Join-Path $testService 'PlotManager.Server.dll'))
+    $start.WorkingDirectory = $testService
     $start.UseShellExecute = $false
     $start.CreateNoWindow = $true
     $start.Environment['ASPNETCORE_URLS'] = $origin

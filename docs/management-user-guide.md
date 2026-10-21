@@ -41,6 +41,14 @@ are values, each distinct from a missing property. Unknown valid properties are
 preserved. Existing native key spelling, including lowercase `plots`, `steps`, and
 parameter names, is retained when editing known fields visually.
 
+Raw layers use precision-preserving JSON parsing and serialization. Unknown large
+integers, exact decimal literals, and JSON numbers beyond JavaScript's finite
+range remain numeric literals through unrelated edits and saves. Safe API
+counters stay ordinary numbers. An unsafe numeric parameter is edited through its
+JSON value field; the native engine still decides whether that parameter type is
+supported. The effective view reflects the engine's numeric types and may differ
+in precision from the raw source; it is never used to overwrite unknown raw data.
+
 To restore inheritance, remove the override property from the source JSON, or use
 the JSON-pointer helper, for example `/Sample/Message`. Escape `/` in a key as
 `~1` and `~` as `~0`. The helper removes object properties; remove the entire array
@@ -88,7 +96,10 @@ execution. Deferred output values and their final types are checked when the
 consumer executes. Unknown invocation/plot metadata survives visual changes.
 The source JSON view is available for fields beyond the generated form. Editing
 an inherited plot explicitly overrides its complete step array in the selected
-layer; its plot defaults and extension properties are retained.
+layer. The array comes from the exact raw file identified by engine provenance;
+its invocation metadata is retained. Other inherited plot properties stay
+inherited rather than being copied into the selected layer. Existing properties
+already present in that selected plot object remain intact.
 
 Run overrides are a separate JSON map keyed by invocation ID. They apply after
 saved layers for that request only. They are not saved into project files. Use

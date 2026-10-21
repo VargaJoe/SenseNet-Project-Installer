@@ -1,3 +1,5 @@
+import { parseJson, stringifyJson } from "./json";
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -23,7 +25,7 @@ export async function api<T>(
   const text = await response.text();
   let data: unknown;
   try {
-    data = text ? JSON.parse(text) : null;
+    data = text ? parseJson(text) : null;
   } catch {
     throw new ApiError(
       `The service returned an unreadable response (${response.status}).`,
@@ -41,9 +43,9 @@ export async function api<T>(
   return data as T;
 }
 export const post = <T>(path: string, body: unknown) =>
-  api<T>(path, { method: "POST", body: JSON.stringify(body) });
+  api<T>(path, { method: "POST", body: stringifyJson(body) });
 export const put = <T>(path: string, body: unknown) =>
-  api<T>(path, { method: "PUT", body: JSON.stringify(body) });
+  api<T>(path, { method: "PUT", body: stringifyJson(body) });
 export const segment = encodeURIComponent;
 export function takeBootstrapToken(): string | null {
   const token = new URLSearchParams(location.hash.slice(1)).get("token");
