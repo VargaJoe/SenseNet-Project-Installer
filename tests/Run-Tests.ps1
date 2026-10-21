@@ -225,7 +225,7 @@ try {
             Assert-True (-not $result.Steps[0].Error.Contains('synthetic-test-secret'))
         } finally { Remove-PlotRegistry $secretRegistry }
     }
-    Test-Case 'IIS mock transitions reread states and use correct order' {
+    Test-Case 'IIS mock transitions reread states and use correct order' -WindowsOnly {
         $iis = $registry.Packages.iis.Module
         & $iis {
             $script:fake = @{Site='Stopped';Pool='Stopped';Calls=[Collections.Generic.List[string]]::new()}
@@ -241,13 +241,13 @@ try {
         Assert-Equal $result.Status 'Succeeded'
         Assert-Equal (& $iis { $script:fake.Calls -join ',' }) 'start-pool,start-site,stop-site,stop-pool'
     }
-    Test-Case 'Direct IIS WhatIf performs no operations' {
+    Test-Case 'Direct IIS WhatIf performs no operations' -WindowsOnly {
         $iis = $registry.Packages.iis.Module
         & $iis { $script:fake.Calls.Clear() }
         & $registry.Steps['iis.start'].Command -Settings @{WebsiteName='demo'} -Context @{} -WhatIf
         Assert-Equal (& $iis { $script:fake.Calls.Count }) 0
     }
-    Test-Case 'Missing IIS website fails explicitly' {
+    Test-Case 'Missing IIS website fails explicitly' -WindowsOnly {
         $iis = $registry.Packages.iis.Module
         & $iis { function script:Get-Website { [CmdletBinding()]param($Name) return $null } }
         $result = Invoke-Plot $registry (New-Config @(@{Step='iis.start';With=@{WebsiteName='missing'}})) demo
@@ -310,7 +310,7 @@ try {
         Assert-Throws { Invoke-Plot $registry $config demo } '*must be array*'
         Assert-True (-not (Test-Path -LiteralPath $path))
     }
-    Test-Case 'IIS timeout is bounded and reports the target' {
+    Test-Case 'IIS timeout is bounded and reports the target' -WindowsOnly {
         $iis = $registry.Packages.iis.Module
         & $iis {
             function script:Get-Website { [CmdletBinding()]param($Name) [pscustomobject]@{Name=$Name;State='Stopped'} }
@@ -347,7 +347,7 @@ try {
         Assert-Equal $LASTEXITCODE 1
         Assert-Equal (($output -join [Environment]::NewLine)|ConvertFrom-Json).Status 'Failed'
     }
-    Test-Case 'Legacy help lists historical steps without running them' {
+    Test-Case 'Legacy help lists historical steps without running them' -WindowsOnly {
         $output = & (Get-Process -Id $PID).Path -NoProfile -NonInteractive -File (Join-Path $scriptsPath 'Run.ps1') -Legacy -Help steps
         Assert-Equal $LASTEXITCODE 0
         Assert-True (($output -join ' ') -like '*backupdb*')

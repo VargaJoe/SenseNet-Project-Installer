@@ -1,5 +1,16 @@
 # Runtime regression tests
 
+The shared desktop/browser application adds a [management test harness](../docs/management-deployment.md#tests-and-evidence)
+and [manual acceptance guide](../docs/management-acceptance.md). Run
+`./scripts/management/Test-Management.ps1` in PowerShell 7 after installing the
+documented .NET/Node/Playwright prerequisites. It uses real isolated PowerShell
+workers and a real browser against a local service. Native WebView smoke and
+Windows NSIS / Ubuntu .deb builds are separate CI checks.
+
+Windows-only IIS/legacy/junction tests are explicitly reported as skipped on
+Linux; unsupported IIS scenario preflight is checked there. A Windows pwsh pass
+does not substitute for Linux execution evidence.
+
 Run from the repository root:
 
 ```powershell
