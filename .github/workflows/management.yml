@@ -1,9 +1,7 @@
 name: Shared management UI
 on:
-  push:
-    paths: ['src/Management/**', 'src/Desktop/**', 'src/Deployment/Scripts/**', 'tests/**', 'scripts/management/**', '.github/workflows/management.yml']
-  pull_request:
-    paths: ['src/Management/**', 'src/Desktop/**', 'src/Deployment/Scripts/**', 'tests/**', 'scripts/management/**', '.github/workflows/management.yml']
+  # Deliberately manual: repository Actions quota is owner-controlled.
+  # Local scripts below remain usable without any GitHub runner allowance.
   workflow_dispatch:
 permissions:
   contents: read
@@ -103,7 +101,7 @@ jobs:
         shell: pwsh
         run: |
           $installer = @(Get-ChildItem ./src/Desktop/src-tauri/target/release/bundle/nsis/*.exe)[0]
-          ./scripts/management/Test-InstalledDesktop.ps1 -Installer $installer.FullName
+          ./scripts/management/Test-InstalledDesktop.ps1 -Installer $installer.FullName -ExpectedPayloadRoot ./artifacts/management/win-x64
       - name: Native Linux desktop execution smoke
         if: runner.os == 'Linux'
         shell: bash

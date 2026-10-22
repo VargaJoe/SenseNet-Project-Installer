@@ -10,8 +10,8 @@ There is no separate desktop configuration resolver. See [API and ownership](man
 | Mode | Required on the execution machine |
 | --- | --- |
 | Windows desktop | Windows 10/11 x64, PowerShell 7 (`pwsh` on PATH), Microsoft WebView2 |
-| Linux desktop | Ubuntu 24.04 x64 graphical session, PowerShell 7 on PATH, GTK 3 / WebKitGTK 4.1; the `.deb` declares system libraries |
-| Published local/hosted service | Windows x64 or Ubuntu 24.04 x64, PowerShell 7 on PATH; the published service includes .NET 8 |
+| Linux desktop | Ubuntu 26.04 x64 graphical session, PowerShell 7 on PATH, GTK 3 / WebKitGTK 4.1; the `.deb` declares system libraries |
+| Published local/hosted service | Windows x64 or Ubuntu 26.04 x64, PowerShell 7 on PATH; the published service includes .NET 8 |
 | Source build | .NET 8 SDK, Node 20, npm; desktop additionally Rust 1.99.1 and platform compiler/WebView development packages |
 
 Install PowerShell from the [Microsoft instructions](https://learn.microsoft.com/powershell/scripting/install/installing-powershell).
@@ -26,7 +26,7 @@ have WebView2. No application signing certificate is required to build or test i
 Windows may show the normal unrecognized-publisher prompt for this unsigned package.
 
 Windows desktop builds need Visual Studio C++ build tools and the Windows SDK.
-Ubuntu 24.04 desktop builds need:
+The Ubuntu desktop build recipe uses:
 
 ```sh
 sudo apt-get install libwebkit2gtk-4.1-dev build-essential curl wget file \
@@ -36,8 +36,12 @@ sudo apt-get install libwebkit2gtk-4.1-dev build-essential curl wget file \
 Platform prerequisites and the Windows bootstrapper behavior follow the
 [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) and
 [Windows installer documentation](https://v2.tauri.app/distribute/windows-installer/).
-The initial Linux package targets Ubuntu 24.04, whose ICU/OpenSSL dependencies
-are declared. Other distributions and ARM64 are not part of this package matrix.
+The delivered Linux development package is built and executed on Ubuntu 26.04 x64;
+its declared ICU dependency accepts ICU 74 or 78. Local validation unpacks the `.deb`
+and runs its native WebView with isolated extracted dependencies; an actual package
+installation through `apt` is a separate check. The manual workflow defines an
+Ubuntu 24.04 build as a separate artifact. Other distributions and ARM64 are outside
+the validated package matrix. See the [validation record](management-validation.md).
 
 ## Build and local browser
 
@@ -98,6 +102,18 @@ isolated Linux build machine, install `llvm`, `lld`, `clang` and `nsis`, run
 ```powershell
 ./scripts/management/Build-Management.ps1 -Runtime win-x64 -Desktop -WindowsCross
 ```
+
+The helper defaults SDK extraction to x64 desktop and restores the caller's process
+environment afterward; explicit `XWIN_ARCH` / `XWIN_VARIANT` values are preserved.
+Place `XWIN_CACHE_DIR`, `CARGO_HOME`, `RUSTUP_HOME`, `NUGET_PACKAGES`, npm's cache
+and `TMPDIR` on a build volume with sufficient free space. SDK extraction and native
+dependencies require several GB beyond the final installer. A cache in `/dev/shm`
+is temporary RAM storage: preserve a completed cache on the build volume before
+shutting down WSL or its container. Docker image layers use Docker's own disk even
+when the checkout is bind-mounted from another drive.
+Distribution builds of `makensis` can retain a fixed `/usr/share/nsis` data path
+even with `NSISDIR` set. A portable builder must provide those files inside its
+isolated build environment; the local verifier uses a private mount namespace.
 
 This still builds the Tauri Windows application and its self-contained Windows
 backend. Its installer is under
@@ -229,7 +245,7 @@ Plot Manager installation, run:
 
 ```powershell
 $installer = @(Get-ChildItem ./src/Desktop/src-tauri/target/release/bundle/nsis/*.exe)[0]
-./scripts/management/Test-InstalledDesktop.ps1 -Installer $installer.FullName
+./scripts/management/Test-InstalledDesktop.ps1 -Installer $installer.FullName -ExpectedPayloadRoot ./artifacts/management/win-x64
 ```
 
 On Linux, install the `.deb` and run `Test-DesktopSmoke.ps1 -Executable /usr/bin/plot-manager`
@@ -238,17 +254,31 @@ hidden native WebView, waits for the authenticated React client to load, checks
 token-fragment removal, shuts down its own service and writes a JSON evidence file
 with OS and executable SHA-256. It is an execution smoke test, not a complete visual
 desktop acceptance test. The Windows helper also silently installs and uninstalls
-its package in an owned temporary directory. It is intended for clean test VMs,
+its package in an owned temporary directory. With `-ExpectedPayloadRoot`, it checks
+every installed service/engine file against the published payload and records a
+manifest hash and installer hash. It is intended for clean test VMs,
 because NSIS registration belongs to the application identity. It refuses to run
 if an existing Plot Manager uninstall registration, standard shortcut or menu
 directory is found, rather than overwriting an existing installation. Installer build
 success, installed-package execution smoke and manual GUI acceptance are separate claims.
 
-`.github/workflows/management.yml` runs the engine, backend, frontend, real browser
+`.github/workflows/management.yml` is **manual only** (`workflow_dispatch`); pushes
+and pull requests never trigger it. The repository owner has disabled Actions
+because of the monthly runner allowance, and does not want automatic runs in later
+months either. The current delivery uses local manual builds and checks instead.
+Do not enable repository Actions or add automatic triggers as a workaround.
+The retained `powershell-tests.yml` workflow is also manual only.
+
+The optional manual workflow runs the engine, backend, frontend, real browser
 flow and installed native desktop smoke on Windows and Ubuntu. It uploads unsigned
 NSIS/`.deb` packages, the portable service and separate execution evidence. The existing PS5.1 regression and WinForms
 smoke remain Windows checks. The workflow result for the delivered commit, not the
 presence of this YAML, is the evidence of successful builds and platform execution.
+Without runner allowance, execute the documented `Run-Tests.ps1`,
+`Test-Management.ps1`, `Build-Management.ps1` and platform desktop smoke commands
+locally with the same checked-in dependency locks and isolated test directories.
+Build and execution evidence for this delivery is recorded in
+[validation](management-validation.md); no successful Actions run is claimed.
 
 For an optional host-independent Linux verifier, build
 `docker build -f scripts/management/Dockerfile.linux-build -t plot-manager-linux-build .`.

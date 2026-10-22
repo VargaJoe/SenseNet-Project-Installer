@@ -15,6 +15,7 @@ Start with [README](../README.md) for the CLI and installed packages.
 | Tests | [Test guide](../tests/README.md) |
 | Shared desktop / browser management | [Architecture](management-architecture.md), [user guide](management-user-guide.md), [build and deployment](management-deployment.md), [API](management-api.md) |
 | Manual management acceptance | [Fresh project, layers, plots, reconnect and CLI parity](management-acceptance.md) |
+| Management delivery evidence and limits | [Validation record](management-validation.md) |
 
 Management UI source belongs under `src/Management/`; desktop packaging under
 `src/Desktop/`. Both wrap the native engine under `src/Deployment/Scripts/`.
