@@ -14,6 +14,9 @@ permission but no WRITE_OWNER, then checks private ACLs, restart and child-file
 inheritance. Run that focused regression with
 `dotnet run --project tests/Management.Server.Tests -- --permissions-only`;
 the full suite includes it automatically. It reports an explicit skip on Linux.
+The Windows backend suite also uses a verbatim local drive engine path for a real
+catalog worker. `--engine-path-only` runs that focused regression; the service must
+normalize the path without changing PowerShell execution policy.
 
 Windows-only IIS/legacy/junction tests are explicitly reported as skipped on
 Linux; unsupported IIS scenario preflight is checked there. A Windows pwsh pass
