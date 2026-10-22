@@ -4,6 +4,8 @@ using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using PlotManager.Server;
@@ -66,6 +68,12 @@ internal static class ManagementTests
         WebApplication? app = null;
         try
         {
+            VerifyOwnedDirectory(Path.Combine(temporary, "owned-modify-only"));
+            if (args.Contains("--permissions-only", StringComparer.Ordinal))
+            {
+                Console.WriteLine($"{checks}/{checks} targeted directory permission assertions passed.");
+                return 0;
+            }
             app = global::Program.Build(Array.Empty<string>(), config);
             app.Services.GetRequiredService<ServiceSettings>().Users["bob"] = bobToken;
             await app.StartAsync();
@@ -309,6 +317,29 @@ internal static class ManagementTests
             var safeRoot = Path.GetFullPath(Path.GetTempPath()) + (Path.EndsInDirectorySeparator(Path.GetTempPath()) ? "" : Path.DirectorySeparatorChar);
             if (Directory.Exists(temporary) && Path.GetFullPath(temporary).StartsWith(safeRoot, OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)) Directory.Delete(temporary, true);
         }
+    }
+    private static void VerifyOwnedDirectory(string path)
+    {
+        if (!OperatingSystem.IsWindows()) { Console.WriteLine("SKIP Windows owned-directory ACL regression on this OS."); return; }
+        var identity = WindowsIdentity.GetCurrent().User!;
+        var directory = Directory.CreateDirectory(path);
+        Check(identity.Equals(directory.GetAccessControl(AccessControlSections.Owner).GetOwner(typeof(SecurityIdentifier))), "permission fixture directory belongs to the service identity");
+        // Reproduce a Rust-created desktop data directory: the owner may edit
+        // its DACL but Modify does not grant WRITE_OWNER. Reassigning the same
+        // owner unnecessarily would fail even though securing the DACL is allowed.
+        var modify = new DirectorySecurity();
+        modify.SetAccessRuleProtection(true, false);
+        modify.AddAccessRule(new FileSystemAccessRule(identity, FileSystemRights.Modify, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+        directory.SetAccessControl(modify);
+        ServiceSettings.PrivateDirectory(path);
+        ServiceSettings.PrivateDirectory(path);
+        var actual = directory.GetAccessControl(AccessControlSections.Owner | AccessControlSections.Access);
+        var rules = actual.GetAccessRules(true, true, typeof(SecurityIdentifier)).Cast<FileSystemAccessRule>().ToArray();
+        Check(identity.Equals(actual.GetOwner(typeof(SecurityIdentifier))) && actual.AreAccessRulesProtected && rules.Length == 1 && rules[0].IdentityReference.Equals(identity) && rules[0].FileSystemRights == FileSystemRights.FullControl && rules[0].AccessControlType == AccessControlType.Allow && rules[0].InheritanceFlags == (InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit), "owned Modify-only directory becomes private and startup remains idempotent without WRITE_OWNER");
+        var child = Path.Combine(path, "private-child.txt");
+        File.WriteAllText(child, "isolated ACL regression");
+        var childRules = new FileInfo(child).GetAccessControl(AccessControlSections.Access).GetAccessRules(true, true, typeof(SecurityIdentifier)).Cast<FileSystemAccessRule>().ToArray();
+        Check(childRules.Length == 1 && childRules[0].IdentityReference.Equals(identity) && childRules[0].AccessControlType == AccessControlType.Allow && childRules[0].FileSystemRights == FileSystemRights.FullControl, "state files inherit only the service identity's full control");
     }
     private static void CheckThrows(Action action, string name)
     {

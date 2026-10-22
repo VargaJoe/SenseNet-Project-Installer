@@ -63,9 +63,14 @@ public sealed class ServiceSettings
             var security = new DirectorySecurity();
             security.SetAccessRuleProtection(true, false);
             var identity = WindowsIdentity.GetCurrent().User ?? throw new InvalidOperationException("Cannot determine service identity.");
-            security.SetOwner(identity);
+            var directory = new DirectoryInfo(path);
+            // An existing owner can secure its DACL without WRITE_OWNER. Desktop
+            // creates the directory first, so reassigning an identical owner can
+            // fail on an otherwise valid Modify-only inherited ACL.
+            if (!identity.Equals(directory.GetAccessControl(AccessControlSections.Owner).GetOwner(typeof(SecurityIdentifier))))
+                security.SetOwner(identity);
             security.AddAccessRule(new FileSystemAccessRule(identity, FileSystemRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
-            new DirectoryInfo(path).SetAccessControl(security);
+            directory.SetAccessControl(security);
         }
         else File.SetUnixFileMode(path, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
     }
