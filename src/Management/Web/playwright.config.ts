@@ -2,7 +2,7 @@ import { defineConfig } from "@playwright/test";
 
 if (!process.env.PLOTMANAGER_E2E_URL || !process.env.PLOTMANAGER_E2E_TOKEN)
   throw new Error(
-    "Start an isolated management service with scripts/Test-Management.ps1, or set PLOTMANAGER_E2E_URL and PLOTMANAGER_E2E_TOKEN.",
+    "Start an isolated management service with scripts/management/Test-Management.ps1, or set PLOTMANAGER_E2E_URL and PLOTMANAGER_E2E_TOKEN.",
   );
 export default defineConfig({
   testDir: "./e2e",

@@ -298,7 +298,7 @@ internal static class ManagementTests
             CheckThrows(() => global::Program.Build(Array.Empty<string>(), unsafeEndpoint), "Kestrel endpoint configuration cannot bypass local binding restriction");
             var unsafeOperator = new Dictionary<string, string?>(config) { ["PLOTMANAGER_MODE"] = "hosted", ["PLOTMANAGER_USERS"] = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, string> { ["alice:child"] = token }) };
             CheckThrows(() => global::Program.Build(Array.Empty<string>(), unsafeOperator), "operator IDs cannot collide with secret ownership namespaces");
-            await VerifySecretProtocol(app, client, id, directory);
+            await VerifySecretProtocol(app, reconnected, id, directory);
             Console.WriteLine($"{checks}/{checks} management backend assertions passed on {System.Runtime.InteropServices.RuntimeInformation.OSDescription}.");
             return 0;
         }

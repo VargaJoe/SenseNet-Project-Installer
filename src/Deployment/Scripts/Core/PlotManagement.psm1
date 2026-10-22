@@ -87,15 +87,27 @@ function Get-ManagedReferenceOrigins {
 function Get-ManagedCatalog {
     param($Registry)
     $windows=[Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT
+    # PATH/module discovery can traverse slow mounted directories. A package
+    # declares prerequisites once; report one consistent observation per catalog,
+    # rather than probing the same executable for every step in that package.
+    $commandComparison=if ($windows) { [StringComparer]::OrdinalIgnoreCase } else { [StringComparer]::Ordinal }
+    $commands=[Collections.Generic.Dictionary[string,bool]]::new($commandComparison)
+    $modules=[Collections.Generic.Dictionary[string,bool]]::new([StringComparer]::OrdinalIgnoreCase)
     $steps=@(foreach ($step in ($Registry.Steps.Values | Sort-Object Id)) {
         $parameters=Copy-PlotValue $step.Definition.Parameters
         foreach ($rule in $parameters.Values) { if ($rule.ContainsKey('Secret') -and $rule.Secret) { $rule.Remove('Default') } }
         $platform='Any'; if ($step.Package.Manifest.ContainsKey('Platform')) { $platform=$step.Package.Manifest.Platform }
         $tools=@(); if ($step.Package.Manifest.ContainsKey('RequiresCommands')) {
-            $tools=@(foreach ($name in $step.Package.Manifest.RequiresCommands) { [pscustomobject]@{Name=$name;Available=($null -ne (Get-Command $name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1))} })
+            $tools=@(foreach ($name in $step.Package.Manifest.RequiresCommands) {
+                if (-not $commands.ContainsKey($name)) { $commands[$name]=($null -ne (Get-Command $name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1)) }
+                [pscustomobject]@{Name=$name;Available=$commands[$name]}
+            })
         }
         if ($step.Package.Manifest.ContainsKey('RequiresModules')) {
-            $tools+=@(foreach ($name in $step.Package.Manifest.RequiresModules) { [pscustomobject]@{Name="PowerShell module: $name";Available=($null -ne (Get-Module -ListAvailable -Name $name | Select-Object -First 1))} })
+            $tools+=@(foreach ($name in $step.Package.Manifest.RequiresModules) {
+                if (-not $modules.ContainsKey($name)) { $modules[$name]=($null -ne (Get-Module -ListAvailable -Name $name | Select-Object -First 1)) }
+                [pscustomobject]@{Name="PowerShell module: $name";Available=$modules[$name]}
+            })
         }
         $outputs=@{}; if ($step.Definition.ContainsKey('Outputs')) { $outputs=Copy-PlotValue $step.Definition.Outputs }
         $description=$step.Id; if ($step.Definition.ContainsKey('Description')) { $description=$step.Definition.Description }
