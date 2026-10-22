@@ -15,7 +15,9 @@ import {
   setMember,
   setPlotSteps,
   createPlot,
+  hydrateWizard,
   type JsonObject,
+  type Wizard,
 } from "./model";
 import { isLosslessNumber, stringifyJson } from "./json";
 
@@ -242,5 +244,40 @@ describe("source-layer editing without configuration resolution", () => {
     });
     expect(JSON.stringify(result)).not.toContain('"With"');
     expect(JSON.stringify(result)).not.toContain('"Steps"');
+  });
+});
+
+describe("saved wizard settings", () => {
+  it("keeps exact answer keys while resolving case-insensitive settings and preserving explicit values", () => {
+    const wizard: Wizard = { title: "Example", description: "", plot: "install", groups: [{ id: "settings", title: "Settings", fields: [
+      { key: "target", label: "First", type: "string", settingPath: "values.first", default: "fallback" },
+      { key: "Target", label: "Second", type: "string", settingPath: "Values.Second", default: "fallback" },
+      { key: "__proto__", label: "Null", type: "string", settingPath: "Values.Nil", default: "fallback" },
+      { key: "enabled", label: "Enabled", type: "bool", settingPath: "Values.Enabled", default: true },
+      { key: "count", label: "Count", type: "int", settingPath: "Values.Count", default: 5 },
+      { key: "items", label: "Items", type: "array", settingPath: "Values.Items", default: ["fallback"] },
+    ] }] };
+    const result = hydrateWizard(wizard, { Values: { First: "first", Second: "second", Nil: null, Enabled: false, Count: 0, Items: [] } });
+    expect(Object.keys(result.values)).toEqual(["target", "Target", "__proto__", "enabled", "count", "items"]);
+    expect(result.values).toMatchObject({ target: "first", Target: "second", enabled: false, count: 0, items: [] });
+    expect(result.values.__proto__).toBeNull();
+    expect(Object.getPrototypeOf(result.values)).toBe(Object.prototype);
+  });
+
+  it("does not resolve or expose references from saved ancestors, nested values or defaults", () => {
+    const wizard: Wizard = { title: "Example", description: "", plot: "install", groups: [{ id: "settings", title: "Settings", fields: [
+      { key: "ancestor", label: "Ancestor", type: "string", settingPath: "Alias.Child", default: "fallback" },
+      { key: "nested", label: "Nested", type: "array", settingPath: "Values.Items" },
+      { key: "default", label: "Default", type: "string", settingPath: "Missing", default: { $env: "PRIVATE" } },
+    ] }] };
+    const result = hydrateWizard(wizard, { Alias: { $ref: "settings.Other" }, Values: { Items: [{ $env: "PRIVATE" }] } });
+    expect(result).toEqual({ values: {}, referenced: ["ancestor", "nested", "default"] });
+  });
+
+  it("preserves a target-layer reference even when an environment shadows it with a literal", () => {
+    const wizard: Wizard = { title: "Example", description: "", plot: "install", groups: [{ id: "settings", title: "Settings", fields: [
+      { key: "message", label: "Message", type: "string", settingPath: "Sample.Message" },
+    ] }] };
+    expect(hydrateWizard(wizard, { Sample: { Message: "environment literal" } }, { Sample: { Message: { $env: "PRIVATE" } } })).toEqual({ values: {}, referenced: ["message"] });
   });
 });

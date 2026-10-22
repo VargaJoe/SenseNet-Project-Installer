@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { pretty, object, type Json, type Parameter } from "./model";
 import {
   isLosslessNumber,
@@ -103,6 +103,7 @@ export function ParameterField({
   schema,
   value,
   onChange,
+  onValidityChange,
   references = [],
   disabled = false,
 }: {
@@ -110,6 +111,7 @@ export function ParameterField({
   schema: Parameter;
   value: Json | undefined;
   onChange: (value: Json | undefined) => void;
+  onValidityChange?: (valid: boolean) => void;
   references?: string[];
   disabled?: boolean;
 }) {
@@ -117,14 +119,22 @@ export function ParameterField({
   const [text, setText] = useState(pretty(value) ?? "");
   const [error, setError] = useState("");
   const id = useId();
+  const validity = useRef(onValidityChange);
+  validity.current = onValidityChange;
+  const savedText = pretty(value);
+  const report = (message = "") => {
+    setError(message);
+    validity.current?.(!message);
+  };
   useEffect(() => {
     setMode(modeOf(value));
     setText(pretty(value) ?? "");
     setError("");
-  }, [value]);
+    validity.current?.(true);
+  }, [name, savedText]);
   const changeMode = (next: ValueMode) => {
     setMode(next);
-    setError("");
+    report();
     switch (next) {
       case "inherit":
         onChange(undefined);
@@ -257,22 +267,24 @@ export function ParameterField({
               max={schema.Maximum}
               step={schema.Type === "int" ? 1 : undefined}
               value={
+                schema.Type === "int" ? text :
                 typeof value === "string" || typeof value === "number"
                   ? value
                   : ""
               }
               onChange={(e) => {
                 if (schema.Type === "int") {
+                  setText(e.target.value);
                   if (e.target.value !== "") {
                     try {
                       onChange(numberInput(e.target.value));
-                      setError("");
+                      report();
                     } catch {
-                      setError(
+                      report(
                         "Enter a complete JSON number. The last valid value is retained.",
                       );
                     }
-                  }
+                  } else report("Enter a complete JSON number, or choose Inherited / omitted to remove it.");
                 } else onChange(e.target.value);
               }}
               disabled={disabled}
@@ -289,14 +301,14 @@ export function ParameterField({
           disabled={disabled}
           onChange={(e) => {
             setText(e.target.value);
-            setError("Unapplied JSON. Finish the value and leave this field.");
+            report("Unapplied JSON. Finish the value and leave this field.");
           }}
           onBlur={() => {
             try {
               onChange(parseJson<Json>(text));
-              setError("");
+              report();
             } catch {
-              setError(
+              report(
                 "Invalid JSON. The last valid value is retained; correct this field before saving.",
               );
             }

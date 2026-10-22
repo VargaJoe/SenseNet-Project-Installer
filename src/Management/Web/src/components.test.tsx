@@ -6,6 +6,33 @@ import { stringifyJson } from "./json";
 
 afterEach(cleanup);
 describe("schema-driven parameters", () => {
+  it("reports unapplied/invalid JSON and retains it across equivalent cloned values until corrected", () => {
+    const valid = vi.fn(), change = vi.fn();
+    const { rerender } = render(<ParameterField name="Items" schema={{ Type: "array" }} value={[]} onChange={change} onValidityChange={valid} />);
+    const input = screen.getByLabelText("Items JSON value");
+    fireEvent.change(input, { target: { value: "[invalid" } });
+    expect(valid).toHaveBeenLastCalledWith(false);
+    rerender(<ParameterField name="Items" schema={{ Type: "array" }} value={[]} onChange={change} onValidityChange={valid} />);
+    expect(input).toHaveValue("[invalid");
+    expect(valid).toHaveBeenLastCalledWith(false);
+    fireEvent.blur(input);
+    expect(valid).toHaveBeenLastCalledWith(false);
+    fireEvent.change(input, { target: { value: "[]" } });
+    fireEvent.blur(input);
+    expect(valid).toHaveBeenLastCalledWith(true);
+  });
+
+  it("reports a cleared integer and clears its error after an explicit source change", () => {
+    const valid = vi.fn();
+    render(<ParameterField name="Count" schema={{ Type: "int" }} value={2} onChange={() => {}} onValidityChange={valid} />);
+    fireEvent.change(screen.getByLabelText("Count"), { target: { value: "" } });
+    expect(screen.getByLabelText("Count")).toHaveValue(null);
+    expect(valid).toHaveBeenLastCalledWith(false);
+    fireEvent.change(screen.getByLabelText("Count value source"), { target: { value: "inherit" } });
+    expect(valid).toHaveBeenLastCalledWith(true);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   it("edits an unsafe numeric scalar as exact JSON instead of exposing wrapper fields or rounding", () => {
     const change = vi.fn();
     const value = parseObject('{"precise":9007199254740993}').precise;

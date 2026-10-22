@@ -154,6 +154,40 @@ export interface Wizard {
   layer?: string;
   groups: { id: string; title: string; fields: WizardField[] }[];
 }
+// Hydrate only from the engine's saved merged document. References stay opaque:
+// resolving them here could expose a runner secret or flatten a portable binding.
+export function hydrateWizard(wizard: Wizard, configuration: JsonObject, targetLayer?: JsonObject) {
+  const values: JsonObject = {};
+  const referenced: string[] = [];
+  const hasReference = (value: Json): boolean =>
+    Array.isArray(value)
+      ? value.some(hasReference)
+      : object(value) &&
+        (Object.keys(value).some((key) => ["$env", "$ref"].includes(key.toLowerCase())) ||
+          Object.values(value).some(hasReference));
+  const lookup = (data: JsonObject, path: string) => {
+    let value: Json | undefined = data;
+    for (const part of path.split(".")) {
+      if (object(value) && Object.keys(value).some((key) => ["$env", "$ref"].includes(key.toLowerCase())))
+        return { reference: true, value: undefined };
+      value = object(value) ? member(value, part) : undefined;
+    }
+    return { value, reference: value !== undefined && hasReference(value) };
+  };
+  for (const field of wizard.groups.flatMap((group) => group.fields)) {
+    const saved = lookup(configuration, field.settingPath || "");
+    let value = saved.value;
+    if (value === undefined && Object.hasOwn(field, "default")) value = field.default;
+    if (saved.reference || (targetLayer && lookup(targetLayer, field.settingPath || "").reference) || (value !== undefined && hasReference(value))) {
+      referenced.push(field.key);
+      continue;
+    }
+    if (value !== undefined) Object.defineProperty(values, field.key, {
+      value: clone(value), writable: true, enumerable: true, configurable: true,
+    });
+  }
+  return { values, referenced };
+}
 export const active = (run?: Run) =>
   !!run && ["Queued", "Running"].includes(run.status);
 // Native PowerShell dictionaries are case insensitive. Keep source spelling on writes.
