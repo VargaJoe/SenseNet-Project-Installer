@@ -57,14 +57,15 @@ internal static class ManagementTests
     public static async Task<int> Main(string[] args)
     {
         var repository = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../"));
-        var enginePath = Path.Combine(repository, "src/Deployment/Scripts");
+        var enginePath = Path.GetFullPath(Path.Combine(repository, "src/Deployment/Scripts"));
         var temporary = Path.Combine(Path.GetTempPath(), "PlotManager-BackendTests-" + Guid.NewGuid().ToString("N"));
         var state = Path.Combine(temporary, "state");
         diagnosticState = state;
         var projectRoot = Path.Combine(temporary, "projects");
         var token = "integration-only-" + Guid.NewGuid().ToString("N");
         var bobToken = "other-operator-" + Guid.NewGuid().ToString("N");
-        var config = new Dictionary<string, string?> { ["urls"] = "http://127.0.0.1:0", ["PLOTMANAGER_MODE"] = "local", ["PLOTMANAGER_TOKEN"] = token, ["PLOTMANAGER_DATA"] = state, ["PLOTMANAGER_PROJECT_ROOT"] = projectRoot, ["PLOTMANAGER_ENGINE"] = enginePath, ["Logging:LogLevel:Default"] = "Warning", ["Logging:LogLevel:PlotManager.Server.RunManager"] = "Information" };
+        var configuredEngine = OperatingSystem.IsWindows() ? @"\\?\" + enginePath : enginePath;
+        var config = new Dictionary<string, string?> { ["urls"] = "http://127.0.0.1:0", ["PLOTMANAGER_MODE"] = "local", ["PLOTMANAGER_TOKEN"] = token, ["PLOTMANAGER_DATA"] = state, ["PLOTMANAGER_PROJECT_ROOT"] = projectRoot, ["PLOTMANAGER_ENGINE"] = configuredEngine, ["Logging:LogLevel:Default"] = "Warning", ["Logging:LogLevel:PlotManager.Server.RunManager"] = "Information" };
         WebApplication? app = null;
         try
         {
@@ -77,6 +78,18 @@ internal static class ManagementTests
             app = global::Program.Build(Array.Empty<string>(), config);
             app.Services.GetRequiredService<ServiceSettings>().Users["bob"] = bobToken;
             await app.StartAsync();
+            if (OperatingSystem.IsWindows())
+            {
+                using var nativePathClient = Client(app, token);
+                var nativeCatalog = await Json(await nativePathClient.GetAsync("/api/catalog"));
+                Check(nativeCatalog["engine"]!["Steps"]!.AsArray().Count == 49, "verbatim local engine directory executes the real worker catalog without changing PowerShell policy");
+            }
+            else Console.WriteLine("SKIP Windows verbatim-drive engine path regression on this OS.");
+            if (args.Contains("--engine-path-only", StringComparer.Ordinal))
+            {
+                Console.WriteLine($"{checks}/{checks} targeted native engine path assertions passed.");
+                return 0;
+            }
             using var client = Client(app);
             Check((await client.GetAsync("/api/health")).IsSuccessStatusCode, "health is public");
             Check((await client.GetAsync("/api/projects")).StatusCode == HttpStatusCode.Unauthorized, "projects require authentication");

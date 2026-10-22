@@ -51,7 +51,24 @@ public sealed class ServiceSettings
             if (token.Length < 24) throw new InvalidOperationException("The local bootstrap token must have at least 24 characters.");
             users["local"] = token;
         }
-        return new ServiceSettings { Mode = mode, DataDirectory = data, ProjectRoot = root, EngineDirectory = Path.GetFullPath(Get("PLOTMANAGER_ENGINE", defaultEngine)), PowerShell = Get("PLOTMANAGER_PWSH", "pwsh"), Users = users };
+        return new ServiceSettings { Mode = mode, DataDirectory = data, ProjectRoot = root, EngineDirectory = PowerShellEnginePath(Get("PLOTMANAGER_ENGINE", defaultEngine)), PowerShell = Get("PLOTMANAGER_PWSH", "pwsh"), Users = users };
+    }
+
+    private static string PowerShellEnginePath(string path)
+    {
+        var full = Path.GetFullPath(path);
+        // Tauri can return a verbatim local drive path. PowerShell's file
+        // authorization rejects that spelling even for an ordinary local file.
+        // Normalize only local drive paths; keep real UNC trust semantics and
+        // the configured execution policy unchanged.
+        if (OperatingSystem.IsWindows() && full.Length >= 7 && full.StartsWith(@"\\?\", StringComparison.Ordinal) && char.IsAsciiLetter(full[4]) && full[5] == ':' && full[6] == '\\')
+        {
+            var ordinary = full[4..];
+            if (ordinary[3..].Split('\\').Any(part => part.EndsWith('.') || part.EndsWith(' ')))
+                throw new InvalidOperationException("The PowerShell engine directory must use ordinary Windows path components.");
+            return Path.GetFullPath(ordinary);
+        }
+        return full;
     }
 
     public static void PrivateDirectory(string path)
