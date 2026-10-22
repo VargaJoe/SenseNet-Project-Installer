@@ -14,6 +14,10 @@ projects, explicit configuration layers, ordered plots, a generic guided install
 and durable native-engine runs. See [build, desktop packaging and deployment](docs/management-deployment.md),
 the [user guide](docs/management-user-guide.md) and [architecture](docs/management-architecture.md).
 
+The portable [SenseNet Docker project](examples/sensenet-docker/README.md) adds a
+guided local installation with persistent SQL/repository data, authenticated
+verification, lifecycle commands and checked backup/restore using the same engine.
+
 ## Run a plot
 
 Requires PowerShell 5.1 or PowerShell 7. The engine, text package and filesystem package do not require administrator privileges or external modules. IIS steps require Windows and WebAdministration when executed.

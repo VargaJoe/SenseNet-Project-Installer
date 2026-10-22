@@ -165,6 +165,12 @@ project. Do not select an existing application directory for a disposable test.
 
 ## Files, secrets, and certificates
 
+For a complete application-specific project, see the [SenseNet Docker
+example](../examples/sensenet-docker/README.md). It has a declarative setup wizard,
+native Compose lifecycle plots, real PKCE login verification, persistent volumes
+and confirmed local backup/restore. Copy its whole directory into the runner's
+project root and Open it; do not copy its generated `.local` credentials.
+
 **Browse on the runner** lists paths on the service host within its allowed root.
 It transfers nothing. **Upload a file from this computer** deliberately copies a
 browser-selected file into the project’s `uploads/` directory on the service host
