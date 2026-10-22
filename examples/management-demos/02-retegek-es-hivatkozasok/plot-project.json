@@ -1,0 +1,14 @@
+{
+  "formatVersion": 1,
+  "configuration": {
+    "default": "default.json",
+    "project": "project.json",
+    "environments": {
+      "development": "environments/development.json",
+      "production": "environments/production.json"
+    }
+  },
+  "name": "02 \u2013 R\u00E9tegek, t\u00EDpusok \u00E9s hivatkoz\u00E1sok",
+  "description": "Default \u2192 projekt \u2192 development/production. A development r\u00E9teg false, 0, null \u00E9s [] \u00E9rt\u00E9keit \u0151rzi; a hibas-sorrend plot statikusan elutas\u00EDtand\u00F3 p\u00E9lda.",
+  "demoVersion": 1
+}

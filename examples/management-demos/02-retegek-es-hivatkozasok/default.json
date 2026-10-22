@@ -1,0 +1,78 @@
+{
+  "Plots": {
+    "show-settings": {
+      "Steps": [
+        {
+          "With": {
+            "Value": {
+              "$ref": "settings.Demo"
+            },
+            "Overwrite": true,
+            "Path": {
+              "$ref": "settings.Demo.Target"
+            }
+          },
+          "Id": "export",
+          "Step": "json.write"
+        },
+        {
+          "With": {
+            "Path": {
+              "$ref": "steps.export.Output.Path"
+            }
+          },
+          "Id": "read",
+          "Step": "json.read"
+        }
+      ]
+    },
+    "hibas-sorrend": {
+      "Steps": [
+        {
+          "With": {
+            "Path": {
+              "$ref": "steps.export.Output.Path"
+            }
+          },
+          "Id": "read",
+          "Step": "json.read"
+        },
+        {
+          "With": {
+            "Value": {
+              "$ref": "settings.Demo"
+            },
+            "Overwrite": true,
+            "Path": {
+              "$ref": "settings.Demo.Target"
+            }
+          },
+          "Id": "export",
+          "Step": "json.write"
+        }
+      ]
+    }
+  },
+  "Demo": {
+    "Enabled": true,
+    "Optional": "\u00F6r\u00F6k\u00F6lt \u00E9rt\u00E9k",
+    "Nested": {
+      "DefaultOnly": "megmarad",
+      "Switched": "default"
+    },
+    "Message": "Alap\u00E9rtelmezett \u00FCzenet",
+    "Target": "settings-result.json",
+    "Items": [
+      "egy",
+      "kett\u0151"
+    ],
+    "Attempts": 3,
+    "Scope": "default"
+  },
+  "VendorMetadata": {
+    "FutureInteger": 9007199254740993,
+    "UnknownFeature": {
+      "Preserve": true
+    }
+  }
+}

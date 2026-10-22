@@ -1,5 +1,10 @@
 # Plot Manager workspace
 
+For the complete Hungarian guide with every page, button and panel, see the
+[Hungarian documentation entry point](management-guide-index-hu.md),
+[GUI manual](management-user-guide-hu.md) and
+[four demo projects with all plots and steps](management-demo-projects-hu.md).
+
 The same React application is used by the desktop window and the browser. It
 connects only to its own ASP.NET service. The runner card and project context show
 the actual service host, operating system, and execution identity. In hosted mode,

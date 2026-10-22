@@ -6,6 +6,10 @@ The repository's historical name, **SenseNet-Project-Installer**, describes its 
 
 Documentation: [guide index](docs/README.md), [component and migration map](docs/migration-map.md).
 
+**Magyar felhasználói dokumentáció:** [olvasási sorrend és GitHub-áttekintés](docs/management-guide-index-hu.md),
+[a GUI teljes használata](docs/management-user-guide-hu.md),
+[a négy demó összes forgatókönyve és lépése](docs/management-demo-projects-hu.md).
+
 ## Shared management application
 
 The React/TypeScript management UI runs in a local browser, on an authenticated
