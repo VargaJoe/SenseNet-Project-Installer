@@ -75,7 +75,16 @@ if ($Desktop) {
     try {
         Invoke-Checked npm @('ci')
         if ($WindowsCross) {
-            Invoke-Checked npm @('run','build','--','--runner','cargo-xwin','--target','x86_64-pc-windows-msvc','--bundles','nsis','--','--locked')
+            $previousArch = [Environment]::GetEnvironmentVariable('XWIN_ARCH', 'Process')
+            $previousVariant = [Environment]::GetEnvironmentVariable('XWIN_VARIANT', 'Process')
+            try {
+                if ([string]::IsNullOrWhiteSpace($previousArch)) { $env:XWIN_ARCH = 'x86_64' }
+                if ([string]::IsNullOrWhiteSpace($previousVariant)) { $env:XWIN_VARIANT = 'desktop' }
+                Invoke-Checked npm @('run','build','--','--runner','cargo-xwin','--target','x86_64-pc-windows-msvc','--bundles','nsis','--','--locked')
+            } finally {
+                [Environment]::SetEnvironmentVariable('XWIN_ARCH', $previousArch, 'Process')
+                [Environment]::SetEnvironmentVariable('XWIN_VARIANT', $previousVariant, 'Process')
+            }
         } else {
             $bundle = if ($IsWindows) { 'nsis' } else { 'deb' }
             Invoke-Checked npm @('run','build','--','--bundles',$bundle,'--','--locked')

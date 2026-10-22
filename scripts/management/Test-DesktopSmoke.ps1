@@ -19,24 +19,50 @@ $start.ArgumentList.Add('--smoke-test')
 $start.WorkingDirectory = Split-Path -Parent $Executable
 $start.UseShellExecute = $false
 $start.CreateNoWindow = $true
+$start.RedirectStandardError = $true
 $start.Environment['PLOTMANAGER_DESKTOP_SMOKE_OUTPUT'] = $smokeOutput
 $start.Environment['PLOTMANAGER_DESKTOP_SMOKE_DATA'] = Join-Path $testRoot 'data'
+if ($IsWindows) { $start.Environment['WEBVIEW2_USER_DATA_FOLDER'] = Join-Path $testRoot 'webview' }
 $desktop = $null
+$failureDetails = $null
 try {
     $desktop = [Diagnostics.Process]::Start($start)
+    $errorOutput = $desktop.StandardError.ReadToEndAsync()
     if (-not $desktop.WaitForExit(90000)) { $desktop.Kill($true); $desktop.WaitForExit(); throw 'Native desktop smoke exceeded 90 seconds.' }
-    if ($desktop.ExitCode -ne 0) { throw "Native desktop smoke exited with code $($desktop.ExitCode)." }
+    if ($desktop.ExitCode -ne 0) {
+        $details = $errorOutput.GetAwaiter().GetResult()
+        if ($details.Length -gt 2000) { $details = $details.Substring($details.Length - 2000) }
+        throw "Native desktop smoke exited with code $($desktop.ExitCode). $details"
+    }
     if (-not (Test-Path -LiteralPath $smokeOutput)) { throw 'Native desktop did not write its smoke result.' }
     $result = Get-Content -LiteralPath $smokeOutput -Raw | ConvertFrom-Json
     if (-not $result.webviewReady -or -not $result.serviceStopped -or $result.protocolVersion -ne 1) { throw 'Native WebView, authenticated session or owned-service shutdown failed.' }
     $evidence = [ordered]@{ os=[Runtime.InteropServices.RuntimeInformation]::OSDescription; architecture=[Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString(); executableSha256=(Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant(); checkedAt=[DateTime]::UtcNow.ToString('o'); result=$result }
     $evidence | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $ResultPath -Encoding utf8
     Write-Host "Native desktop WebView, authenticated UI and service shutdown passed: $ResultPath"
+} catch {
+    $failureDetails = $_.Exception.Message
+    if (Test-Path -LiteralPath $smokeOutput) {
+        $nativeResult = Get-Content -LiteralPath $smokeOutput -Raw
+        $failureDetails += " Native result: $nativeResult"
+    }
+    throw $failureDetails
 } finally {
     if ($desktop -and -not $desktop.HasExited) { $desktop.Kill($true); $desktop.WaitForExit() }
     if ($desktop) { $desktop.Dispose() }
     $resolved = [IO.Path]::GetFullPath($testRoot)
     $temp = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
     if (-not $resolved.StartsWith($temp, [StringComparison]::OrdinalIgnoreCase) -or (Split-Path -Leaf $resolved) -notmatch '^plot-manager-desktop-[a-f0-9]{32}$') { throw 'Refusing cleanup outside the owned test directory.' }
-    Remove-Item -LiteralPath $resolved -Recurse -Force
+    # WebView2 can retain its cookie database briefly after its parent exits.
+    $cleanupDeadline = [DateTime]::UtcNow.AddSeconds(10)
+    while (Test-Path -LiteralPath $resolved) {
+        try { Remove-Item -LiteralPath $resolved -Recurse -Force -ErrorAction Stop; break }
+        catch {
+            if ([DateTime]::UtcNow -ge $cleanupDeadline) {
+                if ($failureDetails) { throw "$failureDetails Cleanup failure: $($_.Exception.Message)" }
+                throw
+            }
+            Start-Sleep -Milliseconds 200
+        }
+    }
 }
