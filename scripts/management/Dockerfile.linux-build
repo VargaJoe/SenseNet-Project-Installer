@@ -1,0 +1,14 @@
+# Optional isolated Ubuntu 24.04 verifier. No host SDK or system packages are changed.
+FROM node:20.20.0-bookworm-slim AS node
+FROM rust:1.99.1-slim-bookworm AS rust
+FROM mcr.microsoft.com/dotnet/sdk:8.0-noble
+COPY --from=node /usr/local/ /usr/local/
+COPY --from=rust /usr/local/cargo/ /usr/local/cargo/
+COPY --from=rust /usr/local/rustup/ /usr/local/rustup/
+ENV CARGO_HOME=/usr/local/cargo RUSTUP_HOME=/usr/local/rustup PATH=/usr/local/cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev \
+    libayatana-appindicator3-dev librsvg2-dev xvfb xauth dbus-x11 git \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /workspace
+CMD ["pwsh", "-NoProfile"]

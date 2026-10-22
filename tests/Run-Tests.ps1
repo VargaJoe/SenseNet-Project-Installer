@@ -17,7 +17,11 @@ function Assert-Throws([scriptblock]$Action, [string]$Pattern) {
     try { & $Action | Out-Null } catch { $caught = $_.Exception.Message }
     if ($null -eq $caught -or $caught -notlike $Pattern) { throw "Expected error '$Pattern'; got '$caught'." }
 }
-function Test-Case([string]$Name, [scriptblock]$Action) {
+function Test-Case([string]$Name, [scriptblock]$Action, [switch]$WindowsOnly) {
+    if ($WindowsOnly -and [Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
+        $results.Add([pscustomobject]@{Test=$Name;Status='SKIP';Error='Requires Windows.'})
+        return
+    }
     try { & $Action; $results.Add([pscustomobject]@{ Test=$Name; Status='PASS'; Error=$null }) }
     catch { $results.Add([pscustomobject]@{ Test=$Name; Status='FAIL'; Error=$_.Exception.Message }) }
 }
@@ -209,6 +213,15 @@ try {
         $path = Join-Path $folder 'package.psd1'
         (Get-Content -LiteralPath $path -Raw).Replace("RootModule='Fixture.a.psm1'", "RootModule='../elsewhere.psm1'") | Set-Content -LiteralPath $path
         Assert-Throws { New-PlotRegistry $auto } '*escapes its package*'
+        if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
+            $caseRoot = Join-Path $testRoot 'case-boundary'
+            $folder = New-TestPackage $caseRoot Case first
+            $null = [IO.Directory]::CreateDirectory((Join-Path $caseRoot 'case'))
+            Copy-Item -LiteralPath (Join-Path $folder 'Fixture.Case.psm1') -Destination (Join-Path $caseRoot 'case/foreign.psm1')
+            $manifestPath = Join-Path $folder 'package.psd1'
+            (Get-Content -LiteralPath $manifestPath -Raw).Replace('Fixture.Case.psm1','../case/foreign.psm1') | Set-Content -LiteralPath $manifestPath
+            Assert-Throws { New-PlotRegistry $caseRoot } '*escapes its package*'
+        }
     }
     Test-Case 'Secret parameters are redacted from failure results' {
         $auto = Join-Path $testRoot 'secret'
@@ -221,7 +234,7 @@ try {
             Assert-True (-not $result.Steps[0].Error.Contains('synthetic-test-secret'))
         } finally { Remove-PlotRegistry $secretRegistry }
     }
-    Test-Case 'IIS mock transitions reread states and use correct order' {
+    Test-Case 'IIS mock transitions reread states and use correct order' -WindowsOnly {
         $iis = $registry.Packages.iis.Module
         & $iis {
             $script:fake = @{Site='Stopped';Pool='Stopped';Calls=[Collections.Generic.List[string]]::new()}
@@ -237,13 +250,13 @@ try {
         Assert-Equal $result.Status 'Succeeded'
         Assert-Equal (& $iis { $script:fake.Calls -join ',' }) 'start-pool,start-site,stop-site,stop-pool'
     }
-    Test-Case 'Direct IIS WhatIf performs no operations' {
+    Test-Case 'Direct IIS WhatIf performs no operations' -WindowsOnly {
         $iis = $registry.Packages.iis.Module
         & $iis { $script:fake.Calls.Clear() }
         & $registry.Steps['iis.start'].Command -Settings @{WebsiteName='demo'} -Context @{} -WhatIf
         Assert-Equal (& $iis { $script:fake.Calls.Count }) 0
     }
-    Test-Case 'Missing IIS website fails explicitly' {
+    Test-Case 'Missing IIS website fails explicitly' -WindowsOnly {
         $iis = $registry.Packages.iis.Module
         & $iis { function script:Get-Website { [CmdletBinding()]param($Name) return $null } }
         $result = Invoke-Plot $registry (New-Config @(@{Step='iis.start';With=@{WebsiteName='missing'}})) demo
@@ -306,7 +319,7 @@ try {
         Assert-Throws { Invoke-Plot $registry $config demo } '*must be array*'
         Assert-True (-not (Test-Path -LiteralPath $path))
     }
-    Test-Case 'IIS timeout is bounded and reports the target' {
+    Test-Case 'IIS timeout is bounded and reports the target' -WindowsOnly {
         $iis = $registry.Packages.iis.Module
         & $iis {
             function script:Get-Website { [CmdletBinding()]param($Name) [pscustomobject]@{Name=$Name;State='Stopped'} }
@@ -343,7 +356,7 @@ try {
         Assert-Equal $LASTEXITCODE 1
         Assert-Equal (($output -join [Environment]::NewLine)|ConvertFrom-Json).Status 'Failed'
     }
-    Test-Case 'Legacy help lists historical steps without running them' {
+    Test-Case 'Legacy help lists historical steps without running them' -WindowsOnly {
         $output = & (Get-Process -Id $PID).Path -NoProfile -NonInteractive -File (Join-Path $scriptsPath 'Run.ps1') -Legacy -Help steps
         Assert-Equal $LASTEXITCODE 0
         Assert-True (($output -join ' ') -like '*backupdb*')
@@ -353,6 +366,7 @@ try {
     . (Join-Path $PSScriptRoot 'Operations.Tests.ps1')
     . (Join-Path $PSScriptRoot 'References.Tests.ps1')
     . (Join-Path $PSScriptRoot 'Platform.Tests.ps1')
+    . (Join-Path $PSScriptRoot 'Management.Tests.ps1')
 } finally {
     if ($null -ne $registry) { Remove-PlotRegistry $registry }
     $resolved = [IO.Path]::GetFullPath($testRoot)
@@ -362,6 +376,8 @@ try {
 }
 $results | Format-Table -AutoSize -Wrap
 $failed = @($results | Where-Object Status -eq 'FAIL')
-Write-Output "PowerShell $($PSVersionTable.PSVersion): $($results.Count - $failed.Count)/$($results.Count) tests passed."
+$skipped = @($results | Where-Object Status -eq 'SKIP')
+$passed = @($results | Where-Object Status -eq 'PASS')
+Write-Output "PowerShell $($PSVersionTable.PSVersion): $($passed.Count)/$($results.Count - $skipped.Count) tests passed; $($skipped.Count) skipped."
 if ($failed.Count) { exit 1 }
 exit 0

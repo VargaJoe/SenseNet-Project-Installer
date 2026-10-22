@@ -59,7 +59,8 @@ function Read-PlotConfiguration {
         Write-Verbose "Configuration layer: $([IO.Path]::GetFullPath($file))"
         $json = Get-Content -LiteralPath $file -Raw -Encoding UTF8 -ErrorAction Stop
         if ([string]::IsNullOrWhiteSpace($json) -or -not $json.TrimStart().StartsWith('{')) { throw "Configuration must be a JSON object: $file" }
-        $configuration = Copy-PlotValue (ConvertFrom-PlotJsonText $json)
+        try { $configuration = Copy-PlotValue (ConvertFrom-PlotJsonText $json) }
+        catch { throw "Invalid JSON in configuration file: $file" }
         if ($configuration -isnot [hashtable]) { throw "Configuration must be a JSON object: $file" }
         $merged = Merge-PlotSettings -Layers @($merged, $configuration)
     }
@@ -77,7 +78,8 @@ function Resolve-PackagePath {
     if ([IO.Path]::IsPathRooted($RelativePath)) { throw 'RootModule must be relative to its package.' }
     $rootPath = [IO.Path]::GetFullPath($Root).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
     $path = [IO.Path]::GetFullPath((Join-Path $Root $RelativePath))
-    if (-not $path.StartsWith($rootPath, [StringComparison]::OrdinalIgnoreCase)) { throw 'RootModule escapes its package.' }
+    $comparison = if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
+    if (-not $path.StartsWith($rootPath, $comparison)) { throw 'RootModule escapes its package.' }
     if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or [IO.Path]::GetExtension($path) -ne '.psm1') {
         throw "Package module not found or not a .psm1 file: $path"
     }
@@ -316,7 +318,7 @@ function Update-PlotSources {
 function Get-PlotPlan {
     [CmdletBinding()]
     param([Parameter(Mandatory)]$Registry, [Parameter(Mandatory)][hashtable]$Configuration,
-        [Parameter(Mandatory)][string]$Plot, [hashtable]$Overrides = @{})
+        [Parameter(Mandatory)][string]$Plot, [hashtable]$Overrides = @{}, [string]$InvocationId)
     $plots = Get-PlotMember $Configuration 'Plots' @{}
     if (-not $plots.ContainsKey($Plot)) { throw "Plot '$Plot' does not exist." }
     $plotDefinition = $plots[$Plot]
@@ -363,12 +365,19 @@ function Get-PlotPlan {
             Update-PlotSources $sources $layers[$i] $labels[$i]
         }
         $settings = Merge-PlotSettings -Layers $layers
+        $rawSettings = Copy-PlotValue $settings
         $settings = Resolve-PlotValue $settings $roots $previousIds -Preflight
-        $null = Convert-StepParameters $settings $step.Definition.Parameters $id -Preflight
-        $plan.Add([pscustomobject]@{ Id=$id; Step=$step; Settings=$settings; Sources=$sources; PreviousIds=@($previousIds) })
+        $settings = Convert-StepParameters $settings $step.Definition.Parameters $id -Preflight
+        $plan.Add([pscustomobject]@{ Id=$id; Index=($index-1); Step=$step; Settings=$settings; RawSettings=$rawSettings; Sources=$sources; PreviousIds=@($previousIds) })
         $previousIds += $id
     }
     foreach ($id in $Overrides.Keys) { if (-not $ids.ContainsKey($id)) { throw "Override targets unknown invocation '$id'." } }
+    if ($InvocationId) {
+        $selected = @($plan | Where-Object { $_.Id -eq $InvocationId })
+        if ($selected.Count -ne 1) { throw "Invocation '$InvocationId' does not exist in plot '$Plot'." }
+        if (Test-DeferredValue $selected[0].Settings) { throw "Invocation '$InvocationId' requires earlier outputs. Run the full plot." }
+        return ,$selected
+    }
     return ,$plan.ToArray()
 }
 
@@ -380,13 +389,15 @@ function Invoke-Plot {
     [CmdletBinding(SupportsShouldProcess)]
     param([Parameter(Mandatory)]$Registry, [Parameter(Mandatory)][hashtable]$Configuration,
         [Parameter(Mandatory)][string]$Plot, [hashtable]$Overrides=@{},
-        [string]$WorkDirectory=(Get-Location).Path)
-    $plan = Get-PlotPlan -Registry $Registry -Configuration $Configuration -Plot $Plot -Overrides $Overrides
+        [string]$WorkDirectory=(Get-Location).Path,
+        [scriptblock]$OnEvent, [string]$InvocationId)
+    $plan = Get-PlotPlan -Registry $Registry -Configuration $Configuration -Plot $Plot -Overrides $Overrides -InvocationId $InvocationId
     $runId = [guid]::NewGuid().ToString()
     $results = [Collections.Generic.List[object]]::new()
     $roots = @{ settings=(Copy-PlotValue $Configuration); steps=@{} }
     $status = 'Succeeded'
     foreach ($invocation in $plan) {
+        if ($OnEvent) { $null = & $OnEvent ([pscustomobject]@{ Type='StepStarted'; InvocationId=$invocation.Id; Step=$invocation.Step.Id; Status='Running'; Timestamp=[DateTime]::UtcNow.ToString('o') }) }
         $timer = [Diagnostics.Stopwatch]::StartNew()
         $stepStatus = 'Succeeded'
         $outputValue = $null
@@ -427,6 +438,7 @@ function Invoke-Plot {
         } finally { $timer.Stop() }
         $result = [pscustomobject]@{ Id=$invocation.Id; Step=$invocation.Step.Id; Status=$stepStatus; Output=$outputValue; Error=$errorMessage; DurationMs=$timer.ElapsedMilliseconds }
         $results.Add($result)
+        if ($OnEvent) { $null = & $OnEvent ([pscustomobject]@{ Type='StepCompleted'; InvocationId=$invocation.Id; Step=$invocation.Step.Id; Status=$stepStatus; DurationMs=$timer.ElapsedMilliseconds; Timestamp=[DateTime]::UtcNow.ToString('o') }) }
         $roots.steps[$invocation.Id] = @{ Output=$outputValue; Status=$stepStatus }
         if ($stepStatus -eq 'Failed') { break }
     }

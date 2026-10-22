@@ -1,4 +1,4 @@
 @{ Name='web'; Version='1.0.0'; RootModule='Plot.Web.psm1';  Steps=@{
-'offline'=@{Command='Set-PlotWebOffline';Parameters=@{Directory=@{Type='string';Required=$true}; Content=@{Type='string';Default='Maintenance in progress.'}}}
-'online'=@{Command='Set-PlotWebOnline';Parameters=@{Directory=@{Type='string';Required=$true}}}
+'offline'=@{Command='Set-PlotWebOffline'; Description='Create an application maintenance marker.'; Outputs=@{Path=@{Description='Path on the runner, relative to its work directory unless absolute.'; Type='string'};Offline=@{Description='Offline (bool).'; Type='bool'}};Parameters=@{Directory=@{Description='Directory (string).'; Type='string';Required=$true}; Content=@{Description='Content to write; accepts a settings or earlier-output reference.'; Type='string';Default='Maintenance in progress.'}}}
+'online'=@{Command='Set-PlotWebOnline'; Description='Remove the application maintenance marker.'; Outputs=@{Path=@{Description='Path on the runner, relative to its work directory unless absolute.'; Type='string'};Offline=@{Description='Offline (bool).'; Type='bool'}};Parameters=@{Directory=@{Description='Directory (string).'; Type='string';Required=$true}}}
 }}

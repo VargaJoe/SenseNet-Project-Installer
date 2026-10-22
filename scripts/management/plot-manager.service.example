@@ -1,0 +1,20 @@
+[Unit]
+Description=Plot Manager authenticated management service
+After=network.target
+
+[Service]
+Type=simple
+User=plotmanager
+Group=plotmanager
+WorkingDirectory=/opt/plot-manager/service
+ExecStart=/opt/plot-manager/service/PlotManager.Server
+EnvironmentFile=/etc/plot-manager/service.env
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+# Step operations run as this identity. Grant only the tools, filesystem paths
+# and service rights needed by approved projects. Privilege is never elevated by UI.
+
+[Install]
+WantedBy=multi-user.target

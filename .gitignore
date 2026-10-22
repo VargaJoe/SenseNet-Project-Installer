@@ -14,3 +14,10 @@ src/WebSite/
 !tests/
 !tests/**
 tests/.work*/
+/artifacts/
+**/bin/
+**/obj/
+**/node_modules/
+tests/.management-*.log
+!scripts/management/Test-*.ps1
+!src/Management/Web/src/test-setup.ts

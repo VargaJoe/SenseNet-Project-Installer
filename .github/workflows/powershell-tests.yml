@@ -1,7 +1,6 @@
 name: Plot Manager tests
 on:
-  push:
-  pull_request:
+  # The owner permits manual runs only, including after quota renews.
   workflow_dispatch:
 permissions:
   contents: read

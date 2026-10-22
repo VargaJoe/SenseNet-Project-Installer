@@ -132,6 +132,7 @@ try {
             @{Step='iis.status';With=@{WebsiteName='demo'}},
             @{Step='web.offline';With=@{Directory=$testRoot}}
         )) {
+            if ($case.Step -like 'iis.*' -and [Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) { continue }
             $plan=Get-PlotPlan $registry (New-Config @(@{Step=$case.Step;With=$case.With})) demo
             $null=& $plan[0].Step.Command -Settings $plan[0].Settings -Context $context -WhatIf
         }
@@ -139,7 +140,7 @@ try {
         Assert-True (-not [IO.File]::Exists((Join-Path $testRoot 'app_offline.htm')))
     }
 } finally { & $sqlModule { param($original) Set-Item Function:script:Invoke-SqlCommand $original } $originalSql }
-Test-Case 'IIS provisioning uses dedicated pools and refuses existing site or binding' {
+Test-Case 'IIS provisioning uses dedicated pools and refuses existing site or binding' -WindowsOnly {
     # Use a separate module instance so earlier lifecycle test fixtures remain untouched.
     $iis=New-Module -ScriptBlock ([scriptblock]::Create([IO.File]::ReadAllText((Join-Path $scriptsPath 'Auto/Iis/Plot.Iis.psm1'))))
     & $iis {
@@ -210,11 +211,18 @@ Test-Case 'Request CLI returns machine-readable success and nonzero error status
     Assert-Equal $LASTEXITCODE 1
     Assert-Equal (($out -join [Environment]::NewLine | ConvertFrom-Json).Status) 'Failed'
 }
-Test-Case 'Platform scenarios preflight with dummy SQL credentials without calling providers' {
+Test-Case 'Platform scenarios preflight supported targets and reject Windows-only scenarios elsewhere' {
     $old=[Environment]::GetEnvironmentVariable('PLOT_SQL_CONNECTION'); $env:PLOT_SQL_CONNECTION='test-only'
     try {
         foreach ($file in @('compose.json','database.json','iis.json')) {
             $config=Read-PlotConfiguration (Join-Path $scriptsPath ('Examples/platform/'+$file))
+            if ($file -eq 'iis.json' -and [Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
+                foreach ($name in $config.Plots.Keys) {
+                    if (@($config.Plots[$name] | Where-Object { $_.Step -like 'iis.*' }).Count) { Assert-Throws { Get-PlotPlan $registry $config $name } '*requires Windows*' }
+                    else { Assert-True ((Get-PlotPlan $registry $config $name).Count -gt 0); Assert-Equal (Invoke-Plot $registry $config $name -WhatIf).Status 'Skipped' }
+                }
+                continue
+            }
             foreach ($name in $config.Plots.Keys) { Assert-True ((Get-PlotPlan $registry $config $name).Count -gt 0); Assert-Equal (Invoke-Plot $registry $config $name -WhatIf).Status 'Skipped' }
         }
     } finally { [Environment]::SetEnvironmentVariable('PLOT_SQL_CONNECTION',$old) }

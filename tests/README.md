@@ -1,5 +1,27 @@
 # Runtime regression tests
 
+The shared desktop/browser application adds a [management test harness](../docs/management-deployment.md#tests-and-evidence)
+and [manual acceptance guide](../docs/management-acceptance.md). Run
+`./scripts/management/Test-Management.ps1` in PowerShell 7 after installing the
+documented .NET/Node/Playwright prerequisites. It uses real isolated PowerShell
+workers and a real browser against a local service. Native WebView execution and
+Windows NSIS / Ubuntu .deb builds are separate checks. Repository workflows are
+manual only; this delivery's actual local results are recorded in the
+[validation record](../docs/management-validation.md).
+
+The backend suite also reproduces Windows state-directory ownership with Modify
+permission but no WRITE_OWNER, then checks private ACLs, restart and child-file
+inheritance. Run that focused regression with
+`dotnet run --project tests/Management.Server.Tests -- --permissions-only`;
+the full suite includes it automatically. It reports an explicit skip on Linux.
+The Windows backend suite also uses a verbatim local drive engine path for a real
+catalog worker. `--engine-path-only` runs that focused regression; the service must
+normalize the path without changing PowerShell execution policy.
+
+Windows-only IIS/legacy/junction tests are explicitly reported as skipped on
+Linux; unsupported IIS scenario preflight is checked there. A Windows pwsh pass
+does not substitute for Linux execution evidence.
+
 Run from the repository root:
 
 ```powershell
