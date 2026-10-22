@@ -4,6 +4,8 @@ Ez az útmutató a jelenlegi asztali és böngészős Plot Manager felületét m
 
 A négy elkészített projekt részletes, lépésenkénti bemutatója a [Demóprojektek és forgatókönyvek](management-demo-projects-hu.md) dokumentumban található. A `04 – SenseNet Docker telepítés és menedzsment` projekt külön [telepítési és üzemeltetési leírást](../examples/sensenet-docker/README.md) is kapott.
 
+A szerkesztési állapot megőrzésének alább leírt javításai a `codex/management-editing-safety` forráság részei. A korábban átadott, `a8cb561b` buildből készült telepítők még a javítás előtti felületet tartalmazzák. A forrás és a csomagok ellenőrzését az [ellenőrzési eredmények](management-validation.md#editing-safety-follow-up) különválasztják.
+
 ## Tartalom
 
 1. [Mit jelent a projekt, a plot és a lépés?](#1-mit-jelent-a-projekt-a-plot-és-a-lépés)
@@ -141,6 +143,8 @@ Az ábra a közös szerkezetet szemlélteti, nem egy adott képernyő pontos mé
 | **Ready / Running** jelvény | Van-e aktív, zárolást tartó futás ebben a projektben. A `Ready` nem a Docker-stack vagy más külső alkalmazás egészségvizsgálata. |
 | Hiba/siker üzenet **×** gombja | Csak az üzenetet zárja be; nem vonja vissza a műveletet. |
 | **Unsaved changes** figyelmeztetés | A kijelölt konfigurációs rétegnek van még el nem mentett vázlata. **Save selected layer** ugyanazt a réteget menti, mint a szerkesztő **Save layer** gombja. |
+| **Unsaved project definition changes** figyelmeztetés / **Open project definition** | A hordozható projektleírás külön vázlatát még nem mentetted. A gomb visszavisz a **Workspace** definíciós paneljéhez, ahol mentheted vagy újratöltheted. |
+| **Unapplied parameter edits** figyelmeztetés | Valamelyik paraméter beírt szövege még nem érvényesült. A mentés és futtatás tiltott, amíg kijavítod vagy megerősítetten eldobod. |
 | Folyamatban lévő művelet miatti tiltások | A GUI nem enged újabb ütköző műveletet vagy futás közbeni rétegírást. A futás a **Run history** oldalon követhető. |
 | **Sign out · …** | Kijelentkezik az aktuális operátori munkamenetből. |
 | Lenyitható sorok, JSON-panelek | A címre kattintva nyílnak/csukódnak. A megjelenítő JSON-panel olvasható eredmény, a szövegmezős JSON-szerkesztő módosítható forrás. |
@@ -191,7 +195,7 @@ Ez a lenyitható, haladó panel a `plot-project.json` fájlt szerkeszti. A **Por
 - **Reload definition**: a legfrissebb projektleírást tölti be; helyi módosítás eldobása előtt megerősítést kér.
 - **Save definition**: verzióellenőrzéssel menti a leírást és frissíti a kapcsolódó projektadatokat. Futás vagy mentetlen konfigurációs réteg mellett tiltott.
 
-Ez külön mentés a **Save layer** gombtól. A rétegszerkesztő általános mentetlenváltozás-jelzése nem a projektleírás külön vázlatának állapotjelzője: a definíciós módosítást még továbblépés előtt mentsd el vagy másold ki. Ismeretlen érvényes metaadatok megmaradnak. A szolgáltatás ellenőrzi a formátumverziót, a fájlútvonalakat és a wizard kötéseit. A fájl nem titoktár.
+Ez külön mentés a **Save layer** gombtól. A projektleírás vázlata megmarad a GUI oldalai közötti váltáskor; projektváltáskor az eldobásához megerősítés kell, és az ablak/böngésző bezárása is figyelmeztethet a mentetlen definícióra. A **Save definition** sikeres mentése megszünteti a definíció saját mentetlen állapotát. Ismeretlen érvényes metaadatok megmaradnak. A szolgáltatás ellenőrzi a formátumverziót, a fájlútvonalakat és a wizard kötéseit. A fájl nem titoktár.
 
 Minimális hordozható leírás:
 
@@ -301,7 +305,7 @@ A mentés nem írja vissza az összeállított jobb oldali objektumot a bal olda
 
 Minden mentés a beolvasott fájlverzióra hivatkozik. Ha ugyanazt a fájlt másik ablak, operátor vagy külső szerkesztő megváltoztatta, a szolgáltatás `409`/`changed` üzenettel visszautasítja a felülírást. Másold ki a saját vázlatod szükséges részét, **Reload**, hasonlítsd össze a friss tartalmat, és alkalmazd újra a saját módosításodat.
 
-Projekt-, környezet- vagy forrásréteg-váltáskor a GUI rákérdez a módosított konfigurációs vázlat eldobására. A böngésző bezárása is figyelmeztethet a mentetlen rétegre. A preflight és a futás mentett fájlokból dolgozik: előbb ments, aztán ellenőrizz/futtass.
+Projekt-, környezet- vagy forrásréteg-váltáskor a GUI rákérdez a módosított konfigurációs vázlat eldobására. A böngésző bezárása is figyelmeztethet a mentetlen rétegre, definícióra vagy nem alkalmazott paraméterbevitelre. A preflight és a futás mentett fájlokból dolgozik: előbb rendezd a mezőhibákat és ments, aztán ellenőrizz/futtass.
 
 ### Files & locations – fájlok és útvonalak
 
@@ -374,7 +378,7 @@ Egy paraméternél nemcsak az értéket, hanem annak forrását is kiválasztod:
 
 Titkosnak deklarált paraméternél a GUI nem kínál közvetlen `Value`/`JSON value` bevitelt. Használj titoktárból kapott `$env` hivatkozást, vagy megfelelő hivatkozási láncot; a szolgáltatás a közvetlen titokliterált visszautasítja.
 
-**JSON-szerkesztésnél a mező elhagyása fontos.** Ha az `Unapplied JSON` vagy `Invalid JSON` üzenet látszik, a legutóbbi érvényes érték maradt a vázlatban. Javítsd a szöveget, kattints ki a mezőből, és csak ezután ments. Az inline hibát nem helyettesíti a másik mezőben megnyomott mentés.
+**JSON-szerkesztésnél a mező elhagyása fontos.** Ha az `Unapplied JSON` vagy `Invalid JSON` üzenet látszik, a legutóbbi érvényes érték maradt a vázlatban, és a mentés, preflight, preview és futtatás tiltott. Javítsd a szöveget, kattints ki a mezőből, és csak ezután ments. Ugyanez a védelem érvényes egy kitörölt vagy hibás számértékre is. Ha másik lépésre vagy nézetre váltanál a még nem alkalmazott bevitellel, a GUI külön eldobási megerősítést kér; a visszautasítás megőrzi a szöveget. Az inline hibát nem helyettesíti a másik mezőben megnyomott mentés.
 
 ### Hivatkozások, konkrét példa
 
@@ -549,7 +553,11 @@ A felső öt szakasz jelzi, hol jársz: **Target → Settings → Preflight → 
 
 A támogatott űrlapmezők szöveg, egész szám, bool, JSON-tömb és JSON-objektum. A boolnak külön `false` és `true` értéke van. Az objektum-/tömbmezőben érvényes JSON kell, és a mező elhagyásakor alkalmazódik. A szolgáltatás a deklarált típust és a kötelező mezőket is ellenőrzi.
 
-A vezetett form a deklarációban megadott alapértékekkel indul, ezért megnyitáskor nézd át őket; ne tekintsd a már kézzel módosított összes konfigurációs érték automatikus visszaolvasásának. A **Save answers** az űrlaphoz kötött mezőket valóban átírja a kijelölt rétegben. A többi réteg továbbra is felülírhatja azokat: az effektív konfigurációt/preflightot ellenőrizd.
+A vezetett form a kiválasztott projekt és környezet mentett, összeállított konfigurációjából olvassa vissza a `settingPath` mezőkhöz tartozó válaszokat. A deklarált alapértéket csak hiányzó beállításnál használja; a `false`, `0`, `[]` és az explicit `null` nem hiányzó érték. Projekt- vagy környezetváltás után az adott konfigurációt tölti újra. Az űrlap ettől még nem mutat minden konfigurációs mezőt, csak a deklarált kötéseket.
+
+Ha egy kötött érték `$ref` vagy `$env` hivatkozást tartalmaz, a form figyelmeztet és a **Save answers** tiltott. A hivatkozást a **Configuration** oldalon szerkeszd: a wizard nem olvassa ki a titkot és nem cseréli le a hivatkozást egy alapértékre vagy feloldott literálra. A **Save answers** egyébként az űrlaphoz kötött mezőket valóban átírja a kijelölt rétegben. A többi réteg továbbra is felülírhatja azokat: az effektív konfigurációt/preflightot ellenőrizd. A szolgáltatás a mezőtípust is ellenőrzi; a típushoz nem illő meglévő értéket mentés előtt javítani kell.
+
+A form a nyers célréteg hivatkozását akkor is megőrzi, ha az aktív környezet azt egy literállal felülírná. A mentés a betöltött célréteg fájlverzióját használja: külső módosításnál előbb töltsd újra a konfigurációt. Ha a deklarált célréteg nincs a betöltött rétegek között, válaszd a hozzá tartozó környezetet és töltsd újra; a wizard nem ment egy frissen, a válaszoktól függetlenül lekért verzióval.
 
 A SenseNet-űrlap stacknevet, helyi HTTPS-portokat és a SQL Developer licenc elfogadását kéri. A licencmező `false` alapértéke nem elfogadás: a tényleges fejlesztői használatról neked kell döntened a projekt [leírása](../examples/sensenet-docker/README.md) alapján. Az első előkészítés után rögzített stacknév/port kezelését és a további management plotokat a [demóforgatókönyvek](management-demo-projects-hu.md) részletezik.
 
