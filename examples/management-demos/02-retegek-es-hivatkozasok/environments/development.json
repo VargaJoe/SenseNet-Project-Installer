@@ -1,0 +1,12 @@
+{
+  "Demo": {
+    "Attempts": 0,
+    "Optional": null,
+    "Items": [],
+    "Scope": "development",
+    "Nested": {
+      "Switched": "development"
+    },
+    "Enabled": false
+  }
+}

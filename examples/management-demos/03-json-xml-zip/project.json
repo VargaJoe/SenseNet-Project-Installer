@@ -1,0 +1,7 @@
+{
+  "Release": {
+    "Manifest": {
+      "Application": "Demo artifact pipeline"
+    }
+  }
+}

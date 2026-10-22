@@ -1,0 +1,11 @@
+{
+  "Release": {
+    "Environment": "development",
+    "Manifest": {
+      "Features": [
+        "debug",
+        "local"
+      ]
+    }
+  }
+}

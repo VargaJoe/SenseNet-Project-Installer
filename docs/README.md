@@ -2,6 +2,18 @@
 
 Start with [README](../README.md) for the CLI and installed packages.
 
+## Magyar felhasználói útmutatók
+
+- [Itt kezdd: olvasási sorrend, négy demó és GitHub-ellenőrzés](management-guide-index-hu.md).
+- [Teljes GUI-útmutató: oldalak, gombok, nézetek, panelek és munkafolyamatok](management-user-guide-hu.md).
+- [Demóprojektek: forgatókönyvek, minden plot és step, bemenetek és elvárt kimenetek](management-demo-projects-hu.md).
+
+Az általános demók [tiszta projektfájljai](../examples/management-demos/README.md)
+és a [SenseNet Docker projekt](../examples/sensenet-docker/README.md) is verziózottak;
+olvasásukhoz nem kell az eredeti gépnek bekapcsolva lennie.
+
+## Technical guides
+
 | Topic | Guide |
 | --- | --- |
 | Runtime and compatibility | [Runtime](plot-manager-runtime.md) |

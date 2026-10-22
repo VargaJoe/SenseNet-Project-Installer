@@ -1,0 +1,13 @@
+{
+  "Demo": {
+    "Scope": "production",
+    "Items": [
+      "release"
+    ],
+    "Enabled": true,
+    "Nested": {
+      "Switched": "production"
+    },
+    "Attempts": 2
+  }
+}

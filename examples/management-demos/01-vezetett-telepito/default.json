@@ -1,0 +1,37 @@
+{
+  "Sample": {
+    "Target": "hello.txt",
+    "Message": "Hello from Plot Manager"
+  },
+  "Plots": {
+    "install": {
+      "Steps": [
+        {
+          "Id": "compose",
+          "Step": "text.join",
+          "With": {
+            "Items": [
+              {
+                "$ref": "settings.Sample.Message"
+              }
+            ],
+            "Separator": ""
+          }
+        },
+        {
+          "Id": "save",
+          "Step": "filesystem.write",
+          "With": {
+            "Path": {
+              "$ref": "settings.Sample.Target"
+            },
+            "Content": {
+              "$ref": "steps.compose.Output.Text"
+            },
+            "Overwrite": true
+          }
+        }
+      ]
+    }
+  }
+}

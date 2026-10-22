@@ -1,5 +1,10 @@
 # Plot Manager workspace
 
+For the complete Hungarian guide with every page, button and panel, see the
+[Hungarian documentation entry point](management-guide-index-hu.md),
+[GUI manual](management-user-guide-hu.md) and
+[four demo projects with all plots and steps](management-demo-projects-hu.md).
+
 The same React application is used by the desktop window and the browser. It
 connects only to its own ASP.NET service. The runner card and project context show
 the actual service host, operating system, and execution identity. In hosted mode,
@@ -164,6 +169,12 @@ Remove only your sample output file and, when finished, your isolated sample
 project. Do not select an existing application directory for a disposable test.
 
 ## Files, secrets, and certificates
+
+For a complete application-specific project, see the [SenseNet Docker
+example](../examples/sensenet-docker/README.md). It has a declarative setup wizard,
+native Compose lifecycle plots, real PKCE login verification, persistent volumes
+and confirmed local backup/restore. Copy its whole directory into the runner's
+project root and Open it; do not copy its generated `.local` credentials.
 
 **Browse on the runner** lists paths on the service host within its allowed root.
 It transfers nothing. **Upload a file from this computer** deliberately copies a

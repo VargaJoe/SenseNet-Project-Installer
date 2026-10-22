@@ -1,0 +1,65 @@
+{
+  "formatVersion": 1,
+  "name": "04 – SenseNet Docker telepítés és menedzsment",
+  "description": "Saját SQL + IdentityServer + SenseNet Docker stack. Install, start/stop, állapot, napló, hitelesített ellenőrzés, mentés és megerősített visszaállítás. Az adatok megmaradnak a konténerek újralétrehozásakor.",
+  "configuration": {
+    "default": "default.json",
+    "project": "project.json",
+    "environments": {
+      "development": "environments/development.json"
+    }
+  },
+  "wizard": {
+    "layer": "project",
+    "groups": [
+      {
+        "id": "target",
+        "fields": [
+          {
+            "key": "stack",
+            "type": "string",
+            "label": "Compose név (pm-sensenet- előtaggal)",
+            "required": true,
+            "settingPath": "SenseNet.StackName",
+            "default": "pm-sensenet-demo"
+          },
+          {
+            "key": "api",
+            "type": "int",
+            "label": "SenseNet HTTPS port (localhost)",
+            "required": true,
+            "settingPath": "SenseNet.ApiPort",
+            "default": 18160
+          },
+          {
+            "key": "identity",
+            "type": "int",
+            "label": "IdentityServer HTTPS port (localhost)",
+            "required": true,
+            "settingPath": "SenseNet.IdentityPort",
+            "default": 18161
+          }
+        ],
+        "title": "Elkülönített helyi stack"
+      },
+      {
+        "id": "license",
+        "fields": [
+          {
+            "key": "eula",
+            "type": "bool",
+            "label": "Elfogadom a Microsoft SQL Server Developer licencét fejlesztési/teszt használatra (https://go.microsoft.com/fwlink/?LinkId=746388)",
+            "required": true,
+            "settingPath": "SenseNet.AcceptSqlLicense",
+            "default": false
+          }
+        ],
+        "title": "Fejlesztői SQL Server"
+      }
+    ],
+    "plot": "install",
+    "description": "Docker Linux-konténerek és PowerShell 7 szükséges. A stack neve és portjai az első előkészítés után rögzülnek. A friss repository beépített admin/admin fiókja kizárólag helyi demóhoz való. Az SQL Developer licenc fejlesztési/teszt célra használható.",
+    "title": "SenseNet helyi Docker telepítő"
+  },
+  "upstreamReference": "https://github.com/SenseNet/sensenet/tree/f889cfce16e724ad095d4ca976a2e0d7fa362c26/deployment"
+}

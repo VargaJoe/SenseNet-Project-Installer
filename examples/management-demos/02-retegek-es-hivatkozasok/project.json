@@ -1,0 +1,10 @@
+{
+  "Demo": {
+    "Message": "Projektb\u0151l \u00E9rkez\u0151 \u00FCzenet",
+    "Scope": "project",
+    "Nested": {
+      "ProjectOnly": "hozz\u00E1adva",
+      "Switched": "project"
+    }
+  }
+}

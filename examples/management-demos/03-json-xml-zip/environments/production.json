@@ -1,0 +1,10 @@
+{
+  "Release": {
+    "Environment": "production",
+    "Manifest": {
+      "Features": [
+        "release"
+      ]
+    }
+  }
+}

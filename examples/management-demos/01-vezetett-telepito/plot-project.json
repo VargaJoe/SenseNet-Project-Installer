@@ -1,0 +1,49 @@
+{
+  "formatVersion": 1,
+  "configuration": {
+    "default": "default.json",
+    "project": "project.json",
+    "environments": {
+      "development": "environments/development.json"
+    }
+  },
+  "name": "01 \u2013 Vezetett f\u00E1jltelep\u00EDt\u0151",
+  "wizard": {
+    "title": "Vezetett f\u00E1jltelep\u00EDt\u0151 dem\u00F3",
+    "description": "V\u00E1laszd ki a projektk\u00F6nyvt\u00E1rban l\u00E9trehozand\u00F3 f\u00E1jlt, add meg a tartalm\u00E1t, majd ind\u00EDtsd az install plotot.",
+    "plot": "install",
+    "layer": "project",
+    "groups": [
+      {
+        "id": "target",
+        "title": "C\u00E9lf\u00E1jl",
+        "fields": [
+          {
+            "key": "target",
+            "label": "F\u00E1jln\u00E9v a projektben",
+            "type": "string",
+            "default": "udvozlet.txt",
+            "required": true,
+            "settingPath": "Sample.Target"
+          }
+        ]
+      },
+      {
+        "id": "settings",
+        "title": "Tartalom",
+        "fields": [
+          {
+            "key": "message",
+            "label": "\u00DCzenet",
+            "type": "string",
+            "default": "Szia a Plot Manager dem\u00F3b\u00F3l!",
+            "required": true,
+            "settingPath": "Sample.Message"
+          }
+        ]
+      }
+    ]
+  },
+  "description": "K\u00E9t k\u00E9rd\u00E9sb\u0151l val\u00F3di UTF-8 f\u00E1jl: Guided setup \u2192 Preflight \u2192 Run \u2192 Run history. A compose l\u00E9p\u00E9s \u00F6n\u00E1ll\u00F3an is fut; a save kor\u00E1bbi outputot ig\u00E9nyel.",
+  "demoVersion": 1
+}

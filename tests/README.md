@@ -61,3 +61,20 @@ Requires Docker Compose and a locally present `mcr.microsoft.com/mssql/server:20
 The Windows Forms UI has a manual acceptance procedure in [local integration](../docs/local-integration.md). Real IIS provisioning must be validated on a disposable Windows IIS host with WebAdministration; the default suite tests its command/state contracts without changing local IIS.
 
 Hidden GUI bridge smoke test on Windows: `pwsh -NoProfile -File ./tests/Run-GuiSmoke.ps1` (also powershell.exe). It instantiates the real controls and drives catalog/preview/run with an STA child, pumps UI events and verifies actual file output without displaying a window. It does not assess visual layout, accessibility or real IIS.
+
+## SenseNet Docker project
+
+`pwsh -NoProfile -File ./tests/Run-SenseNetExample.ps1` validates the portable
+example's 13 native plots and checks license refusal without calling Docker.
+PowerShell 7.2 or later is required for this application-specific example.
+
+Add `-RunDocker` for the actual SenseNet SQL/IdentityServer lifecycle test. This
+explicitly accepts the SQL Server Developer license for a disposable development
+fixture, uses the example's pinned public images (Docker may pull missing images),
+and allocates a unique `pm-sensenet-test-*` namespace with two loopback ports.
+It verifies PKCE admin login, real content creation and stable content ID across
+stop/start and container recreation. Backup/restore must replace changed markers
+in both SQL and App_Data; an unconfirmed restore must leave them unchanged.
+Finally it verifies ownership labels before removing only its own containers,
+volumes, network and private runtime files. Sanitized evidence remains under
+`artifacts/sensenet-example-tests/<fixture>/acceptance-evidence.json`.

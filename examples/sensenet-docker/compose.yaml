@@ -1,0 +1,115 @@
+# Public topology reference: SenseNet/sensenet f889cfce, deployment/compose.services.yml.
+# This independent project uses only loopback endpoints and its own named volumes.
+x-runtime: &runtime
+  ASPNETCORE_ENVIRONMENT: Development
+  ASPNETCORE_URLS: https://+:443;http://+:80
+  Kestrel__Certificates__Default__Path: /root/.aspnet/https/snapp.pfx
+  Kestrel__Certificates__Default__Password: ${CERT_PASSWORD:?Run the prepare plot first}
+x-certificate: &certificate
+  type: bind
+  source: ./.local/snapp.pfx
+  target: /root/.aspnet/https/snapp.pfx
+  read_only: true
+  bind:
+    create_host_path: false
+
+services:
+  snsql:
+    image: ${SQL_IMAGE:?}
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${SQL_PASSWORD:?}
+    volumes:
+      - db-data:/var/opt/mssql
+    healthcheck:
+      test: [CMD-SHELL, '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -C -b -Q "SELECT 1" >/dev/null']
+      interval: 5s
+      timeout: 5s
+      retries: 36
+      start_period: 15s
+    restart: unless-stopped
+  db-init:
+    image: ${SQL_IMAGE:?}
+    environment:
+      SQL_PASSWORD: ${SQL_PASSWORD:?}
+      SQL_DATABASE: ${STACK_NAME:?}-sndb
+    entrypoint: [/bin/bash, -ec]
+    command:
+      - >-
+        exec /opt/mssql-tools18/bin/sqlcmd -S snsql -U sa -P "$$SQL_PASSWORD" -C -b
+        -Q "IF DB_ID(N'$$SQL_DATABASE') IS NULL CREATE DATABASE [$$SQL_DATABASE]"
+    depends_on:
+      snsql:
+        condition: service_healthy
+    restart: "no"
+  snapp:
+    image: ${API_IMAGE:?}
+    environment:
+      <<: *runtime
+      ConnectionStrings__SnCrMsSql: 'Persist Security Info=False;Initial Catalog=${STACK_NAME}-sndb;Data Source=snsql;User ID=sa;Password=${SQL_PASSWORD};TrustServerCertificate=true'
+      sensenet__identityManagement__UserProfilesEnabled: "false"
+      sensenet__repository__Authentication__ApiKey: ${REPOSITORY_API_KEY:?}
+      sensenet__authentication__repositoryUrl: https://localhost:${API_PORT:?}
+      sensenet__authentication__authServerType: IdentityServer
+      sensenet__authentication__authority: https://localhost:${IDENTITY_PORT:?}
+      sensenet__authentication__metadatahost: http://snis
+      sensenet__authentication__AddJwtCookie: "true"
+      sensenet__ClientRequest__Clients__0__ClientType: adminui
+      sensenet__ClientRequest__Clients__0__ClientId: plotmanager-adminui
+    ports:
+      - 127.0.0.1:${API_PORT}:443
+    volumes:
+      - *certificate
+      - app-data:/app/App_Data
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+      snis:
+        condition: service_started
+    restart: unless-stopped
+  snis:
+    image: ${IDENTITY_IMAGE:?}
+    environment:
+      <<: *runtime
+      IdentityServer__IssuerUri: https://localhost:${IDENTITY_PORT}
+      sensenet__LoginPage__DisplayOtherRepositoryButton: "true"
+      sensenet__authentication__setDefaultClients: "true"
+      sensenet__Clients__plotmanager-adminui__AllowedGrantTypes__0: authorization_code
+      sensenet__Clients__plotmanager-adminui__RequireConsent: "false"
+      sensenet__Clients__plotmanager-adminui__RequireClientSecret: "false"
+      sensenet__Clients__plotmanager-adminui__RequirePkce: "true"
+      sensenet__Clients__plotmanager-adminui__AllowedScopes__0: openid
+      sensenet__Clients__plotmanager-adminui__AllowedScopes__1: profile
+      sensenet__Clients__plotmanager-adminui__AllowedScopes__2: sensenet
+      sensenet__Clients__plotmanager-adminui__RedirectUris__0: https://localhost:${API_PORT}/authentication/callback
+      sensenet__Clients__plotmanager-adminui__AllowedCorsOrigins__0: https://localhost:${API_PORT}
+      sensenet__Clients__plotmanager-adminui__RepositoryHosts__0__PublicHost: https://localhost:${API_PORT}
+      sensenet__Clients__plotmanager-adminui__RepositoryHosts__0__InternalHost: http://snapp
+      sensenet__Clients__plotmanager-adminui__RepositoryHosts__1__PublicHost: https://127.0.0.1:${API_PORT}
+      sensenet__Clients__plotmanager-adminui__RepositoryHosts__1__InternalHost: http://snapp
+      sensenet__Clients__adminui__RepositoryHosts__0__PublicHost: https://localhost:${API_PORT}
+      sensenet__Clients__adminui__RepositoryHosts__0__InternalHost: http://snapp
+      sensenet__Clients__adminui__RepositoryHosts__1__PublicHost: https://127.0.0.1:${API_PORT}
+      sensenet__Clients__adminui__RepositoryHosts__1__InternalHost: http://snapp
+      sensenet__Clients__spa__RepositoryHosts__0__PublicHost: https://localhost:${API_PORT}
+      sensenet__Clients__spa__RepositoryHosts__0__InternalHost: http://snapp
+      sensenet__Clients__spa__RepositoryHosts__1__PublicHost: https://127.0.0.1:${API_PORT}
+      sensenet__Clients__spa__RepositoryHosts__1__InternalHost: http://snapp
+      sensenet__Clients__client__RepositoryHosts__0__PublicHost: https://localhost:${API_PORT}
+      sensenet__Clients__client__RepositoryHosts__0__InternalHost: http://snapp
+      sensenet__Clients__client__RepositoryHosts__1__PublicHost: https://127.0.0.1:${API_PORT}
+      sensenet__Clients__client__RepositoryHosts__1__InternalHost: http://snapp
+    ports:
+      - 127.0.0.1:${IDENTITY_PORT}:443
+    volumes:
+      - *certificate
+    restart: unless-stopped
+
+volumes:
+  db-data:
+    labels:
+      io.github.vargajoe.plotmanager.project-directory-sha256: ${PROJECT_DIRECTORY_SHA256:?}
+  app-data:
+    labels:
+      io.github.vargajoe.plotmanager.project-directory-sha256: ${PROJECT_DIRECTORY_SHA256:?}
