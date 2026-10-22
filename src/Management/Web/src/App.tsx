@@ -32,6 +32,7 @@ import {
   pretty,
   removeOverride,
   setPlotSteps,
+  createPlot,
   type CatalogStep,
   type EngineConfiguration,
   type Invocation,
@@ -859,12 +860,14 @@ export default function App() {
                   onClick={() => {
                     const name = window.prompt("New plot name");
                     if (name?.trim() && draftObject) {
-                      setDraft(
-                        pretty(
-                          setPlotSteps(draftObject, effective, name.trim(), []),
-                        ),
-                      );
-                      changePlot(name.trim());
+                      try {
+                        setDraft(
+                          pretty(createPlot(draftObject, effective, name)),
+                        );
+                        changePlot(name.trim());
+                      } catch (error) {
+                        setError(errText(error));
+                      }
                     }
                   }}
                   disabled={locked || !layer || busy}
@@ -2249,11 +2252,19 @@ function WizardFields({
         <WizardInput
           key={field.key}
           field={field}
-          value={values[field.key]}
+          value={
+            Object.hasOwn(values, field.key) ? values[field.key] : undefined
+          }
           onChange={(value) => {
             const next = { ...values };
             if (value === undefined) delete next[field.key];
-            else next[field.key] = value;
+            else
+              Object.defineProperty(next, field.key, {
+                value,
+                writable: true,
+                enumerable: true,
+                configurable: true,
+              });
             onChange(next);
           }}
         />

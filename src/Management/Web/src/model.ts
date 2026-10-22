@@ -164,7 +164,8 @@ export function memberKey(data: JsonObject, name: string): string {
   );
 }
 export function member(data: JsonObject, name: string): Json | undefined {
-  return data[memberKey(data, name)];
+  const key = memberKey(data, name);
+  return Object.hasOwn(data, key) ? data[key] : undefined;
 }
 export function setMember(
   data: JsonObject,
@@ -173,7 +174,13 @@ export function setMember(
 ): void {
   const key = memberKey(data, name);
   if (value === undefined) delete data[key];
-  else data[key] = value;
+  else
+    Object.defineProperty(data, key, {
+      value,
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
 }
 export function plotNames(config: JsonObject): string[] {
   const plots = member(config, "Plots");
@@ -294,6 +301,24 @@ export function setPlotSteps(
   setMember(plots, name, nextPlot);
   return next;
 }
+export function createPlot(
+  layer: JsonObject,
+  effective: JsonObject,
+  name: string,
+): JsonObject {
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error("Enter a plot name.");
+  if (
+    [...plotNames(layer), ...plotNames(effective)].some(
+      (existing) => existing.toLowerCase() === trimmed.toLowerCase(),
+    )
+  ) {
+    throw new Error(
+      `Plot '${trimmed}' already exists. Select it to edit its steps.`,
+    );
+  }
+  return setPlotSteps(layer, effective, trimmed, []);
+}
 export function invocationId(step: string, ids: string[]): string {
   const base =
     step.replace(/[^a-zA-Z0-9_-]/g, "_").replace(/^[^a-zA-Z]+/, "") || "step";
@@ -324,11 +349,11 @@ export function removeOverride(data: JsonObject, pointer: string): JsonObject {
   const next = clone(data);
   let current: Json = next;
   for (const part of parts.slice(0, -1)) {
-    if (!object(current) || !(part in current))
+    if (!object(current) || !Object.hasOwn(current, part))
       throw new Error("That override does not exist in this layer.");
     current = current[part];
   }
-  if (!object(current) || !(parts.at(-1)! in current))
+  if (!object(current) || !Object.hasOwn(current, parts.at(-1)!))
     throw new Error(
       "That override does not exist in this layer. Array values are replaced as a whole; remove the array property.",
     );

@@ -8,16 +8,77 @@ import {
   pretty,
   object,
   plotSteps,
+  plotNames,
   plotSource,
   ownsPlotSteps,
   removeOverride,
   setMember,
   setPlotSteps,
+  createPlot,
   type JsonObject,
 } from "./model";
 import { isLosslessNumber, stringifyJson } from "./json";
 
 describe("source-layer editing without configuration resolution", () => {
+  it("treats prototype and constructor names as ordinary own JSON fields and plot names", () => {
+    const source = parseObject(
+      '{"__proto__":{"toString":false,"kept":9007199254740993},"constructor":{"prototype":{"kept":true}}}',
+    );
+    expect(Object.getPrototypeOf(source)).toBe(Object.prototype);
+    expect(Object.hasOwn(source, "__proto__")).toBe(true);
+    expect(member({}, "constructor")).toBeUndefined();
+    expect(member({}, "__proto__")).toBeUndefined();
+    const edited = removeOverride(source, "/__proto__/toString");
+    expect(stringifyJson(edited)).toBe(
+      '{"__proto__":{"kept":9007199254740993},"constructor":{"prototype":{"kept":true}}}',
+    );
+    expect(typeof Object.prototype.toString).toBe("function");
+    const withProtoPlot = createPlot({}, {}, "__proto__");
+    const withConstructor = createPlot(withProtoPlot, {}, "constructor");
+    expect(stringifyJson(withConstructor)).toBe(
+      '{"Plots":{"__proto__":[],"constructor":[]}}',
+    );
+    expect(Object.getPrototypeOf(withConstructor.Plots)).toBe(Object.prototype);
+    expect(plotNames(withConstructor)).toEqual(["__proto__", "constructor"]);
+    expect(
+      Object.hasOwn(withConstructor.Plots as JsonObject, "__proto__"),
+    ).toBe(true);
+  });
+  it("rejects inherited JSON pointer traversal without mutating any global prototype", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      Object.prototype,
+      "toString",
+    );
+    expect(() => removeOverride({}, "/__proto__/toString")).toThrow(
+      /does not exist/,
+    );
+    expect(() => removeOverride({}, "/constructor/prototype")).toThrow(
+      /does not exist/,
+    );
+    expect(() => removeOverride({ own: {} }, "/own/toString")).toThrow(
+      /does not exist/,
+    );
+    expect(
+      Object.getOwnPropertyDescriptor(Object.prototype, "toString"),
+    ).toEqual(descriptor);
+    expect(Object.hasOwn({}, "kept")).toBe(false);
+  });
+  it("rejects new plot names that duplicate saved or draft plots case-insensitively", () => {
+    const effective = parseObject(
+      '{"Plots":{"INSTALL":{"Steps":[{"Id":"keep","Step":"text.join","With":{"Items":[]}}]}}}',
+    );
+    const draft = parseObject('{"plots":{"Draft":[]},"unknown":false}');
+    const beforeEffective = stringifyJson(effective),
+      beforeDraft = stringifyJson(draft);
+    expect(() => createPlot(draft, effective, "install")).toThrow(
+      /already exists/,
+    );
+    expect(() => createPlot(draft, effective, " dRaFt ")).toThrow(
+      /already exists/,
+    );
+    expect(stringifyJson(effective)).toBe(beforeEffective);
+    expect(stringifyJson(draft)).toBe(beforeDraft);
+  });
   it("retains unknown exact numeric tokens after unrelated visual plot edits and source roundtrip", () => {
     const source =
       '{"unknown":{"integer":9007199254740993,"decimal":0.12345678901234567890123456789,"overflow":1e400,"underflow":1e-400,"negativeZero":-0,"array":[18446744073709551616]},"Plots":{"demo":{"Steps":[{"Id":"first","Step":"text.join","With":{"Items":[]}}]}}}';
