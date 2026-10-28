@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-component-and-migration-map"></a>
+<!-- documentation-anchors:end -->
 # Component and migration map
+
+<!-- documentation-navigation -->
+[English](migration-map.md) | [Magyar](migration-map-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 Source preservation reference before management UI work:
 [`98b483e4214a4299e30e70ba90f71f51eed953d8`](https://github.com/VargaJoe/SenseNet-Project-Installer/tree/98b483e4214a4299e30e70ba90f71f51eed953d8).

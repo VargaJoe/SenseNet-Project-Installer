@@ -1,7 +1,17 @@
+<!-- documentation-anchors:start -->
+<a id="doc-general-purpose-packages"></a>
+<!-- documentation-anchors:end -->
 # General-purpose packages
+
+<!-- documentation-navigation -->
+[English](generic-packages.md) | [Magyar](generic-packages-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 These native packages work with explicit inputs and structured outputs. They use PowerShell/.NET and local files; no administrator privileges, external command-line tools, global legacy settings or application-specific resources are required. Each package directory is independently installable.
 
+<!-- documentation-anchors:start -->
+<a id="doc-filesystem"></a>
+<!-- documentation-anchors:end -->
 ## Filesystem
 
 | Step | Inputs | Output |
@@ -20,6 +30,9 @@ copy-tree copies the **contents** of Source, including hidden files and empty di
 
 remove requires an explicit Root. Path must be strictly inside that root; Root itself and paths escaping it are rejected. Nonempty directories require Recurse. MissingOk returns Removed=false for an absent target. Link/junction traversal is rejected. Use a specific workspace/output directory as Root.
 
+<!-- documentation-anchors:start -->
+<a id="doc-zip-archives"></a>
+<!-- documentation-anchors:end -->
 ## ZIP archives
 
 | Step | Inputs | Output |
@@ -33,6 +46,9 @@ unpack creates the destination directory. It checks entries and destination conf
 
 Copy/extraction can leave partial output on an I/O failure after validation. These operations are not transactional directory deployments. They operate on trusted local filesystem state; they are not an isolation boundary against concurrent filesystem changes.
 
+<!-- documentation-anchors:start -->
+<a id="doc-json"></a>
+<!-- documentation-anchors:end -->
 ## JSON
 
 | Step | Inputs | Output |
@@ -47,6 +63,9 @@ Use the merge output as the Value of json.write to save it. write uses UTF-8 wit
 
 The engine's configuration layers and json.merge are separate: configuration layers define the run; json.merge processes arbitrary object-shaped JSON documents during a run.
 
+<!-- documentation-anchors:start -->
+<a id="doc-xml"></a>
+<!-- documentation-anchors:end -->
 ## XML
 
 xml.set takes Source, Destination, XPath, Value, optional Namespaces (prefix-to-URI map), and Overwrite (default false). It returns Path and Updated=1.
@@ -55,12 +74,18 @@ XPath must select exactly one attribute or leaf element. Values are assigned thr
 
 This updates an existing node; it does not create a schema, invent missing nodes, or perform text replacement across an XML document. Output is UTF-8; semantic content/whitespace is retained where possible, not byte-identical formatting.
 
+<!-- documentation-anchors:start -->
+<a id="doc-preview-and-composition"></a>
+<!-- documentation-anchors:end -->
 ## Preview and composition
 
 Native runner WhatIf skips all step functions. Every mutating function also implements ShouldProcess for direct WhatIf calls. Output references refer to completed earlier invocations; a failed step stops the remaining plot. No automatic rollback or finally/cleanup phase is provided.
 
 The packages do not log document contents. Outputs from read/merge intentionally contain data, which the CLI serializes; keep secrets out of displayed results.
 
+<!-- documentation-anchors:start -->
+<a id="doc-complete-local-example"></a>
+<!-- documentation-anchors:end -->
 ## Complete local example
 
 The example combines three configuration files, generates JSON/XML, stages a directory, creates and restores a ZIP, reports two hashes, and removes only the staging directory.
@@ -78,6 +103,9 @@ Expected: Succeeded; restored/report.json has Label=Example project, Environment
 
 Add -Explain to inspect the layer file order and parameter sources, or -WhatIf to skip operations. To clean up the generated directory, use filesystem.remove with Path=$work, Root=[IO.Path]::GetTempPath() and Recurse=true, after inspecting the path. Re-running in the same output directory fails on existing output files.
 
+<!-- documentation-anchors:start -->
+<a id="doc-migration-status"></a>
+<!-- documentation-anchors:end -->
 ## Migration status
 
 This first batch implements reusable file/directory, ZIP and JSON/XML operations as native packages. These are new general contracts, not aliases for historical deployment functions. Legacy scripts remain available only through legacy mode.

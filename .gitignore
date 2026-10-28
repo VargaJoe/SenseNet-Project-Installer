@@ -20,4 +20,5 @@ tests/.work*/
 **/node_modules/
 tests/.management-*.log
 !scripts/management/Test-*.ps1
+!scripts/management/Test-Documentation.mjs
 !src/Management/Web/src/test-setup.ts

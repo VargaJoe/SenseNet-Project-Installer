@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-shared-management-architecture"></a>
+<!-- documentation-anchors:end -->
 # Shared management architecture
+
+<!-- documentation-navigation -->
+[English](management-architecture.md) | [Magyar](management-architecture-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 The management application wraps the existing native PowerShell engine. The
 React/TypeScript client, ASP.NET Core 8 service and Tauri 2 desktop host share a
@@ -6,6 +13,9 @@ same-origin web interface. The engine remains responsible for object merging,
 whole-array replacement, reference resolution, schema validation, preflight and
 sequential execution. There is no independent JavaScript/C# configuration engine.
 
+<!-- documentation-anchors:start -->
+<a id="doc-components-and-contracts"></a>
+<!-- documentation-anchors:end -->
 ## Components and contracts
 
 | Component | Location / responsibility |
@@ -26,6 +36,9 @@ events go to a separate append-only NDJSON file as they happen. Standard output
 is not a transport for hosted logs: packages may print arbitrary data. The
 retained JSON bridge remains compatible with its earlier callers.
 
+<!-- documentation-anchors:start -->
+<a id="doc-configuration-and-editing"></a>
+<!-- documentation-anchors:end -->
 ## Configuration and editing
 
 Portable project definitions refer to configuration files relative to the
@@ -47,6 +60,9 @@ effective invocation parameters, their engine setting layer, source file/path,
 and recursive settings/environment/output reference provenance. Secret values
 are redacted; reference names remain visible.
 
+<!-- documentation-anchors:start -->
+<a id="doc-execution-and-durability"></a>
+<!-- documentation-anchors:end -->
 ## Execution and durability
 
 Every run performs complete static plot validation before invoking its first
@@ -67,6 +83,9 @@ steps, restore files or undo database/container operations. An external operatio
 already submitted can continue after the client process dies. Application
 shutdown and service-host failure are separate from closing a browser tab.
 
+<!-- documentation-anchors:start -->
+<a id="doc-execution-boundary"></a>
+<!-- documentation-anchors:end -->
 ## Execution boundary
 
 Protocol 1 identifies one runner, its OS, runtime identity and target. Local

@@ -1,10 +1,20 @@
+<!-- documentation-anchors:start -->
+<a id="doc-management-build-desktop-packaging-and-deployment"></a>
+<!-- documentation-anchors:end -->
 # Management build, desktop packaging and deployment
+
+<!-- documentation-navigation -->
+[English](management-deployment.md) | [Magyar](management-deployment-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 The shared React client is served by `src/Management/Server/PlotManager.Server.csproj`.
 The service calls the version 1 JSON worker bridge in isolated PowerShell 7 processes.
 `src/Desktop` is a Tauri 2 native window around **the same service and client**.
 There is no separate desktop configuration resolver. See [API and ownership](management-api.md).
 
+<!-- documentation-anchors:start -->
+<a id="doc-prerequisites"></a>
+<!-- documentation-anchors:end -->
 ## Prerequisites
 
 | Mode | Required on the execution machine |
@@ -43,6 +53,9 @@ installation through `apt` is a separate check. The manual workflow defines an
 Ubuntu 24.04 build as a separate artifact. Other distributions and ARM64 are outside
 the validated package matrix. See the [validation record](management-validation.md).
 
+<!-- documentation-anchors:start -->
+<a id="doc-build-and-local-browser"></a>
+<!-- documentation-anchors:end -->
 ## Build and local browser
 
 From the repository root in PowerShell 7:
@@ -77,6 +90,9 @@ that token in the login screen. Do not pass real tokens in shell history or comm
 them to a project. To run a copied service directory directly, set the variables
 below and execute `service/PlotManager.Server` (Windows: `.exe`).
 
+<!-- documentation-anchors:start -->
+<a id="doc-native-desktop"></a>
+<!-- documentation-anchors:end -->
 ## Native desktop
 
 ```powershell
@@ -150,6 +166,9 @@ that root. The choice belongs to the launcher machine, not the portable project
 definition. Backend ownership/path/link checks still apply, and smoke tests always
 use their isolated project root regardless of this setting.
 
+<!-- documentation-anchors:start -->
+<a id="doc-authenticated-https-server"></a>
+<!-- documentation-anchors:end -->
 ## Authenticated HTTPS server
 
 The browser's execution target is always the service host, under its displayed OS
@@ -220,6 +239,9 @@ There are three separate certificate contexts:
    explicitly authorized project step, with its own private-key permissions. These
    do not automatically become management-service certificates.
 
+<!-- documentation-anchors:start -->
+<a id="doc-tests-and-evidence"></a>
+<!-- documentation-anchors:end -->
 ## Tests and evidence
 
 ```powershell

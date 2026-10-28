@@ -1,0 +1,216 @@
+{
+  "version": 1,
+  "defaultLanguage": "en",
+  "languages": [
+    "en",
+    "hu"
+  ],
+  "entrypoints": {
+    "en": "README.md",
+    "hu": "README-hu.md"
+  },
+  "pages": [
+    {
+      "en": "CONTRIBUTING.md",
+      "hu": "CONTRIBUTING-hu.md"
+    },
+    {
+      "en": "README.md",
+      "hu": "README-hu.md"
+    },
+    {
+      "en": "docs/README.md",
+      "hu": "docs/README-hu.md"
+    },
+    {
+      "en": "docs/build-server-basic-steps.md",
+      "hu": "docs/build-server-basic-steps-hu.md"
+    },
+    {
+      "en": "docs/custom-steps.md",
+      "hu": "docs/custom-steps-hu.md"
+    },
+    {
+      "en": "docs/generic-packages.md",
+      "hu": "docs/generic-packages-hu.md"
+    },
+    {
+      "en": "docs/how-to-execute-a-plot.md",
+      "hu": "docs/how-to-execute-a-plot-hu.md"
+    },
+    {
+      "en": "docs/how-to-execute-steps.md",
+      "hu": "docs/how-to-execute-steps-hu.md"
+    },
+    {
+      "en": "docs/implementation-tasks.md",
+      "hu": "docs/implementation-tasks-hu.md"
+    },
+    {
+      "en": "docs/legacy/build-server-basic-steps.md",
+      "hu": "docs/legacy/build-server-basic-steps-hu.md"
+    },
+    {
+      "en": "docs/legacy/custom-steps.md",
+      "hu": "docs/legacy/custom-steps-hu.md"
+    },
+    {
+      "en": "docs/legacy/how-to-execute-a-plot.md",
+      "hu": "docs/legacy/how-to-execute-a-plot-hu.md"
+    },
+    {
+      "en": "docs/legacy/how-to-execute-steps.md",
+      "hu": "docs/legacy/how-to-execute-steps-hu.md"
+    },
+    {
+      "en": "docs/legacy/settings.md",
+      "hu": "docs/legacy/settings-hu.md"
+    },
+    {
+      "en": "docs/local-integration.md",
+      "hu": "docs/local-integration-hu.md"
+    },
+    {
+      "en": "docs/management-acceptance.md",
+      "hu": "docs/management-acceptance-hu.md"
+    },
+    {
+      "en": "docs/management-api.md",
+      "hu": "docs/management-api-hu.md"
+    },
+    {
+      "en": "docs/management-architecture.md",
+      "hu": "docs/management-architecture-hu.md"
+    },
+    {
+      "en": "docs/management-demo-projects.md",
+      "hu": "docs/management-demo-projects-hu.md"
+    },
+    {
+      "en": "docs/management-deployment.md",
+      "hu": "docs/management-deployment-hu.md"
+    },
+    {
+      "en": "docs/management-guide-index.md",
+      "hu": "docs/management-guide-index-hu.md"
+    },
+    {
+      "en": "docs/management-user-guide.md",
+      "hu": "docs/management-user-guide-hu.md",
+      "localizedTextBlocks": [
+        0,
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "en": "docs/management-validation.md",
+      "hu": "docs/management-validation-hu.md"
+    },
+    {
+      "en": "docs/migration-map.md",
+      "hu": "docs/migration-map-hu.md"
+    },
+    {
+      "en": "docs/operations-packages.md",
+      "hu": "docs/operations-packages-hu.md"
+    },
+    {
+      "en": "docs/platform-packages.md",
+      "hu": "docs/platform-packages-hu.md"
+    },
+    {
+      "en": "docs/plot-manager-runtime.md",
+      "hu": "docs/plot-manager-runtime-hu.md"
+    },
+    {
+      "en": "docs/plot-step-settings-injection.md",
+      "hu": "docs/plot-step-settings-injection-hu.md"
+    },
+    {
+      "en": "docs/plots-steps-audit.md",
+      "hu": "docs/plots-steps-audit-hu.md"
+    },
+    {
+      "en": "docs/powershell-audit-summary.md",
+      "hu": "docs/powershell-audit-summary-hu.md"
+    },
+    {
+      "en": "docs/powershell-coding-standards.md",
+      "hu": "docs/powershell-coding-standards-hu.md"
+    },
+    {
+      "en": "docs/powershell-standards-implementation-plan.md",
+      "hu": "docs/powershell-standards-implementation-plan-hu.md"
+    },
+    {
+      "en": "docs/settings.md",
+      "hu": "docs/settings-hu.md"
+    },
+    {
+      "en": "docs/stories/story01-foundation-transformation.md",
+      "hu": "docs/stories/story01-foundation-transformation-hu.md"
+    },
+    {
+      "en": "docs/stories/story02-angular-modernization.md",
+      "hu": "docs/stories/story02-angular-modernization-hu.md"
+    },
+    {
+      "en": "docs/stories/story03-powershell-standardization.md",
+      "hu": "docs/stories/story03-powershell-standardization-hu.md"
+    },
+    {
+      "en": "docs/stories/story04-testing-framework.md",
+      "hu": "docs/stories/story04-testing-framework-hu.md"
+    },
+    {
+      "en": "docs/stories/story05-security-authentication.md",
+      "hu": "docs/stories/story05-security-authentication-hu.md"
+    },
+    {
+      "en": "docs/stories/story06-docker-orchestration.md",
+      "hu": "docs/stories/story06-docker-orchestration-hu.md"
+    },
+    {
+      "en": "docs/stories/story07-cloud-platform-integration.md",
+      "hu": "docs/stories/story07-cloud-platform-integration-hu.md"
+    },
+    {
+      "en": "docs/stories/story08-monitoring-observability.md",
+      "hu": "docs/stories/story08-monitoring-observability-hu.md"
+    },
+    {
+      "en": "docs/stories/story09-plugin-architecture.md",
+      "hu": "docs/stories/story09-plugin-architecture-hu.md"
+    },
+    {
+      "en": "docs/stories/story10-configuration-management.md",
+      "hu": "docs/stories/story10-configuration-management-hu.md"
+    },
+    {
+      "en": "examples/README.md",
+      "hu": "examples/README-hu.md"
+    },
+    {
+      "en": "examples/management-demos/README.md",
+      "hu": "examples/management-demos/README-hu.md"
+    },
+    {
+      "en": "examples/sensenet-docker/README.md",
+      "hu": "examples/sensenet-docker/README-hu.md"
+    },
+    {
+      "en": "examples/sensenet-docker/VALIDATION.md",
+      "hu": "examples/sensenet-docker/VALIDATION-hu.md"
+    },
+    {
+      "en": "src/GUI/README.md",
+      "hu": "src/GUI/README-hu.md"
+    },
+    {
+      "en": "tests/README.md",
+      "hu": "tests/README-hu.md"
+    }
+  ]
+}

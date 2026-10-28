@@ -1,53 +1,72 @@
-# SenseNet Docker projekt a Plot Managerhez
+<!-- documentation-anchors:start -->
+<a id="doc-sensenet-docker-project-for-plot-manager"></a>
+<!-- documentation-anchors:end -->
+# SenseNet Docker project for Plot Manager
 
-Valódi, helyi fejlesztői SenseNet telepítés: SQL Server Developer, SenseNet repository és IdentityServer. A projekt a meglévő `compose`, `process`, `json` és `filesystem` csomagokat használja. A Plot Manager motorja és konfigurációs formátuma változatlan.
+<!-- documentation-navigation -->
+[English](README.md) | [Magyar](README-hu.md) · [Documentation](../../docs/README.md) · [Project](../../README.md)
+<!-- /documentation-navigation -->
 
-## Indítás az alkalmazásból
+A real local development SenseNet installation: SQL Server Developer, SenseNet repository and IdentityServer. The project uses the existing `compose`, `process`, `json` and `filesystem` packages. The Plot Manager engine and configuration format are unchanged.
 
-1. Másold ezt a teljes könyvtárat a futtató Plot Manager projektgyökerébe, és nyisd meg a **Open project** művelettel. A `.local` könyvtárat ne másold másik projekthez.
-2. A **Guided setup** felületen adj meg egy egyedi `pm-sensenet-…` Compose-nevet és két szabad portot. A beállítások a szokásos `project.json` rétegbe kerülnek.
-3. A Microsoft SQL Server Developer használati feltételeinek elfogadása után ments, ellenőrizd a preflightot, és indítsd az `install` plotot. A Developer kiadás fejlesztésre/tesztelésre való. [Microsoft konténeres SQL útmutató](https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker).
-4. Az eredményben a repository és a bejelentkezési szolgáltatás URL-je, az OData ellenőrzés és a tényleges adminbejelentkezés eredménye jelenik meg. Az első repository-inicializálás több percig tarthat.
+<!-- documentation-anchors:start -->
+<a id="doc-starting-from-the-application"></a>
+<!-- documentation-anchors:end -->
+## Starting from the application
 
-Feltétel: Docker Engine Linux-konténerekkel, Docker Compose v2, PowerShell 7.2 vagy újabb a futtató gép PATH-ján; szabad memória és lemezterület a SQL Serverhez. A stepek a Plot Manager szolgáltatás gépén és felhasználójával futnak. Hostolt Plot Managernél a localhost URL-ek a szerverhez tartoznak.
+1. Copy this entire directory into the running Plot Manager's project root and open it with **Open project**. Do not copy the `.local` directory into another project.
+2. In **Guided setup**, enter a unique `pm-sensenet-…` Compose name and two free ports. Settings are saved in the usual `project.json` layer.
+3. After accepting the Microsoft SQL Server Developer terms, save, check preflight and start the `install` plot. The Developer edition is for development/testing. [Microsoft SQL container guide](https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker).
+4. The result shows the repository and sign-in service URLs, the OData check and the actual admin login result. Initial repository initialization can take several minutes.
 
-## Műveletek
+Prerequisites: Docker Engine with Linux containers, Docker Compose v2 and PowerShell 7.2 or later on the runner machine's PATH; available memory and disk space for SQL Server. Steps run on the Plot Manager service machine under its user identity. With hosted Plot Manager, localhost URLs refer to the server.
 
-| Plot | Eredmény |
+<!-- documentation-anchors:start -->
+<a id="doc-operations"></a>
+<!-- documentation-anchors:end -->
+## Operations
+
+| Plot | Result |
 |---|---|
-| `prepare` | Validálás, saját helyi jelszavak és HTTPS-tanúsítvány létrehozása egyszer. |
-| `install` | Előkészítés, Compose-validálás, szolgáltatások indítása, OData + valódi PKCE adminlogin ellenőrzése. |
-| `start`, `restart` | Indítás vagy újraindítás és hitelesített ellenőrzés. |
-| `status`, `logs` | Saját szolgáltatások állapota, illetve az utolsó 80 naplósor szolgáltatásonként. |
-| `verify` | Aktív kapcsolatteszt, OpenID discovery és bejelentkezés, hitelesített Admin tartalomolvasás. |
-| `demo-content` | Saját mintamappa létrehozása/olvasása az OData API-val. Az ID újrafuttatáskor megmarad. |
-| `verify-demo-content` | A korábban létrehozott mintamappa meglétének ellenőrzése; hiány esetén hibázik. |
-| `stop` | Konténerek leállítása, adatok megőrzése. |
-| `backup` | A saját stack leállítása után a teljes SQL és App_Data volume hidegmentése, hash-manifesttel; a korábban futó szolgáltatások visszaindítása. |
-| `restore` | Kiválasztott saját mentés visszaállítása explicit névmegerősítéssel, majd indítás és ellenőrzés. A jelenlegi saját adatokat lecseréli. |
-| `remove-containers-keep-data` | Saját konténerek és hálózat eltávolítása; a named volume-ok, titkok és mentések megmaradnak. Az `install` visszaindítja. |
+| `prepare` | Validate and create project-local passwords and an HTTPS certificate once. |
+| `install` | Prepare, validate Compose, start services, check OData and actual PKCE admin login. |
+| `start`, `restart` | Start or restart and perform authenticated verification. |
+| `status`, `logs` | Show project service status or the last 80 log lines per service. |
+| `verify` | Active connection test, OpenID discovery and login, authenticated Admin content read. |
+| `demo-content` | Create/read the project's sample folder through the OData API. The ID survives reruns. |
+| `verify-demo-content` | Check that the previously created sample folder exists; fail if absent. |
+| `stop` | Stop containers while preserving data. |
+| `backup` | After stopping this stack, cold-back up the complete SQL and App_Data volumes with a hash manifest; restart services that were previously running. |
+| `restore` | Restore a selected backup belonging to this stack with explicit name confirmation, then start and verify. Replaces this stack's current data. |
+| `remove-containers-keep-data` | Remove this stack's containers and network; retain named volumes, secrets and backups. `install` starts it again. |
 
-Az előnézet/WhatIf statikus ellenőrzés; nem próbál bejelentkezni, nem vizsgál Docker-portfoglalást és nem készít mentést. Egyedi stepek futtatása előtt vedd figyelembe az előkészítés eredményeként létrejövő fájlokat. Teljes plothoz használd a teljes futtatást.
+Preview/WhatIf is a static check; it does not attempt login, inspect Docker port allocation or create a backup. Before running individual steps, account for files created by preparation. Use full execution for a complete plot.
 
-## Adatok, HTTPS és titkok
+<!-- documentation-anchors:start -->
+<a id="doc-data-https-and-secrets"></a>
+<!-- documentation-anchors:end -->
+## Data, HTTPS and secrets
 
-Az alkalmazás saját AppData-projektkönyvtárában élő másolat a munkapéldány; a telepítési könyvtár és a forráscheckout nem automatikus konfigurációforrás. `default.json` → `project.json` → `environments/development.json` a változatlan konfigurációs sorrend.
+The copy in the application's own AppData project directory is the working copy; the installation directory and source checkout are not automatic configuration sources. The configuration order remains `default.json` → `project.json` → `environments/development.json`.
 
-Docker volume-ok: `<stack>_db-data` (`/var/opt/mssql`) és `<stack>_app-data` (`/app/App_Data`). SQL-port nincs publikálva. A repository és az IdentityServer kizárólag a gép loopback interfészén érhető el.
+Docker volumes: `<stack>_db-data` (`/var/opt/mssql`) and `<stack>_app-data` (`/app/App_Data`). No SQL port is published. The repository and IdentityServer are accessible only on the machine's loopback interface.
 
-A generált `.local` könyvtár csak az aktuális operációsrendszer-felhasználónak olvasható: benne a helyi runtime-env, a PFX magánkulcs, az előkészítés állapota és a mentések. Ez szándékosan nincs Gitben. **A mentés is érzékeny adat**, mert adatbázist és a visszaállításhoz szükséges helyi titkokat tartalmazza. A forrásbeli JSON-ok csak publikus paramétereket tartalmaznak. A Dockerhez hozzáférő felhasználó a konténerek konfigurációját olvasni tudja.
+The generated `.local` directory is readable only by the current operating-system user: it contains the local runtime-env, PFX private key, preparation state and backups. It is deliberately excluded from Git. **A backup is also sensitive data**, because it contains a database and the local secrets needed for restoration. Source JSON files contain only public parameters. A user with Docker access can read container configuration.
 
-A localhost tanúsítványt a script nem telepíti az OS tanúsítványtárába. A script HTTP-kliense kizárólag a projekthez generált tanúsítványt fogadja el, hostnév-ellenőrzéssel; más hibás tanúsítványt elutasít. A böngészőben a saját fejlesztői tanúsítványhoz tartozó figyelmeztetés várható. Külső/éles HTTPS-hez külön, valódi tanúsítvány és telepítési konfiguráció szükséges.
+The script does not install the localhost certificate into the OS trust store. Its HTTP client accepts only the certificate generated for this project, with hostname validation; it rejects other invalid certificates. A browser warning for the project's development certificate is expected. External/production HTTPS requires a separate real certificate and deployment configuration.
 
-A hivatalos friss repository demófiókja **admin / admin**. A beépített automatikus ellenőrzés ezt a helyi demófiókot használja. Módosított jelszóhoz ments `SENSENET_ADMIN_PASSWORD` nevű Runner secretet, majd az `Authentication.AdminPassword` beállítást írd át `{"$env":"PLOTMANAGER_SECRET_SENSENET_ADMIN_PASSWORD"}` hivatkozásra. A jelszót a natív process lépés külön környezeti változóként, a futás pillanatképéhez rögzítve kapja; ez a beállítás nincs benne a generált runtime-JSON-ban. CLI esetén ugyanilyen nevű környezeti változó használható.
+The official fresh repository's demo account is **admin / admin**. Built-in automatic verification uses this local demo account. For a changed password, save a Runner secret named `SENSENET_ADMIN_PASSWORD`, then change `Authentication.AdminPassword` to the reference `{"$env":"PLOTMANAGER_SECRET_SENSENET_ADMIN_PASSWORD"}`. The native process step receives the password as a separate environment variable captured for the run snapshot; this setting is not included in generated runtime JSON. The CLI can use an environment variable of the same name.
 
-Ez a minta fejlesztői használatra készült; internetre publikálása és üzemi hitelesítésre átállítása külön feladat. A név és a portok az első előkészítés után rögzítettek: új példányhoz új projektmásolat, másik név és portok kellenek. Az image-ek SHA-256 digesttel rögzítettek, így egy mozgó `preview` vagy `latest` tag újrafuttatáskor nem frissíti őket észrevétlenül.
+This sample is for development use; publishing it to the internet and switching to production authentication are separate tasks. The name and ports are fixed after initial preparation: a new instance requires a new project copy, another name and different ports. Images are pinned by SHA-256 digest, so a moving `preview` or `latest` tag cannot silently update them on a rerun.
 
-Az ellenőrzéshez külön `plotmanager-adminui` PKCE-kliens tartozik, kizárólag a saját repository localhost címére mutató visszahívással. Az ellenőrző script a visszahívási átirányításból olvassa ki a kódot, nem navigál a címre. Külső vagy külön telepített Admin UI csatlakoztatásához további, az adott felület pontos originjére és callbackjére vonatkozó konfiguráció szükséges; ez a projekt ilyen külső hozzáférést nem engedélyez.
+Verification uses a separate `plotmanager-adminui` PKCE client whose callback points only to this repository's localhost address. The verification script reads the code from the callback redirect without navigating to that address. Connecting an external or separately installed Admin UI requires additional configuration for that interface's exact origin and callback; this project does not enable such external access.
 
-## Mentés és visszaállítás
+<!-- documentation-anchors:start -->
+<a id="doc-backup-and-restore"></a>
+<!-- documentation-anchors:end -->
+## Backup and restore
 
-Futtasd a `backup` plotot. A kimenet és a `.local/backups` könyvtár mutatja az elkészült mentést. A `project.json` rétegben állítsd be:
+Run the `backup` plot. The output and `.local/backups` directory identify the completed backup. Set the following in the `project.json` layer:
 
 ```json
 {
@@ -58,11 +77,14 @@ Futtasd a `backup` plotot. A kimenet és a `.local/backups` könyvtár mutatja a
 }
 ```
 
-Ezután `restore`. A névnek pontosan az előkészített stack nevének kell lennie. A művelet a mentés hash-eit és a saját stackhez tartozását a visszaállítás előtt ellenőrzi. A restore után töröld ezt a két felülírást vagy állítsd üresre. Ez az első változat ugyanahhoz a stackhez és azonos rögzített image-ekhez tartozó helyi mentést támogat; új verzióra adatbázis-frissítést nem végez.
+Then run `restore`. The name must exactly match the prepared stack's name. Before restoring, the operation verifies the backup hashes and that the backup belongs to this stack. After restoration, delete these two overrides or set them to empty. This first version supports local backups for the same stack and the same pinned images; it does not upgrade a database to a new version.
 
+<!-- documentation-anchors:start -->
+<a id="doc-cli"></a>
+<!-- documentation-anchors:end -->
 ## CLI
 
-A saját Plot Manager checkout gyökeréből, a `project.json` kitöltése után:
+From the root of your Plot Manager checkout, after filling in `project.json`:
 
 ```powershell
 pwsh -NoProfile -File ./src/Deployment/Scripts/Run.ps1 install `
@@ -72,10 +94,13 @@ pwsh -NoProfile -File ./src/Deployment/Scripts/Run.ps1 install `
   -WorkDirectory ./examples/sensenet-docker
 ```
 
-Az `install` helyére bármelyik fenti plot neve írható. Előnézethez `-WhatIf`. Az alkalmazásba másolt projekt CLI-futtatásakor mindhárom fájlútvonal és a WorkDirectory arra a másolatra mutasson.
+Replace `install` with any plot name above. Use `-WhatIf` for preview. When running a project copied into the application through the CLI, all three file paths and WorkDirectory must point to that copy.
 
-## Publikus alap és határok
+<!-- documentation-anchors:start -->
+<a id="doc-public-foundation-and-boundaries"></a>
+<!-- documentation-anchors:end -->
+## Public foundation and boundaries
 
-A friss, önálló projekt a hivatalos [SenseNet perzisztens Compose forgatókönyv](https://github.com/SenseNet/sensenet/blob/f889cfce16e724ad095d4ca976a2e0d7fa362c26/deployment/docker-compose.with-volume.yml), [szolgáltatásdefiníciók](https://github.com/SenseNet/sensenet/blob/f889cfce16e724ad095d4ca976a2e0d7fa362c26/deployment/compose.services.yml) és [IdentityServer PKCE teszt](https://github.com/SenseNet/sensenet/blob/f889cfce16e724ad095d4ca976a2e0d7fa362c26/deployment/tests/Test-IdentityServerLogin.ps1) publikus szerződéseire épül. Céges telepítőből nincs átvett kód vagy konfiguráció.
+This fresh standalone project builds on the public contracts of the official [SenseNet persistent Compose scenario](https://github.com/SenseNet/sensenet/blob/f889cfce16e724ad095d4ca976a2e0d7fa362c26/deployment/docker-compose.with-volume.yml), [service definitions](https://github.com/SenseNet/sensenet/blob/f889cfce16e724ad095d4ca976a2e0d7fa362c26/deployment/compose.services.yml) and [IdentityServer PKCE test](https://github.com/SenseNet/sensenet/blob/f889cfce16e724ad095d4ca976a2e0d7fa362c26/deployment/tests/Test-IdentityServerLogin.ps1). No code or configuration was transferred from a company installer.
 
-Nincs automatikus image-frissítés, éles közzététel, többgépes telepítés vagy volume-törlő reset plot. A Plot Manager futásmegszakítása nem jelent Docker-rollbacket. A projekt saját scriptjei és Compose-fájljai külső bemeneti fájlok: futás közben ezeket ne szerkeszd; a motor és a JSON-rétegek futási pillanatképe nem fagyasztja be ezeket a fájlokat.
+There is no automatic image update, production publishing, multi-machine deployment or volume-deleting reset plot. Cancelling a Plot Manager run does not mean Docker rollback. The project's scripts and Compose files are external input files: do not edit them during a run; the run snapshot of the engine and JSON layers does not freeze these files.

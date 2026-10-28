@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-local-gui-and-structured-integration"></a>
+<!-- documentation-anchors:end -->
 # Local GUI and structured integration
+
+<!-- documentation-navigation -->
+[English](local-integration.md) | [Magyar](local-integration-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 `Show-PlotRunner.ps1` is a small Windows Forms host for the native runtime. Launch it from Windows PowerShell 5.1 (or a Windows PowerShell 7 installation with Windows Forms):
 
@@ -16,6 +23,9 @@ The window uses the same PowerShell executable that launched it. It does not ele
 
 The old Angular client and experimental HTTP listener remain historical code. They are not wired to the native engine and should not be exposed as a remote command-execution endpoint. The new host uses a local child process and an ephemeral request file; it starts no network listener. Only load trusted package folders, plots, scripts and tool arguments, under the operating-system identity authorized to perform their operations.
 
+<!-- documentation-anchors:start -->
+<a id="doc-json-request-protocol-version-1"></a>
+<!-- documentation-anchors:end -->
 ## JSON request protocol, version 1
 
 The host-independent bridge is `Core/PlotIntegration.psm1` -> `Invoke-PlotRequest`. The CLI wrapper is:
@@ -46,6 +56,9 @@ Example request:
 
 There is no arbitrary command-string field, script evaluation or remotely selectable module path. This is an integration contract for a trusted local caller, not an authentication boundary. A desktop application can invoke the script via a process argument array and parse stdout; a remote service would still need its own authentication, authorization, request limits and isolation.
 
+<!-- documentation-anchors:start -->
+<a id="doc-acceptance-check"></a>
+<!-- documentation-anchors:end -->
 ## Acceptance check
 
 Use the existing layered-artifact example with a newly created temporary work directory. Load default.json, project.json and environment.json from `Examples/layered-artifact` in that order. Preview should leave the directory unchanged; Run should create the documented artifacts and show Succeeded. Running it again should report its normal existing-file behavior. The main regression suite exercises the request protocol on both supported PowerShell hosts; `tests/Run-GuiSmoke.ps1` also exercises the real controls and asynchronous child execution without a visible window. Visual Windows Forms interaction requires this manual check.

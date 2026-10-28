@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-plot-manager-complete-guide-to-the-four-demo-projects"></a>
+<!-- documentation-anchors:end -->
 # Plot Manager: a négy demóprojekt teljes használati útmutatója
+
+<!-- documentation-navigation -->
+[English](management-demo-projects.md) | [Magyar](management-demo-projects-hu.md) · [Dokumentáció](README-hu.md) · [Projekt](../README-hu.md)
+<!-- /documentation-navigation -->
 
 Ez a katalógus a telepített alkalmazásban megnyitható négy projektet magyarázza:
 mit állítanak elő, melyik plotot mikor válaszd, és mit végez minden lépés.
@@ -6,6 +13,9 @@ A forráslinkek a GitHubon is olvashatók; a megértéshez nem kell futó alkalm
 A képernyők és kezelőszervek részletes leírása a
 [magyar GUI-kézikönyvben](management-user-guide-hu.md) található.
 
+<!-- documentation-anchors:start -->
+<a id="doc-contents-and-suggested-order"></a>
+<!-- documentation-anchors:end -->
 ## Tartalom és javasolt sorrend
 
 | Projekt az alkalmazásban | Mit tanít? | Plotok | Külső feltétel |
@@ -15,11 +25,14 @@ A képernyők és kezelőszervek részletes leírása a
 | [03 – JSON, XML és ZIP csomagolás](#demo-03) | Kilenc lépésből álló helyi csomagolás és visszaolvasás; development/production eredmény. | `package` | Nincs. |
 | [04 – SenseNet Docker telepítés és menedzsment](#demo-04) | SQL + repository + IdentityServer telepítés, ellenőrzés, tartalom, napi kezelés, mentés/visszaállítás. | 13 plot, lent mind felsorolva. | Docker Linux-konténerekkel, Compose v2, PowerShell 7.2+. |
 
-Az első három projekt forrása az [examples/management-demos](../examples/management-demos)
+Az első három projekt forrása az [examples/management-demos](../examples/management-demos/README-hu.md)
 könyvtárban van, csak a bemenetekkel. A negyediké az
-[examples/sensenet-docker](../examples/sensenet-docker) könyvtárban.
+[examples/sensenet-docker](../examples/sensenet-docker/README-hu.md) könyvtárban.
 A futtatás eredményei és titkai nem részei ezeknek a GitHub-mappáknak.
 
+<!-- documentation-anchors:start -->
+<a id="doc-how-to-read-the-demos"></a>
+<!-- documentation-anchors:end -->
 ## Hogyan olvasd a demókat?
 
 **Projekt** = hordozható mappa. A `plot-project.json` adja a nevet, a rétegfájlok
@@ -63,6 +76,9 @@ nem igazolja a jelszót, portfoglalást vagy a külső szolgáltatás készenlé
 A valódi futás is teljes preflighttal kezdődik; a lépések végrehajtása ezt követi.
 
 <a id="demo-01"></a>
+<!-- documentation-anchors:start -->
+<a id="doc-01--guided-file-installer"></a>
+<!-- documentation-anchors:end -->
 ## 01 – Vezetett fájltelepítő
 
 Forrás: [projektleíró és wizard](../examples/management-demos/01-vezetett-telepito/plot-project.json),
@@ -70,6 +86,9 @@ Forrás: [projektleíró és wizard](../examples/management-demos/01-vezetett-te
 [projektértékek](../examples/management-demos/01-vezetett-telepito/project.json),
 [development](../examples/management-demos/01-vezetett-telepito/environments/development.json).
 
+<!-- documentation-anchors:start -->
+<a id="doc-what-do-you-see-and-what-is-the-result"></a>
+<!-- documentation-anchors:end -->
 ### Mit látsz és mi az eredmény?
 
 Ez egy kicsi, valódi fájlíró telepítő. Az `install` egyetlen üzenetet állít össze,
@@ -78,6 +97,9 @@ A default `hello.txt` / `Hello from Plot Manager` értékeit a projekt felülír
 `udvozlet.txt` / `Szia a Plot Manager demóból!` értékekre. A development réteg üres,
 így nem változtat rajtuk. Más előre definiált environment itt nincs.
 
+<!-- documentation-anchors:start -->
+<a id="doc-every-step-in-install"></a>
+<!-- documentation-anchors:end -->
 ### Az `install` összes lépése
 
 | Sorrend / ID | Natív Step | Bemenet és tevékenység | Output és függőség |
@@ -85,6 +107,9 @@ A default `hello.txt` / `Hello from Plot Manager` értékeit a projekt felülír
 | 1. `compose` | `text.join` | `Items` = egyetlen elem, `settings.Sample.Message`; `Separator` = üres szöveg. Összefűzi az üzenetet. A név itt szövegösszeállítást jelent, nincs Docker Compose. | `Output.Text` = a teljes üzenet. Önállóan is futtatható. |
 | 2. `save` | `filesystem.write` | `Path` = `settings.Sample.Target`; `Content` = `steps.compose.Output.Text`; `Overwrite:true`. Megírja vagy felülírja a célfájlt. | `Output.Path`, `Output.Bytes`. A jelen futás `compose` outputját igényli. |
 
+<!-- documentation-anchors:start -->
+<a id="doc-a-first-guided-installation"></a>
+<!-- documentation-anchors:end -->
 ### A: első vezetett telepítés
 
 1. Nyisd meg a projektet és a `Guided setup` oldalt.
@@ -98,6 +123,9 @@ A default `hello.txt` / `Hello from Plot Manager` értékeit a projekt felülír
 6. A `Result`/`Run history` eredményében mindkét lépés sikeres. A projektmappában
    ott a célfájl, a megadott üzenettel; a `save` outputjában az elérési út és bájtszám.
 
+<!-- documentation-anchors:start -->
+<a id="doc-b-understanding-a-single-step-and-its-dependency"></a>
+<!-- documentation-anchors:end -->
 ### B: egyetlen lépés és a függőség megértése
 
 1. A `Plot editor` oldalon válaszd az `install` plotot, majd a `compose` sort.
@@ -113,6 +141,9 @@ fájljaid kézi törlése; a plotnak nincs rollback vagy cleanup lépése. A wiz
 mentett beállításokat külön vissza kell állítani, ha az eredeti példát szeretnéd.
 
 <a id="demo-02"></a>
+<!-- documentation-anchors:start -->
+<a id="doc-02--layers-types-and-references"></a>
+<!-- documentation-anchors:end -->
 ## 02 – Rétegek, típusok és hivatkozások
 
 Forrás: [projektleíró](../examples/management-demos/02-retegek-es-hivatkozasok/plot-project.json),
@@ -121,6 +152,9 @@ Forrás: [projektleíró](../examples/management-demos/02-retegek-es-hivatkozaso
 [development](../examples/management-demos/02-retegek-es-hivatkozasok/environments/development.json),
 [production](../examples/management-demos/02-retegek-es-hivatkozasok/environments/production.json).
 
+<!-- documentation-anchors:start -->
+<a id="doc-what-do-you-see-and-what-is-the-result-1"></a>
+<!-- documentation-anchors:end -->
 ### Mit látsz és mi az eredmény?
 
 A `show-settings` a feloldott `Demo` objektumot kiírja `settings-result.json`
@@ -128,6 +162,9 @@ néven, majd visszaolvassa. Így az effektív konfigurációt a valódi fájl é
 `read.Output.Value` mellett is összehasonlíthatod. Itt nincs wizard: a tananyag
 a `Configuration`, az environmentváltó, a `Plot editor` és a preflight használata.
 
+<!-- documentation-anchors:start -->
+<a id="doc-actual-results-for-the-two-environments"></a>
+<!-- documentation-anchors:end -->
 ### A két environment tényleges eredménye
 
 | `Demo` mező | Default → projekt | development eredmény | production eredmény |
@@ -150,6 +187,9 @@ konfiguráció és a veszteségmentes szerkesztés szemléltetésére szolgálna
 ismeretlen mezőt és a JavaScript biztonságos egész tartományán túli számot is
 meg kell őrizni. Ne kerekítsd át kézzel a számot.
 
+<!-- documentation-anchors:start -->
+<a id="doc-every-invocation-in-both-plots"></a>
+<!-- documentation-anchors:end -->
 ### Minden invocation mindkét plotban
 
 | Plot / sorrend | ID / natív Step | Bemenet és művelet | Eredmény |
@@ -159,6 +199,9 @@ meg kell őrizni. Ne kerekítsd át kézzel a számot.
 | `hibas-sorrend` 1. | `read` / `json.read` | Ugyanaz a `steps.export.Output.Path`, de az `export` csak ezután állna elő. | A **teljes plot preflightja elutasítja**, még a fájlolvasás előtt. |
 | `hibas-sorrend` 2. | `export` / `json.write` | Ugyanazok a paraméterek, mint a jó plotban. | Nem hajtódik végre, mert az előrefelé mutató outputhivatkozás hibás. |
 
+<!-- documentation-anchors:start -->
+<a id="doc-a-comparing-development-and-production"></a>
+<!-- documentation-anchors:end -->
 ### A: development és production összehasonlítása
 
 1. Válaszd a `development` environmentet és a `Configuration` oldalt.
@@ -170,6 +213,9 @@ meg kell őrizni. Ne kerekítsd át kézzel a számot.
 5. Válts `production` environmentre, majd ismét teljes futás. A fájl lecserélődik
    a production értékeire; az előző development futás outputja a történetben megmarad.
 
+<!-- documentation-anchors:start -->
+<a id="doc-b-trying-inheritance-and-the-deliberate-error"></a>
+<!-- documentation-anchors:end -->
 ### B: az öröklés és a szándékos hiba kipróbálása
 
 1. A `Configuration` oldalon kifejezetten a development rétegben távolítsd el
@@ -187,6 +233,9 @@ A `read` külön futtatása hiányzó korábbi output miatt elutasított. **Újr
 saját eredményfájlt töröld; a konfigurációs kísérleteket külön állítsd vissza.
 
 <a id="demo-03"></a>
+<!-- documentation-anchors:start -->
+<a id="doc-03--json-xml-and-zip-packaging"></a>
+<!-- documentation-anchors:end -->
 ## 03 – JSON, XML és ZIP csomagolás
 
 Forrás: [projektleíró](../examples/management-demos/03-json-xml-zip/plot-project.json),
@@ -195,6 +244,9 @@ Forrás: [projektleíró](../examples/management-demos/03-json-xml-zip/plot-proj
 [development](../examples/management-demos/03-json-xml-zip/environments/development.json),
 [production](../examples/management-demos/03-json-xml-zip/environments/production.json).
 
+<!-- documentation-anchors:start -->
+<a id="doc-what-do-you-see-and-what-is-the-result-2"></a>
+<!-- documentation-anchors:end -->
 ### Mit látsz és mi az eredmény?
 
 Egyetlen `package` plot épít helyi csomagot. Nem fordít alkalmazást, nem használ
@@ -235,6 +287,9 @@ felülírás), `Attempts:0`, `Optional:null`, `Enabled:false`. Developmentben
 `Environment:"production"`, `Features:["release"]`. A README közös:
 `Ez egy általános, helyi Plot Manager demócsomag.`
 
+<!-- documentation-anchors:start -->
+<a id="doc-a-building-and-inspecting-a-package"></a>
+<!-- documentation-anchors:end -->
 ### A: csomag építése és megvizsgálása
 
 1. `development` environment → `Plot editor` → `package`.
@@ -246,6 +301,9 @@ felülírás), `Attempts:0`, `Optional:null`, `Enabled:false`. Developmentben
 5. Válts `production` environmentre, futtasd újra. Az XML és a manifest most
    productiont, a feature tömb csak `release` értéket tartalmazzon.
 
+<!-- documentation-anchors:start -->
+<a id="doc-b-why-does-a-single-steps-prior-state-matter"></a>
+<!-- documentation-anchors:end -->
 ### B: miért számít az egyedi lépés előzménye?
 
 A `directory` önállóan biztonságosan létrehozza a mappát. A `template`,
@@ -265,6 +323,9 @@ A checksum kiszámítása önmagában nem hasonlítja össze egy előre ismert h
 a `verify` pedig visszaolvas, nem futtat alkalmazástesztet.
 
 <a id="demo-04"></a>
+<!-- documentation-anchors:start -->
+<a id="doc-04--sensenet-docker-installation-and-management"></a>
+<!-- documentation-anchors:end -->
 ## 04 – SenseNet Docker telepítés és menedzsment
 
 Forrás: [projektleíró és wizard](../examples/sensenet-docker/plot-project.json),
@@ -273,9 +334,12 @@ Forrás: [projektleíró és wizard](../examples/sensenet-docker/plot-project.js
 [development](../examples/sensenet-docker/environments/development.json),
 [Compose-topológia](../examples/sensenet-docker/compose.yaml),
 [Manage-SenseNet.ps1](../examples/sensenet-docker/scripts/Manage-SenseNet.ps1).
-További üzemeltetési részletek: [SenseNet README](../examples/sensenet-docker/README.md),
-[korábbi valódi ellenőrzés bizonyítéka](../examples/sensenet-docker/VALIDATION.md).
+További üzemeltetési részletek: [SenseNet README](../examples/sensenet-docker/README-hu.md),
+[korábbi valódi ellenőrzés bizonyítéka](../examples/sensenet-docker/VALIDATION-hu.md).
 
+<!-- documentation-anchors:start -->
+<a id="doc-the-stack-and-data-locations"></a>
+<!-- documentation-anchors:end -->
 ### A stack és az adatok helye
 
 Ez már tényleges, helyi fejlesztői telepítés. A forrás alapértékei:
@@ -305,10 +369,13 @@ A SQL Developer licencet a használónak el kell fogadnia; a forrásban a kapcso
 alapértéke `false`. Ez fejlesztői minta; a beépített új repository `admin/admin`
 belépése és a saját localhost tanúsítvány nem éles használatra készült.
 
+<!-- documentation-anchors:start -->
+<a id="doc-every-plot-in-actual-execution-order"></a>
+<!-- documentation-anchors:end -->
 ### Az összes plot, a tényleges végrehajtási sorrenddel
 
 **Minden plot ugyanazzal a három invocationnel kezdődik.** A táblázatban a
-`közös 1–3` mindig az alábbi három valódi sort jelenti, nem rejtett vagy külön
+közös 1–3 mindig az alábbi három valódi sort jelenti, nem rejtett vagy külön
 motorfunkciót:
 
 | Sorrend / ID | Natív Step | Pontos feladat |
@@ -345,6 +412,9 @@ időtartam szerepel; a Compose output ugyanezt a folyamatmodellt használja.
 A helper értelmezhető sikerüzenetet ír: URL-ek, ellenőrzött content path/ID,
 mentési útvonal. A generált jelszavakat és tokeneket nem kell kiolvasni hozzá.
 
+<!-- documentation-anchors:start -->
+<a id="doc-what-does-the-helper-do-for-each-action"></a>
+<!-- documentation-anchors:end -->
 ### Mit végez a helper az egyes actionök alatt?
 
 | Helper action | Belső folyamat és korlát |
@@ -355,6 +425,9 @@ mentési útvonal. A generált jelszavakat és tokeneket nem kell kiolvasni hozz
 | `backup` | Tulajdonlás és befejezett telepítés ellenőrzése, stack leállítása, a két saját volume tar.gz mentése hálózat nélküli átmeneti segédkonténerrel, a már helyben lévő rögzített SQL-image-ből. Runtime-titkok és tanúsítvány másolása; méret/hash lista. A korábban futó szolgáltatásokat visszaindítja. A mentés idején kiesés van. |
 | `restore` | Csak e projekt `.local/backups` alatti könyvtár; pontos stacknév-megerősítés; egyező binding, image-ek, tanúsítvány, öt fájl neve/mérete/hash-e. Mindez az adatcsere előtt ellenőrződik. A saját leállított volume-ok tartalmát kicseréli és a private fájlokat visszaállítja. Részleges hiba esetén a szolgáltatásokat leállítva hagyja. A teljes plot később indít és loginellenőrzést végez. |
 
+<!-- documentation-anchors:start -->
+<a id="doc-a-first-installation-from-the-gui"></a>
+<!-- documentation-anchors:end -->
 ### A: első telepítés a GUI-ból
 
 1. Nyisd meg a negyedik projektet → `development` → `Guided setup`.
@@ -372,6 +445,9 @@ mentési útvonal. A generált jelszavakat és tokeneket nem kell kiolvasni hozz
    tanúsítvány nincs automatikusan az OS megbízható tárolójába telepítve, ezért a
    böngésző figyelmeztetése várható. Az API-oldal nem egy külön telepített Admin UI.
 
+<!-- documentation-anchors:start -->
+<a id="doc-b-daily-management-and-data-persistence"></a>
+<!-- documentation-anchors:end -->
 ### B: napi kezelés és adatmegmaradás
 
 1. `Plot editor` → `demo-content` → preflight → teljes futás. Jegyezd fel a
@@ -384,6 +460,9 @@ mentési útvonal. A generált jelszavakat és tokeneket nem kell kiolvasni hozz
 6. A konténerek eltávolításának próbájához `remove-containers-keep-data` →
    `install` → `verify-demo-content`. Ez is adatmegőrző folyamat; nincs reset plot.
 
+<!-- documentation-anchors:start -->
+<a id="doc-c-backup-and-deliberate-restore"></a>
+<!-- documentation-anchors:end -->
 ### C: mentés és tudatos visszaállítás
 
 1. Előbb legyen sikeres telepítés és `demo-content`. Ne indíts párhuzamos
@@ -419,6 +498,9 @@ támogat. Nem másik gépre migráló vagy verziófrissítő eszköz; hash-ellen
 sérülést jelzi, nem helyettesít külső digitális aláírást. A mentés jelszavakat is
 tartalmaz: tartsd meg a korlátozott hozzáférést, ne töltsd a PR-ba.
 
+<!-- documentation-anchors:start -->
+<a id="doc-single-step-environment-rerun-and-cleanup"></a>
+<!-- documentation-anchors:end -->
 ### Single step, environment, újrafuttatás és takarítás
 
 A SenseNet plotokban nincs `steps.…Output` referencia; a sorrend nagy része
@@ -455,6 +537,9 @@ Megváltoztatott repository adminjelszó esetén a Runner secret neve legyen
 Ez a beállítás az ellenőrző kliensnek adja át a már létező jelszót; magát a
 SenseNet-fiókot nem módosítja. A nyers JSON-ba ne ments új valódi jelszót.
 
+<!-- documentation-anchors:start -->
+<a id="doc-cli-the-same-layers-and-engine"></a>
+<!-- documentation-anchors:end -->
 ## CLI: ugyanazok a rétegek, ugyanaz a motor
 
 A GUI a natív Plot Manager motort használja. A következő parancsokat a checkout
@@ -462,6 +547,9 @@ gyökeréből futtasd. Más projektmásolat esetén **mindhárom konfigurációs
 és a WorkDirectory is ugyanarra a másolatra** mutasson. A CLI közvetlen futása
 nem hoz létre a GUI szolgáltatásában Run history rekordot.
 
+<!-- documentation-anchors:start -->
+<a id="doc-01-guided-file-installer"></a>
+<!-- documentation-anchors:end -->
 ### 01: vezetett fájltelepítő
 
 ```powershell
@@ -472,6 +560,9 @@ pwsh -NoProfile -File ./src/Deployment/Scripts/Run.ps1 install `
   -WorkDirectory ./examples/management-demos/01-vezetett-telepito
 ```
 
+<!-- documentation-anchors:start -->
+<a id="doc-02-exporting-development-settings"></a>
+<!-- documentation-anchors:end -->
 ### 02: development beállítások exportja
 
 ```powershell
@@ -485,6 +576,9 @@ pwsh -NoProfile -File ./src/Deployment/Scripts/Run.ps1 show-settings `
 A fájlnévben `development` helyett `production` a másik környezet. A plot neve
 helyére `hibas-sorrend` írva az elvárt függőségi hibát kapod.
 
+<!-- documentation-anchors:start -->
+<a id="doc-03-production-package"></a>
+<!-- documentation-anchors:end -->
 ### 03: production csomag
 
 ```powershell
@@ -495,6 +589,9 @@ pwsh -NoProfile -File ./src/Deployment/Scripts/Run.ps1 package `
   -WorkDirectory ./examples/management-demos/03-json-xml-zip
 ```
 
+<!-- documentation-anchors:start -->
+<a id="doc-04-sensenet-static-preview"></a>
+<!-- documentation-anchors:end -->
 ### 04: SenseNet statikus előnézet
 
 ```powershell
@@ -512,6 +609,9 @@ feltételeket; ezután a `-WhatIf` elhagyható. A plotnév bármelyik dokumentá
 SenseNet plotra cserélhető. A CLI `-Step` egy natív Step külön futtatására való,
 nem egy már meglévő plot invocation-ID-jének kiválasztója.
 
+<!-- documentation-anchors:start -->
+<a id="doc-relationship-between-github-source-and-installed-copies"></a>
+<!-- documentation-anchors:end -->
 ## A GitHub-forrás és a telepített másolat kapcsolata
 
 Az első három forrásprojekt 14 JSON-bemenete az alkalmazásban korábban létrehozott

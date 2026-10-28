@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-management-api-protocol-1"></a>
+<!-- documentation-anchors:end -->
 # Management API, protocol 1
+
+<!-- documentation-navigation -->
+[English](management-api.md) | [Magyar](management-api-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 The .NET 8 service serves the shared React client and `/api` from the same origin.
 All JSON wrappers use lower camel case. Native engine responses in `engine` retain

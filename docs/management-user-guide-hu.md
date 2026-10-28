@@ -1,25 +1,40 @@
+<!-- documentation-anchors:start -->
+<a id="doc-plot-manager--complete-user-guide"></a>
+<!-- documentation-anchors:end -->
 # Plot Manager – teljes felhasználói útmutató
+
+<!-- documentation-navigation -->
+[English](management-user-guide.md) | [Magyar](management-user-guide-hu.md) · [Dokumentáció](README-hu.md) · [Projekt](../README-hu.md)
+<!-- /documentation-navigation -->
 
 Ez az útmutató a jelenlegi asztali és böngészős Plot Manager felületét mutatja be. Az angol feliratokat pontosan úgy írjuk, ahogy a GUI-ban szerepelnek; utánuk magyarul olvasható a jelentésük és a hatásuk. Az oldalak leírása a GitHubon, a helyi gép és futó alkalmazás nélkül is követhető.
 
-A négy elkészített projekt részletes, lépésenkénti bemutatója a [Demóprojektek és forgatókönyvek](management-demo-projects-hu.md) dokumentumban található. A `04 – SenseNet Docker telepítés és menedzsment` projekt külön [telepítési és üzemeltetési leírást](../examples/sensenet-docker/README.md) is kapott.
+A négy elkészített projekt részletes, lépésenkénti bemutatója a [Demóprojektek és forgatókönyvek](management-demo-projects-hu.md) dokumentumban található. A `04 – SenseNet Docker telepítés és menedzsment` projekt külön [telepítési és üzemeltetési leírást](../examples/sensenet-docker/README-hu.md) is kapott.
 
+A szerkesztési állapot megőrzésének alább leírt javításai a `codex/management-editing-safety` forráság részei. A korábban átadott, `a8cb561b` buildből készült telepítők még a javítás előtti felületet tartalmazzák. A forrás és a csomagok ellenőrzését az [ellenőrzési eredmények](management-validation-hu.md#doc-editing-safety-follow-up) különválasztják.
+
+<!-- documentation-anchors:start -->
+<a id="doc-contents"></a>
+<!-- documentation-anchors:end -->
 ## Tartalom
 
-1. [Mit jelent a projekt, a plot és a lépés?](#1-mit-jelent-a-projekt-a-plot-és-a-lépés)
-2. [Hol fut, hol tárol, mi történik bezáráskor?](#2-hol-fut-hol-tárol-mi-történik-bezáráskor)
-3. [Belépés és a képernyő felépítése](#3-belépés-és-a-képernyő-felépítése)
-4. [Workspace – projektek és környezetek](#4-workspace--projektek-és-környezetek)
-5. [Configuration – forrásrétegek és öröklés](#5-configuration--forrásrétegek-és-öröklés)
-6. [Plot editor – lépések összeállítása](#6-plot-editor--lépések-összeállítása)
-7. [Ellenőrzés, előnézet és tényleges futtatás](#7-ellenőrzés-előnézet-és-tényleges-futtatás)
-8. [Run history – eredmények, napló és leállítás](#8-run-history--eredmények-napló-és-leállítás)
-9. [Guided setup – vezetett beállítás](#9-guided-setup--vezetett-beállítás)
-10. [Runner secrets – titkok kezelése](#10-runner-secrets--titkok-kezelése)
-11. [Teljes munkafolyamatok](#11-teljes-munkafolyamatok)
-12. [Hibák és gyakori kérdések](#12-hibák-és-gyakori-kérdések)
-13. [Jelenlegi határok és további dokumentáció](#13-jelenlegi-határok-és-további-dokumentáció)
+1. [Mit jelent a projekt, a plot és a lépés?](#doc-1-what-are-projects-plots-and-steps)
+2. [Hol fut, hol tárol, mi történik bezáráskor?](#doc-2-where-does-it-run-and-store-data-and-what-happens-when-it-closes)
+3. [Belépés és a képernyő felépítése](#doc-3-signing-in-and-the-screen-layout)
+4. [Workspace – projektek és környezetek](#doc-4-workspace--projects-and-environments)
+5. [Configuration – forrásrétegek és öröklés](#doc-5-configuration--source-layers-and-inheritance)
+6. [Plot editor – lépések összeállítása](#doc-6-plot-editor--composing-steps)
+7. [Ellenőrzés, előnézet és tényleges futtatás](#doc-7-validation-preview-and-actual-execution)
+8. [Run history – eredmények, napló és leállítás](#doc-8-run-history--results-logs-and-stopping)
+9. [Guided setup – vezetett beállítás](#doc-9-guided-setup--guided-configuration)
+10. [Runner secrets – titkok kezelése](#doc-10-runner-secrets--managing-secrets)
+11. [Teljes munkafolyamatok](#doc-11-complete-workflows)
+12. [Hibák és gyakori kérdések](#doc-12-errors-and-frequently-asked-questions)
+13. [Jelenlegi határok és további dokumentáció](#doc-13-current-limits-and-further-documentation)
 
+<!-- documentation-anchors:start -->
+<a id="doc-1-what-are-projects-plots-and-steps"></a>
+<!-- documentation-anchors:end -->
 ## 1. Mit jelent a projekt, a plot és a lépés?
 
 | Fogalom | Jelentése | Példa |
@@ -36,8 +51,14 @@ A négy elkészített projekt részletes, lépésenkénti bemutatója a [Demópr
 
 A plot lineáris: az első lépés után a második, majd a harmadik következik. Egy korábbi lépés kimenete lehet egy későbbi bemenete. A GUI ugyanazt a PowerShell-motort használja, amely a natív parancssori futtatást is végzi.
 
+<!-- documentation-anchors:start -->
+<a id="doc-2-where-does-it-run-and-store-data-and-what-happens-when-it-closes"></a>
+<!-- documentation-anchors:end -->
 ## 2. Hol fut, hol tárol, mi történik bezáráskor?
 
+<!-- documentation-anchors:start -->
+<a id="doc-the-browser-is-the-interface-the-service-does-the-work"></a>
+<!-- documentation-anchors:end -->
 ### A böngésző a kezelőfelület; a szolgáltatás végzi a munkát
 
 ```text
@@ -52,8 +73,11 @@ PowerShell-motor → fájlok / Docker / HTTP / más telepített csomagok
 
 Ez értelmező ábra, nem képernyőkép. A **PROJECT DIRECTORY** a szolgáltatás gépén található könyvtár. Az **EXECUTION TARGET** mutatja, melyik gép és felhasználó végez műveleteket. Egy távoli szerverhez kapcsolódó böngészőben a `localhost`, a Docker és a fájlútvonalak a végrehajtó szempontjából értendők, ha az adott lépés nem határoz meg más célt.
 
-Az **Environment** választó konfigurációt vált; nem választ másik végrehajtó gépet. A jelenlegi GUI egy szolgáltatás saját végrehajtóját használja. Több távoli agent kiválasztására még nincs kezelőfelület.
+Ugyanaz a React-alkalmazás fut az asztali ablakban és a böngészőben, és kizárólag a saját ASP.NET-szolgáltatásához kapcsolódik. Az **Environment** választó konfigurációt vált; nem választ másik végrehajtó gépet. A jelenlegi GUI egy szolgáltatás saját végrehajtóját használja. Több távoli agent kiválasztására még nincs kezelőfelület.
 
+<!-- documentation-anchors:start -->
+<a id="doc-storage-locations-and-format"></a>
+<!-- documentation-anchors:end -->
 ### Tárolási helyek és formátum
 
 Az alábbiak a normál indítók alapértékei Windowson. Az üzemeltető más adattárat és engedélyezett projektgyökeret is megadhat.
@@ -64,7 +88,7 @@ Az alábbiak a normál indítók alapértékei Windowson. Az üzemeltető más a
 | `Start-Management.ps1` böngészős indító | `%LOCALAPPDATA%\PlotManager\browser` | Az adattár `projects` alkönyvtára. |
 | Közvetlenül indított vagy hosted szolgáltatás | Az üzemeltető `PLOTMANAGER_DATA` beállítása; közvetlen indításkor a szolgáltatás alapértéke `%LOCALAPPDATA%\PlotManager`. | `PLOTMANAGER_PROJECT_ROOT`, ennek hiányában az adattár `projects` könyvtára. |
 
-Linuxon a megfelelő felhasználói alkalmazásadat-könyvtár használatos; a tényleges projektútvonal mindig a GUI-ban ellenőrizhető. Az asztali indító projektgyökere a `PLOTMANAGER_DESKTOP_PROJECT_ROOT` helyi indítási beállítással módosítható; részletek a [telepítési leírásban](management-deployment.md#native-desktop).
+Linuxon a megfelelő felhasználói alkalmazásadat-könyvtár használatos; a tényleges projektútvonal mindig a GUI-ban ellenőrizhető. Az asztali indító projektgyökere a `PLOTMANAGER_DESKTOP_PROJECT_ROOT` helyi indítási beállítással módosítható; részletek a [telepítési leírásban](management-deployment-hu.md#doc-native-desktop).
 
 A program telepítési könyvtára a programfájlok helye. A beállításokat a projekt kiválasztott JSON-fájljai tartalmazzák; a szolgáltatás adattárában van a projektregiszter, a futási előzmény és a helyi titoktár. A forráskód checkoutjából nem vesz fel automatikusan projekteket.
 
@@ -81,10 +105,13 @@ projekt/
 └── ...                          # a projekt saját fájljai és eredményei
 ```
 
-A `default.json` és `project.json` elnevezés bevett minta, nem kötelező fájlnév: a `plot-project.json` relatív útvonalai határozzák meg a használt fájlokat. A konfiguráció a natív motor meglévő JSON-formátuma marad. A `plot-project.json` ehhez ad hordozható GUI-projektleírást; a GUI nem alakítja a rétegeket egy új, összelapított beállításfájllá. A történelmi `-Legacy` konfiguráció külön kompatibilitási út, lásd [a régi formátum leírását](legacy/settings.md).
+A `default.json` és `project.json` elnevezés bevett minta, nem kötelező fájlnév: a `plot-project.json` relatív útvonalai határozzák meg a használt fájlokat. A konfiguráció a natív motor meglévő JSON-formátuma marad. A `plot-project.json` ehhez ad hordozható GUI-projektleírást; a GUI nem alakítja a rétegeket egy új, összelapított beállításfájllá. A történelmi `-Legacy` konfiguráció külön kompatibilitási út, lásd [a régi formátum leírását](legacy/settings-hu.md).
 
 Ha a desktop és a böngészős példány saját adattárában is van ugyanolyan nevű demó, azok külön másolatok. Egyikben végzett módosítás nem szinkronizálódik automatikusan a másikba. Másoláskor a teljes projektet vidd át, de a helyi titkokat, futási adattárat és például a SenseNet generált `.local` könyvtárát ne kezeld megosztható forrásként.
 
+<!-- documentation-anchors:start -->
+<a id="doc-closing-signing-out-and-shutting-down-the-machine"></a>
+<!-- documentation-anchors:end -->
 ### Bezárás, kijelentkezés, gépleállítás
 
 | Művelet | Hatás |
@@ -97,14 +124,23 @@ Ha a desktop és a böngészős példány saját adattárában is van ugyanolyan
 
 Egy korábban elindított Docker-konténer külön életciklussal rendelkezik; a GUI bezárása nem azonos a projekt `stop` plotjával. Ha azt akarod, hogy a SenseNet stack álljon le, a projekt erre szolgáló plotját futtasd. A futás megszakítása nem állítja vissza az addig végzett módosításokat.
 
+<!-- documentation-anchors:start -->
+<a id="doc-3-signing-in-and-the-screen-layout"></a>
+<!-- documentation-anchors:end -->
 ## 3. Belépés és a képernyő felépítése
 
+<!-- documentation-anchors:start -->
+<a id="doc-signing-in"></a>
+<!-- documentation-anchors:end -->
 ### Belépés
 
 A normál helyi indító és az asztali alkalmazás előkészíti a saját hitelesített kapcsolatát. Ha a belépőoldal jelenik meg, az **Access token** mezőbe a szolgáltatáshoz kapott operátori tokent kell beírni, majd **Connect to workspace**.
 
-Ez a Plot Manager belépése; nem a SenseNet `admin` jelszava, nem Docker Hub-jelszó, és nem a **Runner secrets** egyik értéke. A felület a tokent HttpOnly munkamenetsütire cseréli. A frontend nem menti böngésző `localStorage` vagy `sessionStorage` tárba, illetve projektfájlba. A helyi indító belépési URL-jének tokent tartalmazó részét eltávolítja a címből.
+Ez a Plot Manager belépése; nem a SenseNet `admin` jelszava, nem Docker Hub-jelszó, és nem a **Runner secrets** egyik értéke. A felület a tokent HttpOnly munkamenetsütire cseréli. A frontend nem menti böngésző `localStorage` vagy `sessionStorage` tárba, illetve projektfájlba. A helyi indító belépési URL-jének egyszer használatos, tokent tartalmazó részét még a cserét megelőzően azonnal eltávolítja a címből. A kijelentkezés visszavonja a böngésző munkamenetsütijét.
 
+<!-- documentation-anchors:start -->
+<a id="doc-layout-map"></a>
+<!-- documentation-anchors:end -->
 ### Elrendezési térkép
 
 Az ábra a közös szerkezetet szemlélteti, nem egy adott képernyő pontos méretezését.
@@ -141,16 +177,24 @@ Az ábra a közös szerkezetet szemlélteti, nem egy adott képernyő pontos mé
 | **Ready / Running** jelvény | Van-e aktív, zárolást tartó futás ebben a projektben. A `Ready` nem a Docker-stack vagy más külső alkalmazás egészségvizsgálata. |
 | Hiba/siker üzenet **×** gombja | Csak az üzenetet zárja be; nem vonja vissza a műveletet. |
 | **Unsaved changes** figyelmeztetés | A kijelölt konfigurációs rétegnek van még el nem mentett vázlata. **Save selected layer** ugyanazt a réteget menti, mint a szerkesztő **Save layer** gombja. |
+| **Unsaved project definition changes** figyelmeztetés / **Open project definition** | A hordozható projektleírás külön vázlatát még nem mentetted. A gomb visszavisz a **Workspace** definíciós paneljéhez, ahol mentheted vagy újratöltheted. |
+| **Unapplied parameter edits** figyelmeztetés | Valamelyik paraméter beírt szövege még nem érvényesült. A mentés és futtatás tiltott, amíg kijavítod vagy megerősítetten eldobod. |
 | Folyamatban lévő művelet miatti tiltások | A GUI nem enged újabb ütköző műveletet vagy futás közbeni rétegírást. A futás a **Run history** oldalon követhető. |
 | **Sign out · …** | Kijelentkezik az aktuális operátori munkamenetből. |
 | Lenyitható sorok, JSON-panelek | A címre kattintva nyílnak/csukódnak. A megjelenítő JSON-panel olvasható eredmény, a szövegmezős JSON-szerkesztő módosítható forrás. |
 
+<!-- documentation-anchors:start -->
+<a id="doc-4-workspace--projects-and-environments"></a>
+<!-- documentation-anchors:end -->
 ## 4. Workspace – projektek és környezetek
 
 ![Workspace: projektlista, létrehozás, gyorshivatkozások és projektleírás](images/management/01-workspace.png)
 
 *Valódi felület az 01-es demóval; a gép-, fiók- és könyvtáradatok anonimizáltak.*
 
+<!-- documentation-anchors:start -->
+<a id="doc-statistics-and-project-selection"></a>
+<!-- documentation-anchors:end -->
 ### Statisztikák és projektválasztás
 
 | Panel/vezérlő | Használat |
@@ -162,8 +206,11 @@ Az ábra a közös szerkezetet szemlélteti, nem egy adott képernyő pontos mé
 | **Open existing project on the service host** | Egy már létező, `plot-project.json`-t tartalmazó runneroldali könyvtárat kell megadni. |
 | **Open project** | Felveszi/megnyitja ezt a meglévő projektet a workspace-ben. Nem tölt fel könyvtárat a saját böngészőgépedről. |
 
-Az útvonalnak a szolgáltatás engedélyezett projektgyökerén belül kell lennie. Az ismeretlen, másik felhasználóhoz tartozó, nem engedélyezett vagy nem biztonságosan feloldható útvonalat a szolgáltatás visszautasítja.
+Az útvonalnak a szolgáltatás engedélyezett projektgyökerén belül kell lennie. Az ismeretlen, másik felhasználóhoz tartozó, nem engedélyezett vagy nem biztonságosan feloldható útvonalat a szolgáltatás visszautasítja. A projekttulajdonlást az API ellenőrzi.
 
+<!-- documentation-anchors:start -->
+<a id="doc-new-project"></a>
+<!-- documentation-anchors:end -->
 ### Új projekt
 
 | Mező/gomb | Használat |
@@ -173,6 +220,9 @@ Az útvonalnak a szolgáltatás engedélyezett projektgyökerén belül kell len
 | **Include the generic guided installation** | Bejelölve az általános szöveg/fájlrendszer mintát és hozzá vezetett űrlapot készíti el. Nem SenseNet-telepítőt generál. |
 | **+ Create project** | Létrehozza a projektet és a rétegfájlokat; mintával létrehozva rögtön a **Guided setup** oldalra lép. Nem üres, már létező projekt megnyitásához az **Open project** kell. |
 
+<!-- documentation-anchors:start -->
+<a id="doc-continue-with--panel"></a>
+<!-- documentation-anchors:end -->
 ### Continue with … panel
 
 | Vezérlő | Cél |
@@ -184,6 +234,9 @@ Az útvonalnak a szolgáltatás engedélyezett projektgyökerén belül kell len
 | **Create environment** | Új környezeti JSON-fájlt és hozzá projektleírás-bejegyzést hoz létre, majd kiválasztja. Nem telepít külön alkalmazást vagy infrastruktúrát. |
 | **Portable project definition** | A regisztrált projekt hordozható leírásának olvasható JSON-nézete. |
 
+<!-- documentation-anchors:start -->
+<a id="doc-edit-portable-project-definition-"></a>
+<!-- documentation-anchors:end -->
 ### Edit portable project definition …
 
 Ez a lenyitható, haladó panel a `plot-project.json` fájlt szerkeszti. A **Portable project definition JSON** mezőben a név, a konfigurációfájlok relatív útvonalai, a környezetek és a `wizard` leírója látható.
@@ -191,7 +244,7 @@ Ez a lenyitható, haladó panel a `plot-project.json` fájlt szerkeszti. A **Por
 - **Reload definition**: a legfrissebb projektleírást tölti be; helyi módosítás eldobása előtt megerősítést kér.
 - **Save definition**: verzióellenőrzéssel menti a leírást és frissíti a kapcsolódó projektadatokat. Futás vagy mentetlen konfigurációs réteg mellett tiltott.
 
-Ez külön mentés a **Save layer** gombtól. A rétegszerkesztő általános mentetlenváltozás-jelzése nem a projektleírás külön vázlatának állapotjelzője: a definíciós módosítást még továbblépés előtt mentsd el vagy másold ki. Ismeretlen érvényes metaadatok megmaradnak. A szolgáltatás ellenőrzi a formátumverziót, a fájlútvonalakat és a wizard kötéseit. A fájl nem titoktár.
+Ez külön mentés a **Save layer** gombtól. A projektleírás vázlata megmarad a GUI oldalai közötti váltáskor; projektváltáskor az eldobásához megerősítés kell, és az ablak/böngésző bezárása is figyelmeztethet a mentetlen definícióra. A **Save definition** sikeres mentése megszünteti a definíció saját mentetlen állapotát. Ismeretlen érvényes metaadatok megmaradnak. A szolgáltatás ellenőrzi a formátumverziót, a fájlútvonalakat és a wizard kötéseit. A fájl nem titoktár.
 
 Minimális hordozható leírás:
 
@@ -209,12 +262,18 @@ Minimális hordozható leírás:
 }
 ```
 
+<!-- documentation-anchors:start -->
+<a id="doc-5-configuration--source-layers-and-inheritance"></a>
+<!-- documentation-anchors:end -->
 ## 5. Configuration – forrásrétegek és öröklés
 
 ![Configuration: kijelölt forrásréteg és az effektív konfiguráció](images/management/03-configuration.png)
 
 *Valódi felület az 01-es demóval; a gép-, fiók- és könyvtáradatok anonimizáltak.*
 
+<!-- documentation-anchors:start -->
+<a id="doc-the-top-editing-toolbar"></a>
+<!-- documentation-anchors:end -->
 ### A felső szerkesztőeszköztár
 
 Ez a sáv a **Configuration** és a **Plot editor** oldalon is megjelenik.
@@ -228,6 +287,9 @@ Ez a sáv a **Configuration** és a **Plot editor** oldalon is megjelenik.
 
 **Az Environment és az Editing source layer két külön választás.** Például `development` környezetben szerkesztheted a default réteget is; az eredményben a projektréteg vagy development réteg továbbra is felülírhatja az adott értéket.
 
+<!-- documentation-anchors:start -->
+<a id="doc-source-and-effective-configuration"></a>
+<!-- documentation-anchors:end -->
 ### Forrás és effektív konfiguráció
 
 | Panel/lenyitható rész | Mit jelent? |
@@ -239,6 +301,9 @@ Ez a sáv a **Configuration** és a **Plot editor** oldalon is megjelenik.
 | **Restore inheritance at JSON pointer** | A kiválasztott rétegből egy konkrét felülírást távolít el. |
 | **Remove override** | A megadott objektumtulajdonságot a szerkesztési vázlatból törli; utána **Save layer** szükséges. |
 
+<!-- documentation-anchors:start -->
+<a id="doc-two-successive-orders"></a>
+<!-- documentation-anchors:end -->
 ### Két egymásra épülő sorrend
 
 Először a konfigurációfájlok állnak össze:
@@ -260,6 +325,9 @@ Ezután egy adott lépéspéldány paraméterei kapnak értéket. Az alábbi lis
 
 Ezért egy általános defaultérték megváltoztatása nem ír felül automatikusan egy lépés `With` mezőjében már konkrétan megadott értéket. Vegyes paraméterű lépésekhez ne adj minden lépésre értelmezhetetlen paramétert a globális `Defaults` objektumba; használj `StepDefaults`-ot vagy konkrét `With` mezőt.
 
+<!-- documentation-anchors:start -->
+<a id="doc-inheritance-rules-with-an-example"></a>
+<!-- documentation-anchors:end -->
 ### Öröklési szabályok, példával
 
 | Forrásbeli érték | Jelentés |
@@ -295,14 +363,20 @@ A `development` effektív értéke: `Message = "Fejlesztői"`, `Enabled = false`
 
 Ha a projektrétegben a `Values.Message` felülírást akarod megszüntetni, válaszd a project réteget, add meg a `/Values/Message` pointert, kattints **Remove override**, majd **Save layer**. Egy kulcsban lévő `/` jelet `~1`, a `~` jelet `~0` alakban kell a pointerbe írni. A helper objektumtulajdonságot töröl; egy tömb öröklésének visszaállításához a teljes tömbtulajdonságot távolítsd el.
 
-A mentés nem írja vissza az összeállított jobb oldali objektumot a bal oldali rétegbe. Az ismeretlen érvényes mezők és a forrásban használt kulcsírásmód megmaradnak. A forrás JSON-szerkesztő a nagy számok pontosságát is megőrzi; a motor effektív nézete a motor saját számtípusait használja, ezért az olvasható effektív nézetet ne másold vissza egy teljes forrásréteg helyére.
+A mentés nem írja vissza az összeállított jobb oldali objektumot a bal oldali rétegbe. Az ismeretlen érvényes mezők és a forrásban használt kulcsírásmód megmaradnak, a natív kisbetűs `plots`, `steps` és paraméternevek is, amikor ismert mezőket vizuálisan szerkesztesz. A forrás JSON-szerkesztő pontosságot megőrző feldolgozást és sorosítást használ: az ismeretlen nagy egészek, pontos tizedes literálok és a JavaScript véges számtartományán túli számok más mezők szerkesztése és mentése közben is számliterálok maradnak. A biztonságos API-számlálók közönséges számok maradnak. A nem biztonságosan ábrázolható numerikus paramétert a JSON-érték mezőben szerkeszd; a paramétertípus támogatásáról továbbra is a natív motor dönt. A motor effektív nézete a saját számtípusait használja, és eltérő pontosságú lehet, ezért az olvasható effektív nézetet ne másold vissza egy teljes forrásréteg helyére.
 
+<!-- documentation-anchors:start -->
+<a id="doc-save-conflicts-and-unsaved-changes"></a>
+<!-- documentation-anchors:end -->
 ### Mentési ütközés és mentetlen változás
 
 Minden mentés a beolvasott fájlverzióra hivatkozik. Ha ugyanazt a fájlt másik ablak, operátor vagy külső szerkesztő megváltoztatta, a szolgáltatás `409`/`changed` üzenettel visszautasítja a felülírást. Másold ki a saját vázlatod szükséges részét, **Reload**, hasonlítsd össze a friss tartalmat, és alkalmazd újra a saját módosításodat.
 
-Projekt-, környezet- vagy forrásréteg-váltáskor a GUI rákérdez a módosított konfigurációs vázlat eldobására. A böngésző bezárása is figyelmeztethet a mentetlen rétegre. A preflight és a futás mentett fájlokból dolgozik: előbb ments, aztán ellenőrizz/futtass.
+Projekt-, környezet- vagy forrásréteg-váltáskor a GUI rákérdez a módosított konfigurációs vázlat eldobására. A böngésző bezárása is figyelmeztethet a mentetlen rétegre, definícióra vagy nem alkalmazott paraméterbevitelre. A preflight és a futás mentett fájlokból dolgozik: előbb rendezd a mezőhibákat és ments, aztán ellenőrizz/futtass.
 
+<!-- documentation-anchors:start -->
+<a id="doc-files--locations--files-and-paths"></a>
+<!-- documentation-anchors:end -->
 ### Files & locations – fájlok és útvonalak
 
 Ez a panel a **Configuration** oldal alján található.
@@ -319,12 +393,18 @@ Ez a panel a **Configuration** oldal alján található.
 
 A feltöltés egy fájlt másol, legfeljebb 10 MiB méretben, egyedi fájlnévvel. A visszakapott például `uploads/…-input.json` útvonalat neked kell a megfelelő konfigurációs paraméterbe tenni. Titkot vagy privát kulcsot ne ezzel a mintafájl-feltöltéssel kezelj; a titkokhoz a **Runner secrets** való.
 
+<!-- documentation-anchors:start -->
+<a id="doc-6-plot-editor--composing-steps"></a>
+<!-- documentation-anchors:end -->
 ## 6. Plot editor – lépések összeállítása
 
 ![Plot editor: sorrendi lépések, telepített katalógus és a kijelölt invocation beállításai](images/management/02-plot-editor.png)
 
 *Valódi felület az 01-es demóval; a gép-, fiók- és könyvtáradatok anonimizáltak.*
 
+<!-- documentation-anchors:start -->
+<a id="doc-plot-selector-and-the-two-main-panels"></a>
+<!-- documentation-anchors:end -->
 ### Plotválasztó és a két fő panel
 
 | Elem | Működés |
@@ -338,6 +418,9 @@ A feltöltés egy fájlt másol, legfeljebb 10 MiB méretben, egyedi fájlnévve
 
 A katalógus mutatja a csomagnevet, verziót, leírást, platformkorlátozást, szükséges külső eszközöket, valamint `available`/`missing on runner` állapotukat. Az **Unsupported** lépés nem adható hozzá az adott platformon. A Docker, Git vagy más külső eszköz tényleges elérhetőségét a runner gépén kell megoldani; a böngésző saját gépén telepített program ettől még nem lesz elérhető a szerveren.
 
+<!-- documentation-anchors:start -->
+<a id="doc-step-row-buttons"></a>
+<!-- documentation-anchors:end -->
 ### Lépéssor gombjai
 
 | Gomb | Hatás |
@@ -349,8 +432,11 @@ A katalógus mutatja a csomagnevet, verziót, leírást, platformkorlátozást, 
 
 Átrendezéskor az ID változatlan. Másoláskor a másolt hivatkozások eredeti céljai megmaradnak; nézd át, valóban arra kell-e hivatkozniuk. Ha törölsz vagy átnevezel egy producerlépést, a rá mutató hivatkozásokat külön kell javítani. Mentés után ismét futtass preflightot.
 
-Ha egy korábbi rétegből örökölt plot lépéseit módosítod, a kiválasztott rétegben a plot **teljes lépéstömbjének** felülírása jön létre. A tömböt későbbi réteg nem elemenként toldja meg. Az eredeti lépésmetaadatokat a szerkesztő megőrzi; a plot egyéb, nem felülírt tulajdonságai tovább öröklődhetnek.
+Ha egy korábbi rétegből örökölt plot lépéseit módosítod, a kiválasztott rétegben a plot **teljes lépéstömbjének** felülírása jön létre. A tömböt későbbi réteg nem elemenként toldja meg. A szerkesztő a tömböt a motor eredetinformációja által azonosított pontos nyers forrásfájlból olvassa, és megőrzi az eredeti lépéshívás-metaadatokat. A plot egyéb, nem felülírt tulajdonságai öröklődhetnek a kiválasztott rétegbe másolás helyett; a kiválasztott plotobjektumban már meglévő tulajdonságok megmaradnak.
 
+<!-- documentation-anchors:start -->
+<a id="doc-invocation-settings--the-step-occurrences-parameters"></a>
+<!-- documentation-anchors:end -->
 ### INVOCATION SETTINGS – a lépéspéldány paraméterei
 
 | Mező/rész | Jelentés |
@@ -374,8 +460,11 @@ Egy paraméternél nemcsak az értéket, hanem annak forrását is kiválasztod:
 
 Titkosnak deklarált paraméternél a GUI nem kínál közvetlen `Value`/`JSON value` bevitelt. Használj titoktárból kapott `$env` hivatkozást, vagy megfelelő hivatkozási láncot; a szolgáltatás a közvetlen titokliterált visszautasítja.
 
-**JSON-szerkesztésnél a mező elhagyása fontos.** Ha az `Unapplied JSON` vagy `Invalid JSON` üzenet látszik, a legutóbbi érvényes érték maradt a vázlatban. Javítsd a szöveget, kattints ki a mezőből, és csak ezután ments. Az inline hibát nem helyettesíti a másik mezőben megnyomott mentés.
+**JSON-szerkesztésnél a mező elhagyása fontos.** Ha az `Unapplied JSON` vagy `Invalid JSON` üzenet látszik, a legutóbbi érvényes érték maradt a vázlatban, és a mentés, preflight, preview és futtatás tiltott. Javítsd a szöveget, kattints ki a mezőből, és csak ezután ments. Ugyanez a védelem érvényes egy kitörölt vagy hibás számértékre is. Ha másik lépésre vagy nézetre váltanál a még nem alkalmazott bevitellel, a GUI külön eldobási megerősítést kér; a visszautasítás megőrzi a szöveget. Az inline hibát nem helyettesíti a másik mezőben megnyomott mentés.
 
+<!-- documentation-anchors:start -->
+<a id="doc-references-with-a-concrete-example"></a>
+<!-- documentation-anchors:end -->
 ### Hivatkozások, konkrét példa
 
 ```json
@@ -394,7 +483,7 @@ Ez az ugyanabban a futásban **korábban** lefutott `compose` lépéspéldány `
 {"$env":"PLOTMANAGER_SECRET_EXAMPLE"}
 ```
 
-Ez a runneren elérhető változó neve. A hivatkozásobjektum pontosan egy direktívát tartalmazzon. A `$ref` és `$env` nem PowerShell-kifejezés, és nem szövegbe behelyettesítendő sablon; például a `"prefix {$ref:...}"` nem ez a mechanizmus. A ponttal tagolt hivatkozási útvonal kulcsai maguk nem tartalmazhatnak pontot. A körkörös, hiányzó és előre mutató hivatkozás hibás.
+Ez a runneren elérhető változó neve. A hivatkozásobjektum pontosan egy direktívát tartalmazzon. A `$ref` és `$env` nem PowerShell-kifejezés, és nem szövegbe behelyettesítendő sablon; például a `"prefix {$ref:...}"` nem ez a mechanizmus. A ponttal tagolt hivatkozási útvonal kulcsai maguk nem tartalmazhatnak pontot. A körkörös, hiányzó és előre mutató hivatkozás hibás. A kimenetjavaslatok csak korábbi invocation ID-ket kínálnak. A hivatkozások feloldását, a sémák ellenőrzését, a beállítások összeolvasztását és a műveletek végrehajtását a motor végzi; a GUI nem helyettesíti ezeket a natív szabályokat.
 
 Az alábbi teljes plotban a második lépés az első eredményét írja fájlba:
 
@@ -429,6 +518,9 @@ Az alábbi teljes plotban a második lépés az első eredményét írja fájlba
 
 A relatív `hello.txt` a projekt munkakönyvtárában jön létre. A példát saját demóprojektben használd: `Overwrite: true` mellett az ugyanott meglévő `hello.txt` felülíródik.
 
+<!-- documentation-anchors:start -->
+<a id="doc-additional-expandable-panels"></a>
+<!-- documentation-anchors:end -->
 ### További lenyitható panelek
 
 | Panel | Működés |
@@ -445,6 +537,9 @@ Például a fenti `save` lépés egyetlen futásban más célfájlt kap:
 
 Ez a felső szintű override-térkép a `save` **invocation ID** alapján címez, nem a `filesystem.write` lépésnév alapján. Titkot itt is hivatkozással adj meg. Projekt-/környezetváltáskor a GUI visszaállítja az override-mezőt; szükség esetén őrizd meg külön a nem titkos mintát.
 
+<!-- documentation-anchors:start -->
+<a id="doc-7-validation-preview-and-actual-execution"></a>
+<!-- documentation-anchors:end -->
 ## 7. Ellenőrzés, előnézet és tényleges futtatás
 
 Mentsd a kiválasztott réteget, ellenőrizd az **Environment**, **PROJECT DIRECTORY** és **EXECUTION TARGET** értékét, majd válassz műveletet.
@@ -462,6 +557,9 @@ Mentsd a kiválasztott réteget, ellenőrizd az **Environment**, **PROJECT DIREC
 
 A statikus ellenőrzés a kiválasztott teljes hatókört ellenőrzi az első csomagművelet előtt: a lépés elérhetőségét, beállításait, kötelező paramétereit, statikus típusait, hivatkozásait és sorrendi függőségeit. A producer kimenetének tényleges mezője/típusa csak akkor ellenőrizhető véglegesen, amikor a producer már lefutott, közvetlenül a fogyasztó lépés végrehajtása előtt.
 
+<!-- documentation-anchors:start -->
+<a id="doc-engine-preflight-panel"></a>
+<!-- documentation-anchors:end -->
 ### Engine preflight panel
 
 Minden tervezett invocation külön lenyitható sor. A soron belül:
@@ -473,16 +571,25 @@ Minden tervezett invocation külön lenyitható sor. A soron belül:
 | **Exact file / setting origins** | A konkrét forrásfájl, beállításútvonal és esetleges hivatkozási eredet. |
 | **Complete plan response** | A teljes strukturált motorválasz. |
 
+<!-- documentation-anchors:start -->
+<a id="doc-why-cannot-a-dependent-step-run-on-its-own"></a>
+<!-- documentation-anchors:end -->
 ### Miért nem futtatható önmagában egy függő lépés?
 
 A fenti `hello` példában a `compose` önállóan futtatható. A `save` önállóan nem, mert szüksége van `steps.compose.Output.Text` értékére. A **Run invocation** nem indítja el automatikusan a korábbi lépéseket, és nem tölti be egy korábbi run kimenetét. Futtasd a teljes plotot, vagy készíts olyan külön plotot/példányt, amelynek minden bemenete önállóan rendelkezésre áll.
 
+<!-- documentation-anchors:start -->
+<a id="doc-consequences-of-starting-a-run"></a>
+<!-- documentation-anchors:end -->
 ### Futás indításának következményei
 
-Indításkor a szolgáltatás rögzíti a kiválasztott konfigurációfájlok és a motor/csomagok másolatát, valamint ezek ujjlenyomatát. A hivatkozott futtatói környezetértékeket a kéréshez rögzíti; a titokértékek nem kerülnek a nyilvánosan olvasható konfigurációs snapshotba. A későbbi konfigurációs szerkesztés nem változtatja meg a már elindított futás bemenetét.
+Indításkor a szolgáltatás rögzíti a kiválasztott konfigurációfájlok és a motor/csomagok másolatát, valamint ezek verzióját és ujjlenyomatát. A hivatkozott futtatói környezetértékeket a kéréshez rögzíti; a titokértékek nem kerülnek a nyilvánosan olvasható konfigurációs snapshotba. A későbbi konfigurációs szerkesztés nem változtatja meg a már elindított futás bemenetét.
 
 Egy aktív futás zárolja a projektet. Ugyanabban a projektben az ütköző második futás és a konfigurációmentés elutasításra kerül. A `Succeeded` preview azt jelenti, hogy az előnézeti futás sikeres; tényleges lépésműveleteket csak a `whatIf: false` futás végez.
 
+<!-- documentation-anchors:start -->
+<a id="doc-8-run-history--results-logs-and-stopping"></a>
+<!-- documentation-anchors:end -->
 ## 8. Run history – eredmények, napló és leállítás
 
 ![Run history: futáslista, sikeres futás, lépéseredmények és strukturált kimenet](images/management/05-run-history.png)
@@ -503,9 +610,12 @@ Az oldal bal oldala a futáslista, a jobb oldala a kijelölt futás részlete.
 | Lépéseredmény-táblázat | **Invocation**, **State**, **Duration**: lépéspéldány és lépésnév, állapot, időtartam. |
 | **Structured result** | A motor teljes strukturált eredménye: lépéskimenetek, eredményadatok és hibák. A projektekben ígért fájlútvonalakat, hash-eket vagy állapotokat itt is keresd. |
 | **Live event log** | Időbélyeg, folyamatos `#cursor`, eseménytípus, invocation/lépés, állapot, időtartam. A számláló a betöltött eseményeket jelzi. |
-| **Run snapshot · immutable configuration and package fingerprints** | A futáshoz rögzített konfiguráció és csomagok ujjlenyomatai. Nem a projekt aktuális szerkesztési állapota. |
+| **Run snapshot · immutable configuration and package fingerprints** | A futáshoz rögzített konfiguráció és csomagok ujjlenyomatai. Nem a projekt aktuális szerkesztési állapota vagy általános bemenetifájl-szerkesztő. |
 | **Request stop · terminate worker** | Aktív futásnál leállítási kérelmet ad a futtató worker és folyamatfája megszüntetésére. |
 
+<!-- documentation-anchors:start -->
+<a id="doc-reading-states"></a>
+<!-- documentation-anchors:end -->
 ### Állapotok olvasása
 
 | Állapot | Értelmezés |
@@ -518,10 +628,13 @@ Az oldal bal oldala a futáslista, a jobb oldala a kijelölt futás részlete.
 | `Interrupted` | Egy befejezetlen futás a szolgáltatás megszűnése/újraindulása miatt megszakadtként került elő. Nem indul újra automatikusan. |
 | Lépésszintű `Skipped` | Például WhatIf alatt a parancs nem lett meghívva; nem a művelet tényleges sikere. |
 
-A rendszer tartós eseményeket olvas vissza, és aktív futásnál rendszeresen frissít. Kapcsolatvesztés után az utolsó kurzortól próbál folytatni. A címsorban projekt-/környezet-/futásazonosítók lehetnek; egy eltett URL újranyitása és szükség szerinti belépés után a korábbi futás visszanézhető ugyanabban az elérhető szolgáltatásban.
+A rendszer tartós eseményeket olvas vissza, és aktív futásnál rendszeresen frissít. Kapcsolatvesztés után az utolsó kurzortól próbál folytatni. A címsor csak projekt-/környezet-/futásazonosítókat tartalmaz; egy eltett URL újranyitása és szükség szerinti belépés után a korábbi futás visszanézhető ugyanabban az elérhető szolgáltatásban. Az oldal újratöltése a tartós történetet játssza vissza, nem a korábbi böngészőmunkamenetre támaszkodik.
 
 **A leállítás nem visszagörgetés.** A már létrehozott fájl, elindított konténer vagy külső adatbázisművelet megmaradhat, és egy külső szolgáltatásban elkezdett művelet folytatódhat. `Cancelled` vagy `Interrupted` után ellenőrizd a célállapotot, mielőtt újraindítasz. A SenseNet `stop` plotja szabályos alkalmazás-életciklusművelet; a **Request stop** egy folyamatban lévő Plot Manager-futás megszakítása.
 
+<!-- documentation-anchors:start -->
+<a id="doc-9-guided-setup--guided-configuration"></a>
+<!-- documentation-anchors:end -->
 ## 9. Guided setup – vezetett beállítás
 
 ![Guided setup: az ötlépéses varázsló célválasztó és beállítási mezői](images/management/04-guided-setup.png)
@@ -549,10 +662,17 @@ A felső öt szakasz jelzi, hol jársz: **Target → Settings → Preflight → 
 
 A támogatott űrlapmezők szöveg, egész szám, bool, JSON-tömb és JSON-objektum. A boolnak külön `false` és `true` értéke van. Az objektum-/tömbmezőben érvényes JSON kell, és a mező elhagyásakor alkalmazódik. A szolgáltatás a deklarált típust és a kötelező mezőket is ellenőrzi.
 
-A vezetett form a deklarációban megadott alapértékekkel indul, ezért megnyitáskor nézd át őket; ne tekintsd a már kézzel módosított összes konfigurációs érték automatikus visszaolvasásának. A **Save answers** az űrlaphoz kötött mezőket valóban átírja a kijelölt rétegben. A többi réteg továbbra is felülírhatja azokat: az effektív konfigurációt/preflightot ellenőrizd.
+A vezetett form a kiválasztott projekt és környezet mentett, összeállított konfigurációjából olvassa vissza a `settingPath` mezőkhöz tartozó válaszokat. A deklarált alapértéket csak hiányzó beállításnál használja; a `false`, `0`, `[]` és az explicit `null` nem hiányzó érték. Projekt- vagy környezetváltás után az adott konfigurációt tölti újra. Az űrlap ettől még nem mutat minden konfigurációs mezőt, csak a deklarált kötéseket.
 
-A SenseNet-űrlap stacknevet, helyi HTTPS-portokat és a SQL Developer licenc elfogadását kéri. A licencmező `false` alapértéke nem elfogadás: a tényleges fejlesztői használatról neked kell döntened a projekt [leírása](../examples/sensenet-docker/README.md) alapján. Az első előkészítés után rögzített stacknév/port kezelését és a további management plotokat a [demóforgatókönyvek](management-demo-projects-hu.md) részletezik.
+Ha egy kötött érték `$ref` vagy `$env` hivatkozást tartalmaz, a form figyelmeztet és a **Save answers** tiltott. A hivatkozást a **Configuration** oldalon szerkeszd: a wizard nem olvassa ki a titkot és nem cseréli le a hivatkozást egy alapértékre vagy feloldott literálra. A **Save answers** egyébként az űrlaphoz kötött mezőket valóban átírja a kijelölt rétegben. A többi réteg továbbra is felülírhatja azokat: az effektív konfigurációt/preflightot ellenőrizd. A szolgáltatás a mezőtípust is ellenőrzi; a típushoz nem illő meglévő értéket mentés előtt javítani kell.
 
+A form a nyers célréteg hivatkozását akkor is megőrzi, ha az aktív környezet azt egy literállal felülírná. A mentés a betöltött célréteg fájlverzióját használja: külső módosításnál előbb töltsd újra a konfigurációt. Ha a deklarált célréteg nincs a betöltött rétegek között, válaszd a hozzá tartozó környezetet és töltsd újra; a wizard nem ment egy frissen, a válaszoktól függetlenül lekért verzióval.
+
+A generikus minta a `target` mezőt a `Sample.Target`, a `message` mezőt a `Sample.Message` beállításhoz köti; a normál `install` plot összefűzi az üzenetet és kiírja. A SenseNet-űrlap stacknevet, helyi HTTPS-portokat és a SQL Developer licenc elfogadását kéri. A licencmező `false` alapértéke nem elfogadás: a tényleges fejlesztői használatról neked kell döntened a projekt [leírása](../examples/sensenet-docker/README-hu.md) alapján. Az első előkészítés után rögzített stacknév/port kezelését és a további management plotokat a [demóforgatókönyvek](management-demo-projects-hu.md) részletezik. A mentett konfiguráció az ott leírt natív CLI-vel is működik. Generikus projektnél futtasd a `pwsh -NoProfile -File ./src/Deployment/Scripts/Run.ps1 install` parancsot a `-DefaultConfigPath <project>/default.json`, `-ConfigPath <project>/project.json`, `-EnvironmentConfigPath <project>/environments/development.json` és `-WorkDirectory <project>` kapcsolókkal; mind ugyanarra a projektmásolatra mutasson.
+
+<!-- documentation-anchors:start -->
+<a id="doc-10-runner-secrets--managing-secrets"></a>
+<!-- documentation-anchors:end -->
 ## 10. Runner secrets – titkok kezelése
 
 ![Runner secrets: helyi titok mentésének űrlapja, mentett érték kiolvasása nélkül](images/management/06-runner-secrets.png)
@@ -577,12 +697,20 @@ Használat:
 3. Add meg a visszakapott `PLOTMANAGER_SECRET_EXAMPLE` változónevet.
 4. **Save layer**, majd preflight. A projektbe csak a `$env` hivatkozás kerül.
 
-Ne illeszd a tényleges titkot a réteg JSON-jába, run override-ba, feltöltött mintafájlba vagy Gitbe. A rendszer maszkolja az ismert titokértékeket a támogatott motorválaszokban; egy tetszőleges saját csomag naplózása/kimenete ettől még nem általános titokvédelmi határ. Saját csomag ne írjon ki titkot.
+Ne illeszd a tényleges titkot a réteg JSON-jába, run override-ba, feltöltött mintafájlba vagy Gitbe. A titkot a rendszer a hitelesített operátor worker-környezetébe adja; a listázó/olvasó API-k nem adják vissza az értékét, és a futási snapshotba sem írja ki. A rendszer maszkolja az ismert titokértékeket a támogatott motorválaszokban; egy tetszőleges saját csomag naplózása/kimenete ettől még nem általános titokvédelmi határ. Saját csomag ne írjon ki titkot.
+
+Három tanúsítványügyet különböztess meg: a GUI–API HTTPS-kapcsolat tanúsítványát, a runner által elért szolgáltatás TLS-/kliens-tanúsítványát, valamint a plot által telepített célalkalmazás tanúsítványát. Ezeket nem közös „SSL-kapcsoló” vezérli a **Runner secrets** alatt. Kövesd az adott lépés paramétereit és a projekt dokumentációját. A runner identitása és a gép útvonalai határozzák meg, hol használja a hitelesítő adatokat és tanúsítványtárakat. A tanúsítvány-ellenőrzés kikapcsolása ne legyen alapértelmezett kerülőút.
 
 Három külön tanúsítványtémát érdemes megkülönböztetni: a GUI–API HTTPS-kapcsolat tanúsítványa; a runner által hívott szolgáltatás TLS-/kliens-tanúsítványa; és a plot által telepített célalkalmazás tanúsítványa. Ezeket nem a **Runner secrets** egy közös „SSL-kapcsolója” kezeli. A lépések konkrét paramétereit és a projektdokumentációt kövesd.
 
+<!-- documentation-anchors:start -->
+<a id="doc-11-complete-workflows"></a>
+<!-- documentation-anchors:end -->
 ## 11. Teljes munkafolyamatok
 
+<!-- documentation-anchors:start -->
+<a id="doc-a-understanding-and-trying-the-four-demos"></a>
+<!-- documentation-anchors:end -->
 ### A. A négy demó megértése és kipróbálása
 
 1. **Workspace → Your projects** alatt válaszd ki a projektet.
@@ -594,6 +722,9 @@ Három külön tanúsítványtémát érdemes megkülönböztetni: a GUI–API H
 7. A forgatókönyvben leírt hatás ismeretében **▶ Run plot**.
 8. **Run history → Structured result** alatt ellenőrizd az eredményt. Fájl létrehozásánál a fájlt, alkalmazásindításnál a projekt valódi egészség-/bejelentkezési ellenőrzését is vizsgáld meg.
 
+<!-- documentation-anchors:start -->
+<a id="doc-b-a-new-generic-project-with-a-guided-form"></a>
+<!-- documentation-anchors:end -->
 ### B. Új, általános projekt vezetett formmal
 
 1. **Workspace → Create a project**: adj nevet, a mappát hagyhatod automatikuson.
@@ -604,6 +735,11 @@ Három külön tanúsítványtémát érdemes megkülönböztetni: a GUI–API H
 6. A **Result**, majd **Open run history** alatt nézd meg a létrejött fájl útvonalát és a lépések eredményét.
 7. **Open ordinary plot editor** megmutatja, hogy ez egy normál text/fájlrendszer plot, nem egy rejtett második telepítő.
 
+Eldobható próbához izolált mintaprojektet használj, ne meglévő alkalmazáskönyvtárat. A végén csak a saját mintakimeneti fájlt és az izolált mintaprojektet távolítsd el.
+
+<!-- documentation-anchors:start -->
+<a id="doc-c-the-same-plot-with-different-settings-without-changing-defaults"></a>
+<!-- documentation-anchors:end -->
 ### C. Ugyanaz a plot más beállítással, a default megváltoztatása nélkül
 
 1. Válaszd ki a környezetet és a megfelelő környezeti forrásréteget.
@@ -612,6 +748,9 @@ Három külön tanúsítványtémát érdemes megkülönböztetni: a GUI–API H
 4. **Preflight plot**; nézd meg a konkrét invocation beállítását és eredetét.
 5. Futtasd a plotot. Ha csak egyetlen kérésre kell eltérés, környezeti fájl helyett a megfelelő invocation ID alatti run override is használható.
 
+<!-- documentation-anchors:start -->
+<a id="doc-d-sensenet-docker-from-installation-to-daily-management"></a>
+<!-- documentation-anchors:end -->
 ### D. SenseNet Docker: telepítéstől napi kezelésig
 
 1. Válaszd a **04 – SenseNet Docker telepítés és menedzsment** projektet.
@@ -621,8 +760,11 @@ Három külön tanúsítványtémát érdemes megkülönböztetni: a GUI–API H
 5. Napi állapothoz/loghoz a projekt `status`/`logs`, szabályos leállításhoz/újraindításhoz a dedikált lifecycle plotjai használhatók.
 6. Módosítás előtt a projekt mentési forgatókönyvét kövesd; a visszaállítás adatmódosító művelet, külön projektoldali megerősítést igényel.
 
-A teljes plotlista és a mentés/visszaállítás részletes menete a [SenseNet-projekt leírásában](../examples/sensenet-docker/README.md), a lépéssorok a [demóútmutatóban](management-demo-projects-hu.md) vannak. Másold át a projektet, ha saját környezetet akarsz: a telepített browser-/desktopdemó külön állapottal rendelkezik.
+A teljes plotlista és a mentés/visszaállítás részletes menete a [SenseNet-projekt leírásában](../examples/sensenet-docker/README-hu.md), a lépéssorok a [demóútmutatóban](management-demo-projects-hu.md) vannak. Saját környezethez a teljes projektmappát másold a runner engedélyezett projektgyökere alá, és az **Open project** művelettel nyisd meg; a generált `.local` hitelesítő adatokat ne másold. A telepített browser-/desktopdemó külön állapottal rendelkezik.
 
+<!-- documentation-anchors:start -->
+<a id="doc-e-following-a-run-after-reopening-the-screen"></a>
+<!-- documentation-anchors:end -->
 ### E. Futás folytatása a képernyő újranyitása után
 
 1. Hosszabb műveletnél hagyd működni a szolgáltatást/indítóterminált. Asztali ablak bezárásakor a saját szolgáltatás leáll, ezért az ablakot ilyenkor ne zárd be.
@@ -631,6 +773,9 @@ A teljes plotlista és a mentés/visszaállítás részletes menete a [SenseNet-
 4. Válaszd ki a projektet, **Run history**, majd a futást. A tartós rekord és események visszatöltődnek.
 5. `Interrupted` esetén vizsgáld meg a célállapotot. Az alkalmazás nem próbálja automatikusan újra a részben már végrehajtott műveletsort.
 
+<!-- documentation-anchors:start -->
+<a id="doc-12-errors-and-frequently-asked-questions"></a>
+<!-- documentation-anchors:end -->
 ## 12. Hibák és gyakori kérdések
 
 | Jelenség | Jelentés / következő lépés |
@@ -660,6 +805,9 @@ A teljes plotlista és a mentés/visszaállítás részletes menete a [SenseNet-
 
 Hibajelentésben add meg a projekt/plot nevét, a környezetet, a sikertelen invocation ID-t, a run ID-t, a pontos üzenetet és azt, hogy preflight, WhatIf vagy valódi futás történt. Tokent, jelszót, privát kulcsot ne másolj bele.
 
+<!-- documentation-anchors:start -->
+<a id="doc-13-current-limits-and-further-documentation"></a>
+<!-- documentation-anchors:end -->
 ## 13. Jelenlegi határok és további dokumentáció
 
 - A desktop és a böngésző ugyanazt a React-felületet és szolgáltatási API-t használja. A platformmal és a szolgáltatás gépével kapcsolatos eltérések a runnerből és az indítási módból adódnak.
@@ -668,16 +816,20 @@ Hibajelentésben add meg a projekt/plot nevét, a környezetet, a sikertelen inv
 - A szolgáltatás a megjelenített OS-identitás jogaival fut. Egy jóváhagyott plot valódi rendszer-/Docker-/fájlműveleteket végezhet; a GUI belépés nem külön operációsrendszer-jogosultsági emelés.
 - A hordozható projektet Gitben lehet ellenőrizni és megosztani. A telepített példány saját állapotai, titkai és generált adatai külön kezelendők; a PR-ban olvasható forrás nem függ egy bekapcsolva hagyott fejlesztői géptől.
 
+A frontend fejlesztésénél a buildet Node.js 20.20.0-val ellenőriztük; a Vite eszközlánc a Node 20 ágon legalább 20.19-et igényel. A `src/Management/Web` alatt futtasd az `npm ci`, `npm run build` és `npm test` parancsokat. A build a `dist/` alá ír, ezt a szolgáltatás a publikált statikus állományok közé másolja. Futáskor nem kell külső betűtípus, kép vagy CDN.
+
+Integrált elfogadási teszthez a repó gyökeréből futtasd a `pwsh -NoProfile -File ./scripts/management/Test-Management.ps1` parancsot. Izolált szolgáltatást épít, és a valódi workerrel futtat böngészős teszteket. A Playwright Chromiumot egyszer telepítsd a Web könyvtárban az `npx playwright install chromium` paranccsal. A tesztek a valódi wizardkimenet bájtjait, a típusos ismeretlen adatok oda-vissza megőrzését, az átrendezett függőség elutasítását, a teljes/egyedi futást és az esemény-visszajátszást fedik le. A frontend unit tesztjei a típusos rétegszerkesztést, kulcsírásmód-megőrzést, stabil ID-ket, hivatkozási űrlapokat, rejtett deklarált titkokat és a cookie/CSRF átvitelt vizsgálják. A build és a teszt sikere különbözik az asztali telepítés/natív WebView-smoke és a valódi Linux-runner eredményétől; a platformmátrixhoz az ellenőrzési és telepítési leírást olvasd.
+
 Kapcsolódó leírások:
 
 | Dokumentum | Mire való? |
 | --- | --- |
 | [Demóprojektek és forgatókönyvek](management-demo-projects-hu.md) | A négy konkrét projekt célja, plotjai, minden lépés szerepe és ellenőrizhető eredménye. |
-| [SenseNet Docker projekt](../examples/sensenet-docker/README.md) | A valós stack telepítése, napi kezelése, helyi adatok, mentés és visszaállítás. |
-| [Natív konfigurációs szabályok](settings.md) | Teljes konfigurációs formátum, precedencia, referenciák és CLI. |
-| [Telepítés, indítás és csomagolás](management-deployment.md) | Asztali/böngészős/hosted indítás, előfeltételek, adattárak és szolgáltatásbeállítások. |
-| [Management API](management-api.md) | Programozott projekt-, konfiguráció- és futáskezelés. |
-| [Generikus lépéscsomagok](generic-packages.md), [platformcsomagok](platform-packages.md), [műveleti csomagok](operations-packages.md) | Lépéssémák, paraméterek és példák csomagonként. |
-| [Ellenőrzési és elfogadási eredmények](management-validation.md) | Mit teszteltünk ténylegesen, melyik platformon, és milyen korlátokkal. |
+| [SenseNet Docker projekt](../examples/sensenet-docker/README-hu.md) | A valós stack telepítése, napi kezelése, helyi adatok, mentés és visszaállítás. |
+| [Natív konfigurációs szabályok](settings-hu.md) | Teljes konfigurációs formátum, precedencia, referenciák és CLI. |
+| [Telepítés, indítás és csomagolás](management-deployment-hu.md) | Asztali/böngészős/hosted indítás, előfeltételek, adattárak és szolgáltatásbeállítások. |
+| [Management API](management-api-hu.md) | Programozott projekt-, konfiguráció- és futáskezelés. |
+| [Generikus lépéscsomagok](generic-packages-hu.md), [platformcsomagok](platform-packages-hu.md), [műveleti csomagok](operations-packages-hu.md) | Lépéssémák, paraméterek és példák csomagonként. |
+| [Ellenőrzési és elfogadási eredmények](management-validation-hu.md) | Mit teszteltünk ténylegesen, melyik platformon, és milyen korlátokkal. |
 
 A jelen útmutató vezérlőneveinek forrása: [App.tsx](../src/Management/Web/src/App.tsx), [components.tsx](../src/Management/Web/src/components.tsx). A kliens a natív motor és a [szolgáltatás](../src/Management/Server/Program.cs) tényleges eredményeit mutatja; a dokumentációban a statikus terv, a preview és a valós művelet ezért következetesen külön szerepel.

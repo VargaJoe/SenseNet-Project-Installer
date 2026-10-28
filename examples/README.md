@@ -1,28 +1,34 @@
-# Plot Manager bemutatóprojektek
+<!-- documentation-anchors:start -->
+<a id="doc-plot-manager-demo-projects"></a>
+<!-- documentation-anchors:end -->
+# Plot Manager demo projects
 
-Ezek a repóhoz tartozó, újra használható mintaprojektek. A bemenetek verziózottak,
-a generált eredményfájlok, helyi jelszavak és mentések nem részei a forrásnak.
-A projektek célja, hogy a Plot Manager működését friss projektmásolatokon is
-lépésről lépésre be lehessen mutatni.
+<!-- documentation-navigation -->
+[English](README.md) | [Magyar](README-hu.md) · [Documentation](../docs/README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
-| Demó | Forrás | Bemutatott képesség |
+These reusable example projects belong to the repository. Their inputs are
+versioned; generated output files, local passwords and backups are not source
+files. They demonstrate Plot Manager step by step using fresh project copies.
+
+| Demo | Source | Demonstrated capability |
 |---|---|---|
-| 01 – Vezetett fájltelepítő | [Projekt](management-demos/01-vezetett-telepito) | Vezetett kérdések, mentett beállítások, outputfüggőség és tényleges fájlírás. |
-| 02 – Rétegek, típusok és hivatkozások | [Projekt](management-demos/02-retegek-es-hivatkozasok) | Default/projekt/environment, értéktípusok és öröklés, szándékosan hibás sorrend felismerése. |
-| 03 – JSON, XML és ZIP csomagolás | [Projekt](management-demos/03-json-xml-zip) | Kilenc lépéses fájlgenerálás, csomagolás, hash és visszaellenőrzés. |
-| 04 – SenseNet Docker telepítés és menedzsment | [Projekt](sensenet-docker) | Egy valódi alkalmazás telepítése, kezelése, hitelesített ellenőrzése és mentése/visszaállítása. |
+| 01 – Guided file installer | [Project](management-demos/01-vezetett-telepito) | Guided questions, saved settings, output dependencies and actual file writing. |
+| 02 – Layers, types and references | [Project](management-demos/02-retegek-es-hivatkozasok) | Default/project/environment layers, value types and inheritance, detection of intentionally incorrect ordering. |
+| 03 – JSON, XML and ZIP packaging | [Project](management-demos/03-json-xml-zip) | A nine-step file generation, packaging, hashing and verification pipeline. |
+| 04 – SenseNet Docker installation and management | [Project](sensenet-docker/README.md) | Installing and managing a real application, authenticated verification, and backup/restore. |
 
-**[Magyar dokumentáció – itt kezdd](../docs/management-guide-index-hu.md)**
-· [Minden demó, forgatókönyv és step](../docs/management-demo-projects-hu.md)
-· [Minden GUI-oldal, gomb és panel](../docs/management-user-guide-hu.md)
+**[Documentation — start here](../docs/management-guide-index.md)**
+· [Every demo, scenario and step](../docs/management-demo-projects.md)
+· [Every GUI page, button and panel](../docs/management-user-guide.md)
 
-Az első háromhoz csak a Plot Manager natív csomagjai kellenek. A negyedik saját
-Docker Linux-konténereket és adattárolókat hoz létre; a feltételeit és adatot
-cserélő restore műveletét futtatás előtt olvasd el.
+The first three require only Plot Manager's native packages. The fourth creates
+its own Docker Linux containers and volumes; read its prerequisites and its
+data-replacing restore operation before running it.
 
-Az alkalmazásba felvett munkapéldány a repó tiszta mintájától független. Új
-bemutatóhoz másold a megfelelő teljes projektkönyvtárat a szolgáltatás engedélyezett
-projektgyökere alá, majd a **Workspace → Open project** mezőben add meg a másolat
-útvonalát a futtató gépen. A repóba helyezés önmagában nem regisztrálja a projektet
-minden desktop/böngészős adattárban. SenseNethez mindig új nevet és szabad portokat
-válassz; a `.local` könyvtárat ne másold másik példányhoz.
+A working copy registered in the application is independent of the repository's
+clean example. For a new demonstration, copy the complete project directory
+beneath the service's allowed project root, then enter that copy's runner-side
+path in **Workspace → Open project**. Adding a project to the repository does
+not register it in every desktop/browser data store. Always choose a new name
+and free ports for SenseNet; do not copy `.local` to another instance.

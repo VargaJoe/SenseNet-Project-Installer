@@ -1,7 +1,17 @@
+<!-- documentation-anchors:start -->
+<a id="doc-sql-server-iis-web-maintenance-and-compose"></a>
+<!-- documentation-anchors:end -->
 # SQL Server, IIS, web maintenance and Compose
+
+<!-- documentation-navigation -->
+[English](platform-packages.md) | [Magyar](platform-packages-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 The native runtime now exposes **14 packages / 49 steps**. These packages implement generic platform operations with explicit settings; they contain no application-specific chart, server list, credentials or database schema. Each step also works independently through `Run.ps1 -Step <id> -Params '{"single":{...}}'`.
 
+<!-- documentation-anchors:start -->
+<a id="doc-sql-server-sqlserver"></a>
+<!-- documentation-anchors:end -->
 ## SQL Server (`sqlserver`)
 
 Requires `System.Data.SqlClient` in the PowerShell host (verified on Windows PowerShell 5.1 and PowerShell 7). It does not require SMO, the SqlServer PowerShell module or sqlcmd. This package targets SQL Server, not every SQL dialect or Azure SQL Database's restricted DDL/backup surface.
@@ -31,6 +41,9 @@ Backup/restore paths belong to the **SQL Server machine/container**, not WorkDir
 
 See [database.json](../src/Deployment/Scripts/Examples/platform/database.json). Supply `PLOT_SQL_CONNECTION` through your local secret mechanism and override Values with actual database names and server paths. The example includes readiness, creation, backup, restore into a separate database, and query-to-JSON export. For multiple databases, use one explicitly named backup invocation per database; there is no implicit server-wide discovery or bulk deletion.
 
+<!-- documentation-anchors:start -->
+<a id="doc-iis-and-web-maintenance"></a>
+<!-- documentation-anchors:end -->
 ## IIS and web maintenance
 
 IIS steps require Windows, IIS/WebAdministration and appropriate local permissions. Use Windows PowerShell 5.1 on the IIS host when WebAdministration is unavailable in your PowerShell 7 host. Native runtime/package tests cover both shells; WebAdministration availability is a separate platform prerequisite.
@@ -46,6 +59,9 @@ The web package only manages the ASP.NET maintenance-file convention. The applic
 
 [iis.json](../src/Deployment/Scripts/Examples/platform/iis.json) contains create, deploy, status, recycle and recover-online plots. Deploy places the app offline, copies a prepared artifact, brings it online and checks HTTP readiness. **Copy failure stops the plot and intentionally leaves maintenance enabled.** Inspect the partial deployment, restore/correct files and then run recover-online. Artifact content must exclude `app_offline.htm`; directory copy merges files and does not remove stale destination files. Use a separate scoped removal or versioned deployment directory where required. XML configuration edits remain available through `xml.set`.
 
+<!-- documentation-anchors:start -->
+<a id="doc-docker-compose-compose"></a>
+<!-- documentation-anchors:end -->
 ## Docker Compose (`compose`)
 
 Steps: `compose.config`, `pull`, `build`, `up`, `ps`, `logs`, `stop`, `down`. Declares a dependency on `process`. Requires Docker CLI with Compose support and access to the intended Docker context.
@@ -58,6 +74,9 @@ Outputs follow process.run (ExitCode, StandardOutput, StandardError). `compose.c
 
 [compose.json](../src/Deployment/Scripts/Examples/platform/compose.json) and [compose.yaml](../src/Deployment/Scripts/Examples/platform/compose.yaml) provide validate/up/status/down plots. Run with WorkDirectory set to their platform example directory. The example binds localhost:18080 and uses a generic nginx image; it requires an available/free port and may pull the image.
 
+<!-- documentation-anchors:start -->
+<a id="doc-general-workflow-equivalents"></a>
+<!-- documentation-anchors:end -->
 ## General workflow equivalents
 
 | Older capability | Native composition |
