@@ -1,4 +1,12 @@
+<!-- documentation-anchors:start -->
+<a id="doc-how-to-execute-a-plot"></a>
+<!-- documentation-anchors:end -->
 # How to execute a "plot"
+
+<!-- documentation-navigation -->
+[English](how-to-execute-a-plot.md) | [Magyar](how-to-execute-a-plot-hu.md) · [Documentation](../README.md) · [Project](../../README.md)
+<!-- /documentation-navigation -->
+
 As it was mentioned earlier, the solutions main goal is to do specified tasks syncronously. The scenario names "plot" the executable task is the "step". Since in most of the cases "plot" makes it possibel to automate tasks with multiple steps, saving us time, in basic scenarios (e.g. creating or updating the development enviroment) the "plot" plays the bigger role. These scenarios are declared in the settings file storing the steps of related plot. 'fullinstall' is a good example for that, installing sensenet from schratch configured for the specified project. This plot is made up from the following steps (may be different from project to project of course):
 - stops the site (if it was installed before)
 - downloads the nuget packages that are declared in the project

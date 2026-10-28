@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-execute-one-step"></a>
+<!-- documentation-anchors:end -->
 # Execute one step
+
+<!-- documentation-navigation -->
+[English](how-to-execute-steps.md) | [Magyar](how-to-execute-steps-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 Use Run.ps1 -Step package.step. The single invocation ID is single; pass its parameters as JSON with -Params, for example:
 

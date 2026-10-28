@@ -19,6 +19,7 @@ import {
   clone,
   duration,
   flatten,
+  hydrateWizard,
   invocationId,
   member,
   setMember,
@@ -104,11 +105,35 @@ export default function App() {
   const [connection, setConnection] = useState("");
   const [wizard, setWizard] = useState<Wizard>();
   const [wizardValues, setWizardValues] = useState<JsonObject>({});
+  const [wizardReferences, setWizardReferences] = useState<string[]>([]);
+  const [definitionDirty, setDefinitionDirty] = useState(false);
+  const [definitionEpoch, setDefinitionEpoch] = useState(0);
+  const [parameterErrors, setParameterErrors] = useState<string[]>([]);
+  const [parameterEpoch, setParameterEpoch] = useState(0);
   const [wizardStage, setWizardStage] = useState(0);
   const [wizardPlan, setWizardPlan] = useState<Plan>();
   const [wizardRunId, setWizardRunId] = useState("");
   const generation = useRef(0);
   const dirty = !!layer && draft !== pretty(layer.data);
+  const unapplied = parameterErrors.length > 0;
+  const unsaved = dirty || definitionDirty || unapplied;
+  const reportParameter = (key: string, valid: boolean) =>
+    setParameterErrors((previous) => valid
+      ? previous.includes(key) ? previous.filter((item) => item !== key) : previous
+      : previous.includes(key) ? previous : [...previous, key]);
+  const discardParameters = () => {
+    setParameterErrors([]);
+    setParameterEpoch((previous) => previous + 1);
+  };
+  const confirmParameterDiscard = () => {
+    if (unapplied && !window.confirm("Discard unapplied parameter edits? The last valid values will remain.")) return false;
+    if (unapplied) discardParameters();
+    return true;
+  };
+  const navigate = (next: View) => {
+    if (next !== view && !confirmParameterDiscard()) return;
+    setView(next);
+  };
   const busy = pending > 0;
   const locked = runs.some(active);
   const pid = project ? `/projects/${segment(project.id)}` : "";
@@ -207,7 +232,8 @@ export default function App() {
         );
       return { ...document, file: source.Path };
     });
-    setConfiguration({ ...result.engine, RawLayers: rawLayers });
+    const loaded = { ...result.engine, RawLayers: rawLayers };
+    setConfiguration(loaded);
     setPlan(undefined);
     setWizardPlan(undefined);
     setPlot((previous) =>
@@ -215,7 +241,7 @@ export default function App() {
         ? previous
         : plotNames(result.engine.Configuration)[0] || "",
     );
-    return result.engine;
+    return loaded;
   }, [pid, environment]);
 
   const loadLayer = useCallback(async () => {
@@ -247,6 +273,7 @@ export default function App() {
     setSelectedInvocation("");
     setWizardStage(0);
     setWizardRunId("");
+    setWizard(undefined);
     setRuns([]);
     updateQuery("project", project.id);
     updateQuery("environment", environment);
@@ -262,17 +289,6 @@ export default function App() {
       if (expectedGeneration !== generation.current) return;
       setLayers(available.layers);
       setWizard(descriptor);
-      setWizardValues(
-        descriptor
-          ? Object.fromEntries(
-              descriptor.groups.flatMap((group) =>
-                group.fields
-                  .filter((field) => Object.hasOwn(field, "default"))
-                  .map((field) => [field.key, field.default!]),
-              ),
-            )
-          : {},
-      );
       const previousRun =
         history.find((r) => r.id === readQuery("run")) || history.find(active);
       if (previousRun) setRun(previousRun);
@@ -280,22 +296,31 @@ export default function App() {
   }, [project?.id, environment, loadConfiguration, refreshRuns]);
 
   useEffect(() => {
+    const answers = wizard && configuration
+      ? hydrateWizard(wizard, configuration.Configuration,
+          configuration.RawLayers?.find((source) => source.id === (wizard.layer || "project"))?.data)
+      : { values: {}, referenced: [] };
+    setWizardValues(answers.values);
+    setWizardReferences(answers.referenced);
+  }, [wizard, configuration]);
+
+  useEffect(() => {
     if (pid)
       void protectedAction(async () => {
         await loadLayer();
       });
-  }, [pid, loadLayer]);
+  }, [pid, loadLayer, environment]);
 
   useEffect(() => {
     const beforeUnload = (event: BeforeUnloadEvent) => {
-      if (dirty) {
+      if (unsaved) {
         event.preventDefault();
         event.returnValue = "";
       }
     };
     addEventListener("beforeunload", beforeUnload);
     return () => removeEventListener("beforeunload", beforeUnload);
-  }, [dirty]);
+  }, [unsaved]);
 
   useEffect(() => {
     if (!run || !pid || !session?.authenticated) return;
@@ -353,12 +378,15 @@ export default function App() {
     };
   }, [run?.id, pid, session?.authenticated]);
 
-  const chooseProject = (p: Project) => {
+  const chooseProject = (p: Project, confirmed = false) => {
     if (
-      dirty &&
-      !window.confirm("Discard unsaved changes in the selected layer?")
+      !confirmed && unsaved &&
+      !window.confirm("Discard unsaved project definition, layer or parameter changes and switch project?")
     )
-      return;
+      return false;
+    discardParameters();
+    setDefinitionDirty(false);
+    setDefinitionEpoch((previous) => previous + 1);
     setLayer(undefined);
     setDraft("{}");
     setProject(p);
@@ -366,13 +394,17 @@ export default function App() {
     setLayerId("project");
     setView("workspace");
     updateQuery("run", "");
+    return true;
   };
   const changeEnvironment = (value: string) => {
     if (
-      dirty &&
-      !window.confirm("Discard unsaved layer changes and switch environment?")
+      unsaved &&
+      !window.confirm("Discard unsaved project definition, layer or parameter changes and switch environment?")
     )
       return;
+    discardParameters();
+    setDefinitionDirty(false);
+    setDefinitionEpoch((previous) => previous + 1);
     setEnvironment(value);
     if (layerId.startsWith("environment:")) {
       setLayer(undefined);
@@ -382,15 +414,17 @@ export default function App() {
   };
   const changeLayer = (value: string) => {
     if (
-      dirty &&
+      (dirty || unapplied) &&
       !window.confirm("Discard unsaved changes and select a different layer?")
     )
       return;
+    discardParameters();
     setLayer(undefined);
     setDraft("{}");
     setLayerId(value);
   };
   const save = async () => {
+    if (unapplied) throw new Error("Correct or explicitly discard unapplied parameter edits before saving.");
     if (!layer) throw new Error("Select a configuration layer.");
     const data = parseObject(draft);
     const result = await put<Layer>(`${pid}/layers/${segment(layerId)}`, {
@@ -411,8 +445,8 @@ export default function App() {
     ...(invocation ? { invocationId: invocation } : {}),
   });
   const check = async (invocation?: string) => {
-    if (dirty)
-      throw new Error("Save the selected layer before preflight or execution.");
+    if (unsaved)
+      throw new Error("Save the project definition and layer, and correct unapplied parameter edits before preflight or execution.");
     const result = await post<{ engine: Plan }>(
       `${pid}/plan`,
       requestBody(plot, invocation),
@@ -423,7 +457,7 @@ export default function App() {
     );
   };
   const start = async (whatIf: boolean, invocation?: string, name = plot) => {
-    if (dirty) throw new Error("Save the selected layer before execution.");
+    if (unsaved) throw new Error("Save the project definition and layer, and correct unapplied parameter edits before execution.");
     const body = requestBody(name, invocation);
     await post(`${pid}/plan`, body);
     const record = await post<Run>(`${pid}/runs`, { ...body, whatIf });
@@ -474,6 +508,7 @@ export default function App() {
       steps.map((step) => (step.Id === selectedInvocation ? next : step)),
     );
   const changePlot = (name: string) => {
+    if (!confirmParameterDiscard()) return;
     setPlot(name);
     setSelectedInvocation("");
     setPlan(undefined);
@@ -551,7 +586,7 @@ export default function App() {
           href="#"
           onClick={(e) => {
             e.preventDefault();
-            setView("workspace");
+            navigate("workspace");
           }}
         >
           <span className="brand-mark">P</span>
@@ -573,7 +608,7 @@ export default function App() {
             <button
               key={item.id}
               className={view === item.id ? "nav-item selected" : "nav-item"}
-              onClick={() => setView(item.id)}
+              onClick={() => navigate(item.id)}
               disabled={
                 !project && item.id !== "workspace" && item.id !== "secrets"
               }
@@ -596,7 +631,10 @@ export default function App() {
           className="sign-out"
           onClick={() =>
             void protectedAction(async () => {
+              if (unsaved && !window.confirm("Discard unsaved project definition, layer or parameter changes and sign out?")) return;
               await api("/session", { method: "DELETE" });
+              discardParameters();
+              setDefinitionDirty(false);
               setSession({ authenticated: false, user: "", mode: "" });
               setProject(undefined);
               setToken("");
@@ -705,11 +743,22 @@ export default function App() {
               Preflight and run use saved files.
               <button
                 className="small"
-                disabled={busy || locked || !!draftError}
+                disabled={busy || locked || !!draftError || unapplied}
                 onClick={() => void protectedAction(save)}
               >
                 Save selected layer
               </button>
+            </Notice>
+          )}
+          {definitionDirty && (
+            <Notice kind="warning">
+              Unsaved project definition changes. Save or reload the definition in Workspace before running.
+              {view !== "workspace" && <button className="small" onClick={() => navigate("workspace")}>Open project definition</button>}
+            </Notice>
+          )}
+          {unapplied && (
+            <Notice kind="warning">
+              Unapplied parameter edits. Correct the highlighted fields or explicitly discard them before saving or running.
             </Notice>
           )}
           {locked && view !== "runs" && (
@@ -728,44 +777,53 @@ export default function App() {
               catalogCount={catalog.length}
               onCreate={(name, directory, template) =>
                 protectedAction(async () => {
+                  if (unsaved && !window.confirm("Discard unsaved project definition, layer or parameter changes and create another project?")) return;
                   const created = await post<Project>("/projects", {
                     name,
                     ...(directory ? { directory } : {}),
                     ...(template ? { template: "generic" } : {}),
                   });
                   await refreshProjects();
-                  chooseProject(created);
+                  chooseProject(created, true);
                   if (template) setView("wizard");
                 })
               }
               onOpen={(directory) =>
                 protectedAction(async () => {
+                  if (unsaved && !window.confirm("Discard unsaved project definition, layer or parameter changes and open another project?")) return;
                   const opened = await post<Project>("/projects/open", {
                     directory,
                   });
                   await refreshProjects();
-                  chooseProject(opened);
+                  chooseProject(opened, true);
                 })
               }
               onEnvironment={(name) =>
                 protectedAction(async () => {
+                  if (unsaved && !window.confirm("Discard unsaved project definition, layer or parameter changes and create another environment?")) return;
                   await post(`${pid}/environments`, { name });
                   const updated = await api<Project>(pid);
+                  discardParameters();
+                  setDefinitionDirty(false);
+                  setDefinitionEpoch((previous) => previous + 1);
                   setProject(updated);
                   setEnvironment(name);
                   setLayerId(`environment:${name}`);
                 })
               }
-              onBrowse={() => setView("layers")}
-              onNavigate={setView}
+              onBrowse={() => navigate("layers")}
+              onNavigate={navigate}
               busy={busy}
             />
           )}
 
-          {project && view === "workspace" && (
+          {project && (
+            <div hidden={view !== "workspace"}>
             <DefinitionEditor
+              key={`${project.id}:${definitionEpoch}`}
               pid={pid}
-              locked={locked || dirty}
+              locked={locked || dirty || unapplied}
+              onDirtyChange={setDefinitionDirty}
               onError={setError}
               onSaved={() =>
                 protectedAction(async () => {
@@ -793,6 +851,7 @@ export default function App() {
                 })
               }
             />
+            </div>
           )}
           {project && (view === "plot" || view === "layers") && (
             <div className="editor-toolbar">
@@ -818,12 +877,13 @@ export default function App() {
                 className="small"
                 onClick={() => {
                   if (
-                    !dirty ||
+                    !(dirty || unapplied) ||
                     window.confirm(
                       "Discard unsaved changes and load the latest file?",
                     )
                   )
                     void protectedAction(async () => {
+                      discardParameters();
                       await Promise.all([loadLayer(), loadConfiguration()]);
                     });
                 }}
@@ -832,7 +892,7 @@ export default function App() {
               </button>
               <button
                 className="primary small"
-                disabled={!dirty || busy || locked || !!draftError}
+                disabled={!dirty || busy || locked || !!draftError || unapplied}
                 onClick={() => void protectedAction(save)}
               >
                 Save layer
@@ -858,6 +918,7 @@ export default function App() {
                 <button
                   className="small"
                   onClick={() => {
+                    if (!confirmParameterDiscard()) return;
                     const name = window.prompt("New plot name");
                     if (name?.trim() && draftObject) {
                       try {
@@ -877,14 +938,14 @@ export default function App() {
                 <div className="toolbar-spacer" />
                 <button
                   className="small"
-                  disabled={!plot || busy || dirty || locked}
+                  disabled={!plot || busy || unsaved || locked}
                   onClick={() => void protectedAction(() => check())}
                 >
                   Preflight plot
                 </button>
                 <button
                   className="small"
-                  disabled={!plot || busy || dirty || locked}
+                  disabled={!plot || busy || unsaved || locked}
                   onClick={() =>
                     void protectedAction(async () => {
                       await start(true);
@@ -895,7 +956,7 @@ export default function App() {
                 </button>
                 <button
                   className="primary small"
-                  disabled={!plot || busy || dirty || locked}
+                  disabled={!plot || busy || unsaved || locked}
                   onClick={() =>
                     void protectedAction(async () => {
                       await start(false);
@@ -941,7 +1002,10 @@ export default function App() {
                       >
                         <button
                           className="invocation-main"
-                          onClick={() => setSelectedInvocation(step.Id)}
+                          onClick={() => {
+                            if (step.Id !== selectedInvocation && !confirmParameterDiscard()) return;
+                            setSelectedInvocation(step.Id);
+                          }}
                         >
                           <span className="step-index">
                             {String(index + 1).padStart(2, "0")}
@@ -980,6 +1044,7 @@ export default function App() {
                             aria-label={`Copy ${step.Id}`}
                             disabled={locked || !layer || busy}
                             onClick={() => {
+                              if (!confirmParameterDiscard()) return;
                               const copy = clone(step);
                               copy.Id = invocationId(
                                 step.Step,
@@ -998,6 +1063,7 @@ export default function App() {
                             aria-label={`Remove ${step.Id}`}
                             disabled={locked || !layer || busy}
                             onClick={() => {
+                              if (!confirmParameterDiscard()) return;
                               editSteps(steps.filter((s) => s.Id !== step.Id));
                               if (selectedInvocation === step.Id)
                                 setSelectedInvocation("");
@@ -1013,6 +1079,7 @@ export default function App() {
                     catalog={catalog}
                     disabled={locked || busy || !layer || !draftObject || !plot}
                     onAdd={(step) => {
+                      if (!confirmParameterDiscard()) return;
                       const id = invocationId(
                         step.Id,
                         steps.map((s) => s.Id),
@@ -1041,7 +1108,7 @@ export default function App() {
                           <input
                             value={selected.Id}
                             pattern="[A-Za-z][A-Za-z0-9_-]*"
-                            disabled={locked || busy || !layer}
+                            disabled={locked || busy || !layer || unapplied}
                             onChange={(e) => {
                               const nextId = e.target.value;
                               updateInvocation({ ...selected, Id: nextId });
@@ -1074,11 +1141,12 @@ export default function App() {
                           Object.entries(selectedSchema.Parameters).map(
                             ([name, schema]) => (
                               <ParameterField
-                                key={`${selected.Id}-${name}`}
+                                key={`${parameterEpoch}-${selected.Id}-${name}`}
                                 name={name}
                                 schema={schema}
                                 value={member(selected.With, name)}
                                 disabled={locked || busy || !layer}
+                                onValidityChange={(valid) => reportParameter(`${selected.Id}/${name}`, valid)}
                                 references={[
                                   ...flatten(effective)
                                     .filter(
@@ -1129,7 +1197,7 @@ export default function App() {
                         <div className="button-row">
                           <button
                             className="small"
-                            disabled={busy || dirty || locked}
+                            disabled={busy || unsaved || locked}
                             onClick={() =>
                               void protectedAction(() => check(selected.Id))
                             }
@@ -1138,7 +1206,7 @@ export default function App() {
                           </button>
                           <button
                             className="small"
-                            disabled={busy || dirty || locked}
+                            disabled={busy || unsaved || locked}
                             onClick={() =>
                               void protectedAction(async () => {
                                 await start(true, selected.Id);
@@ -1149,7 +1217,7 @@ export default function App() {
                           </button>
                           <button
                             className="primary small"
-                            disabled={busy || dirty || locked}
+                            disabled={busy || unsaved || locked}
                             onClick={() =>
                               void protectedAction(async () => {
                                 await start(false, selected.Id);
@@ -1342,6 +1410,12 @@ export default function App() {
               </div>
               <div className="panel-body">
                 <p className="muted">{wizard.description}</p>
+                {wizardReferences.length > 0 && (
+                  <Notice kind="warning">
+                    This wizard has reference-backed settings. Their values are not exposed or overwritten here.
+                    Edit them in Configuration; the ordinary saved plot can still be preflighted and run.
+                  </Notice>
+                )}
                 <ol className="wizard-stages">
                   {["Target", "Settings", "Preflight", "Run", "Result"].map(
                     (name, index) => (
@@ -1385,12 +1459,15 @@ export default function App() {
                         <WizardFields
                           key={group.id}
                           group={group}
+                          excluded={wizardReferences}
+                          onValidityChange={(key, valid) => reportParameter(`wizard:${key}`, valid)}
                           values={wizardValues}
                           onChange={setWizardValues}
                         />
                       ))}
                     <button
                       className="primary"
+                      disabled={unapplied}
                       onClick={() => setWizardStage(1)}
                     >
                       Continue to settings →
@@ -1408,6 +1485,8 @@ export default function App() {
                         <WizardFields
                           key={group.id}
                           group={group}
+                          excluded={wizardReferences}
+                          onValidityChange={(key, valid) => reportParameter(`wizard:${key}`, valid)}
                           values={wizardValues}
                           onChange={setWizardValues}
                         />
@@ -1417,15 +1496,14 @@ export default function App() {
                       do not create a separate execution system.
                     </p>
                     <div className="button-row">
-                      <button onClick={() => setWizardStage(0)}>Back</button>
+                      <button onClick={() => { if (confirmParameterDiscard()) setWizardStage(0); }}>Back</button>
                       <button
                         className="primary"
-                        disabled={busy || locked || dirty}
+                        disabled={busy || locked || unsaved || wizardReferences.length > 0}
                         onClick={() =>
                           void protectedAction(async () => {
-                            const currentLayer = await api<Layer>(
-                              `${pid}/layers/${segment(wizard.layer || "project")}`,
-                            );
+                            const currentLayer = configuration?.RawLayers?.find((source) => source.id === (wizard.layer || "project"));
+                            if (!currentLayer) throw new Error("Reload the wizard's configuration layer before saving answers.");
                             await post<Layer>(`${pid}/wizard`, {
                               etag: currentLayer.etag,
                               values: wizardValues,
@@ -1452,9 +1530,10 @@ export default function App() {
                     </Notice>
                     <button
                       className="primary"
-                      disabled={busy || locked}
+                      disabled={busy || locked || unsaved}
                       onClick={() =>
                         void protectedAction(async () => {
+                          if (unsaved) throw new Error("Save the project definition and layer before preflight.");
                           const result = await post<{ engine: Plan }>(
                             `${pid}/plan`,
                             { plot: wizard.plot, environment, overrides: {} },
@@ -1492,9 +1571,10 @@ export default function App() {
                     </p>
                     <button
                       className="primary"
-                      disabled={busy || locked}
+                      disabled={busy || locked || unsaved}
                       onClick={() =>
                         void protectedAction(async () => {
+                          if (unsaved) throw new Error("Save the project definition and layer before execution.");
                           const record = await post<Run>(`${pid}/runs`, {
                             plot: wizard.plot,
                             environment,
@@ -1786,11 +1866,13 @@ function DefinitionEditor({
   locked,
   onError,
   onSaved,
+  onDirtyChange,
 }: {
   pid: string;
   locked: boolean;
   onError: (error: string) => void;
   onSaved: () => Promise<void>;
+  onDirtyChange: (dirty: boolean) => void;
 }) {
   const [document, setDocument] = useState<{
       etag: string;
@@ -1798,6 +1880,9 @@ function DefinitionEditor({
     }>(),
     [text, setText] = useState(""),
     [busy, setBusy] = useState(false);
+  useEffect(() => {
+    onDirtyChange(!!document && text !== pretty(document.data));
+  }, [document, text, onDirtyChange]);
   const load = useCallback(async () => {
     const result = await api<{ etag: string; data: JsonObject }>(
       `${pid}/definition`,
@@ -2238,20 +2323,25 @@ function RunResults({ run }: { run: Run }) {
 
 function WizardFields({
   group,
+  excluded = [],
+  onValidityChange,
   values,
   onChange,
 }: {
   group: Wizard["groups"][number];
+  excluded?: string[];
+  onValidityChange?: (key: string, valid: boolean) => void;
   values: JsonObject;
   onChange: (values: JsonObject) => void;
 }) {
   return (
     <fieldset className="wizard-fields">
       <legend>{group.title}</legend>
-      {group.fields.map((field) => (
+      {group.fields.filter((field) => !excluded.includes(field.key)).map((field) => (
         <WizardInput
           key={field.key}
           field={field}
+          onValidityChange={(valid) => onValidityChange?.(field.key, valid)}
           value={
             Object.hasOwn(values, field.key) ? values[field.key] : undefined
           }
@@ -2277,17 +2367,27 @@ function WizardInput({
   field,
   value,
   onChange,
+  onValidityChange,
 }: {
   field: Wizard["groups"][number]["fields"][number];
   value: Json | undefined;
   onChange: (value: Json | undefined) => void;
+  onValidityChange?: (valid: boolean) => void;
 }) {
   const [text, setText] = useState(pretty(value) ?? ""),
     [error, setError] = useState("");
+  const validity = useRef(onValidityChange);
+  validity.current = onValidityChange;
+  const savedText = pretty(value);
+  const report = (message = "") => {
+    setError(message);
+    validity.current?.(!message);
+  };
   useEffect(() => {
     setText(pretty(value) ?? "");
     setError("");
-  }, [value]);
+    validity.current?.(true);
+  }, [field.key, savedText]);
   return (
     <label className="field">
       {field.label}
@@ -2313,7 +2413,7 @@ function WizardInput({
           value={text}
           onChange={(e) => {
             setText(e.target.value);
-            setError("JSON not applied. Finish editing and leave the field.");
+            report("JSON not applied. Finish editing and leave the field.");
           }}
           onBlur={() => {
             try {
@@ -2325,9 +2425,9 @@ function WizardInput({
               )
                 throw new Error(`Use a JSON ${field.type}.`);
               onChange(parsed);
-              setError("");
+              report();
             } catch (e) {
-              setError(errText(e));
+              report(errText(e));
             }
           }}
         />

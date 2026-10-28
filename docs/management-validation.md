@@ -1,10 +1,20 @@
+<!-- documentation-anchors:start -->
+<a id="doc-management-validation-record"></a>
+<!-- documentation-anchors:end -->
 # Management validation record
+
+<!-- documentation-navigation -->
+[English](management-validation.md) | [Magyar](management-validation-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 This records execution during the 2026-10-21–22 implementation sessions. Build,
 automated execution smoke, and interactive manual acceptance are separate claims.
 Use [acceptance](management-acceptance.md) for the remaining human review and
 [deployment](management-deployment.md) to reproduce builds and checks.
 
+<!-- documentation-anchors:start -->
+<a id="doc-source-and-review"></a>
+<!-- documentation-anchors:end -->
 ## Source and review
 
 - Preparation: [PR #31](https://github.com/VargaJoe/SenseNet-Project-Installer/pull/31),
@@ -18,6 +28,9 @@ Use [acceptance](management-acceptance.md) for the remaining human review and
 - Native engine remains 14 packages / 49 steps. CLI, PS5.1 entry points and the
   temporary Windows Forms launcher remain available.
 
+<!-- documentation-anchors:start -->
+<a id="doc-executed-checks"></a>
+<!-- documentation-anchors:end -->
 ## Executed checks
 
 | Check | Actual environment | Result |
@@ -139,6 +152,9 @@ with the same 49 steps and discovered tool results. A fresh PowerShell worker on
 mounted build storage has additional startup cost. Discovery reports executable
 or module availability; it does not establish Docker/database connectivity.
 
+<!-- documentation-anchors:start -->
+<a id="doc-limits-and-later-work"></a>
+<!-- documentation-anchors:end -->
 ## Limits and later work
 
 - This delivery has one execution host per service. Outbound authenticated agents,
@@ -156,3 +172,107 @@ or module availability; it does not establish Docker/database connectivity.
   these management checks.
 - Hosted mode was exercised through actual isolated Kestrel HTTPS and access-control
   tests. No public production service was deployed.
+
+<!-- documentation-anchors:start -->
+<a id="doc-editing-safety-follow-up"></a>
+<!-- documentation-anchors:end -->
+## Editing safety follow-up
+
+The `codex/management-editing-safety` branch starts at PR #33's `9b96153`.
+It changes the shared browser/desktop client; the previously delivered
+`a8cb561b` installers and portable ZIPs do **not** include these changes.
+No new native installer, Linux package or installed-desktop acceptance is claimed.
+
+Three editing defects were reproduced before the fixes:
+
+- Reopening a wizard restored descriptor defaults instead of saved settings.
+  A custom target returned as `hello.txt`, and saving could replace the operator's
+  chosen values. Hydration now uses saved configuration, distinguishes missing
+  from `null`/`false`/`0`/`[]`, and keeps reference-backed settings out of literal
+  wizard edits. This also checks the raw target layer when an environment literal
+  hides a reference in that layer, and refreshes answers after configuration or
+  definition saves.
+- Leaving Workspace unmounted the portable-definition editor and discarded its
+  draft. Page navigation now retains it; unsaved definitions participate in
+  unload and project/environment transition protection.
+- Invalid or unapplied parameter input left the previous valid value in the
+  layer while save and execution remained enabled. The shared client now blocks
+  these actions until correction or explicit discard. Rerendering another field
+  must retain the invalid draft and its protection.
+
+The initial eight added component/application regressions failed while all 23
+existing tests passed. All three added real-browser tests also failed at their
+expected assertions against the previously built client: saved wizard values,
+exact definition-draft retention, and the still-enabled Save button while a
+parameter contains invalid JSON. The browser tests use an isolated
+service/data/project root, not an existing installed application or its credentials.
+
+Final source checks on Windows, Node 20.20.0, PowerShell 7.6.6,
+Playwright Chromium 1.64.1 and .NET SDK 10.0.113 targeting `net8.0`:
+
+| Check | Result |
+| --- | --- |
+| React/model/component/application regressions | 39/39 passed across five test files; 16 added checks |
+| TypeScript and production web build | Passed; final client `index-C339-pX0.js` |
+| Service build carrying the new client | Passed, zero warnings/errors; no backend implementation changes |
+| New browser regressions | All three passed: wizard save/reopen, definition navigation/save, invalid parameter/sibling edit/save |
+| Existing blank-project browser flow | Passed in the same full-suite run as the three new regressions |
+| Existing full/single-run, reorder, numeric roundtrip and reconnect flow | Passed in a focused rerun after bounded test-wait corrections, 1.1 minutes |
+| Documentation links and whitespace | 145 local links/anchors valid; `git diff --check` passed |
+
+All five distinct browser scenarios passed against the same new client build.
+The full-suite run first passed four cases and exhausted the old long-flow wait
+limits. Its trace showed a configuration request starting at 116.9 seconds under
+a 120-second total limit; the next attempt exhausted the 20-second URL/run-creation
+assertion while the actual accepted run was already visible. The long flow alone
+now has a 180-second total allowance and 60-second run-ID waits, matching the
+existing bounded run-state wait. Its focused rerun passed without a product
+change, automatic test retry or further timeout increase. These are test
+allowances, not application startup or performance guarantees.
+
+Local evidence is under ignored `artifacts/management/`: `editing-safety-web-unit.log`,
+`editing-safety-web-build.log`, `editing-safety-service-build.log`,
+`editing-safety-e2e-final.log` (four passes and the earlier wait failure), and
+`editing-safety-existing-flow-final.log` (successful corrected long flow).
+
+To reproduce from the repository root with the documented prerequisites:
+
+```powershell
+npm --prefix src/Management/Web test
+npm --prefix src/Management/Web run build
+dotnet build src/Management/Server/PlotManager.Server.csproj -c Release
+pwsh -NoProfile -File scripts/management/Test-Management.ps1 -SkipBuild -SkipBackendTests
+```
+
+The last command runs the real browser suite against the freshly built client and
+service. The engine and backend implementations are unchanged in this follow-up;
+their earlier results above remain historical results, not new executions.
+Workflows remain manual only. No user AppData, existing Docker stacks, or the
+previous transfer ZIP are changed by these checks.
+
+<!-- documentation-anchors:start -->
+<a id="doc-bilingual-documentation-follow-up--2026-10-28"></a>
+<!-- documentation-anchors:end -->
+## Bilingual documentation follow-up — 2026-10-28
+
+All 49 repository documentation topics now have full English and Hungarian
+pages. Canonical filenames default to English; `-hu.md` siblings contain Hungarian.
+The complete GUI manual and four-demo catalog have equal coverage in both
+languages, as do the technical, testing, legacy and historical planning guides.
+Both indexes reach every page in their own language, and every page links to its
+counterpart and localized index. Explicit section IDs keep local deep links usable
+across translated headings. Original GUI labels, sample values and code remain
+recognizable rather than being translated into different executable inputs.
+
+The independent checks are `node ./scripts/management/Test-Documentation.mjs --self-test`
+and `node ./scripts/management/Test-Documentation.mjs`. They verify pair coverage,
+heading/table coverage, 68 identical executable examples and inline code literals,
+reciprocal language navigation, local targets/anchors and per-language reachability.
+Self-checks also prove rejection of missing pairs/targets/anchors, wrong-language
+links, changed examples/literals, unpaired pages and unreachable documents.
+The four explanatory text diagrams have localized labels, explicitly registered
+in the manifest. The full documentation graph passed with zero errors.
+
+This follow-up changes documentation and its independent validator only. Earlier
+application/runtime results above remain dated evidence; no new app, Docker,
+installer, browser, native desktop or Linux execution is claimed for translation.

@@ -1,0 +1,111 @@
+{
+  "Release": {
+    "Readme": "Ez egy \u00E1ltal\u00E1nos, helyi Plot Manager dem\u00F3csomag.",
+    "Environment": "default",
+    "Manifest": {
+      "Features": [
+        "alap"
+      ],
+      "Attempts": 0,
+      "Application": "Plot Manager demo",
+      "Optional": null,
+      "Environment": {
+        "$ref": "settings.Release.Environment"
+      },
+      "Enabled": false
+    }
+  },
+  "Plots": {
+    "package": {
+      "Steps": [
+        {
+          "With": {
+            "Path": "build"
+          },
+          "Id": "directory",
+          "Step": "filesystem.mkdir"
+        },
+        {
+          "With": {
+            "Overwrite": true,
+            "Content": "\u003Cconfiguration\u003E\u003CappSettings\u003E\u003Cadd key=\u0022Environment\u0022 value=\u0022unset\u0022 /\u003E\u003C/appSettings\u003E\u003C/configuration\u003E",
+            "Path": "build/app.template.xml"
+          },
+          "Id": "template",
+          "Step": "filesystem.write"
+        },
+        {
+          "With": {
+            "Value": {
+              "$ref": "settings.Release.Environment"
+            },
+            "Source": "build/app.template.xml",
+            "Destination": "build/app.config",
+            "Overwrite": true,
+            "XPath": "/configuration/appSettings/add/@value"
+          },
+          "Id": "configure",
+          "Step": "xml.set"
+        },
+        {
+          "With": {
+            "Value": {
+              "$ref": "settings.Release.Manifest"
+            },
+            "Overwrite": true,
+            "Path": "build/manifest.json"
+          },
+          "Id": "manifest",
+          "Step": "json.write"
+        },
+        {
+          "With": {
+            "Overwrite": true,
+            "Content": {
+              "$ref": "settings.Release.Readme"
+            },
+            "Path": "build/README.txt"
+          },
+          "Id": "readme",
+          "Step": "filesystem.write"
+        },
+        {
+          "With": {
+            "Overwrite": true,
+            "Source": "build",
+            "Destination": "demo-bundle.zip"
+          },
+          "Id": "pack",
+          "Step": "archive.pack"
+        },
+        {
+          "With": {
+            "Overwrite": true,
+            "Source": {
+              "$ref": "steps.pack.Output.Path"
+            },
+            "Destination": "expanded"
+          },
+          "Id": "unpack",
+          "Step": "archive.unpack"
+        },
+        {
+          "With": {
+            "Path": {
+              "$ref": "steps.pack.Output.Path"
+            }
+          },
+          "Id": "checksum",
+          "Step": "filesystem.hash"
+        },
+        {
+          "With": {
+            "Path": "expanded/manifest.json"
+          },
+          "Id": "verify",
+          "Step": "json.read"
+        }
+      ]
+    }
+  }
+}

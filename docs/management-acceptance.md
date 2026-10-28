@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-management-application-acceptance"></a>
+<!-- documentation-anchors:end -->
 # Management application acceptance
+
+<!-- documentation-navigation -->
+[English](management-acceptance.md) | [Magyar](management-acceptance-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 Use a fresh project and a directory reserved exclusively for this exercise. The
 sample uses text and filesystem packages only; it needs no database, container,

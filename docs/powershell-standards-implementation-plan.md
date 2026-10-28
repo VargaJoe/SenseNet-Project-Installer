@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-runtime-refactor-status"></a>
+<!-- documentation-anchors:end -->
 # Runtime refactor status
+
+<!-- documentation-navigation -->
+[English](powershell-standards-implementation-plan.md) | [Magyar](powershell-standards-implementation-plan-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 The native runtime refactor is implemented on feature/powershell-standardization.
 

@@ -1,0 +1,14 @@
+{
+  "formatVersion": 1,
+  "configuration": {
+    "default": "default.json",
+    "project": "project.json",
+    "environments": {
+      "development": "environments/development.json",
+      "production": "environments/production.json"
+    }
+  },
+  "name": "03 \u2013 JSON, XML \u00E9s ZIP csomagol\u00E1s",
+  "description": "Val\u00F3di helyi pipeline: mappa \u2192 XML sablon \u2192 environment-be\u00E1ll\u00EDt\u00E1s \u2192 JSON manifest \u2192 ZIP \u2192 biztons\u00E1gos kibont\u00E1s \u2192 SHA-256 \u2192 visszaolvas\u00E1s. Nincs k\u00FCls\u0151 szolg\u00E1ltat\u00E1s.",
+  "demoVersion": 1
+}

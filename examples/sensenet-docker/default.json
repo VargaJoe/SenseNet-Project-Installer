@@ -1,0 +1,833 @@
+{
+  "SenseNet": {
+    "StackName": "pm-sensenet-demo",
+    "ApiPort": 18160,
+    "IdentityPort": 18161,
+    "AcceptSqlLicense": false,
+    "Images": {
+      "Api": "sensenetcsp/sn-api-sql@sha256:d9baec7b120762dd82d9903fb31d3f6fdb5a277761bcf93b8aa769e64e3b3da3",
+      "Identity": "sensenetcsp/sn-identityserver@sha256:b151bdb6322b9a66ec35c68b56648d0d43330c2eae0d98eb81d442bddc7493e0",
+      "Sql": "mcr.microsoft.com/mssql/server@sha256:cf8f0ab2ebe61feec2eed2629061a07d247f791c2a8ddda74a4ac9f06a291718"
+    }
+  },
+  "Restore": {
+    "BackupPath": "",
+    "ConfirmStackName": ""
+  },
+  "Authentication": {
+    "AdminPassword": "admin"
+  },
+  "StepDefaults": {
+    "compose.config": {
+      "TimeoutSeconds": 900,
+      "Files": [
+        "compose.yaml"
+      ],
+      "EnvFiles": [
+        ".local/runtime.env"
+      ],
+      "Directory": ".",
+      "ProjectName": {
+        "$ref": "settings.SenseNet.StackName"
+      }
+    },
+    "compose.up": {
+      "TimeoutSeconds": 900,
+      "Files": [
+        "compose.yaml"
+      ],
+      "EnvFiles": [
+        ".local/runtime.env"
+      ],
+      "Directory": ".",
+      "ProjectName": {
+        "$ref": "settings.SenseNet.StackName"
+      }
+    },
+    "compose.ps": {
+      "TimeoutSeconds": 900,
+      "Files": [
+        "compose.yaml"
+      ],
+      "EnvFiles": [
+        ".local/runtime.env"
+      ],
+      "Directory": ".",
+      "ProjectName": {
+        "$ref": "settings.SenseNet.StackName"
+      }
+    },
+    "compose.logs": {
+      "TimeoutSeconds": 900,
+      "Files": [
+        "compose.yaml"
+      ],
+      "EnvFiles": [
+        ".local/runtime.env"
+      ],
+      "Directory": ".",
+      "ProjectName": {
+        "$ref": "settings.SenseNet.StackName"
+      }
+    },
+    "compose.stop": {
+      "TimeoutSeconds": 900,
+      "Files": [
+        "compose.yaml"
+      ],
+      "EnvFiles": [
+        ".local/runtime.env"
+      ],
+      "Directory": ".",
+      "ProjectName": {
+        "$ref": "settings.SenseNet.StackName"
+      }
+    },
+    "compose.down": {
+      "TimeoutSeconds": 900,
+      "Files": [
+        "compose.yaml"
+      ],
+      "EnvFiles": [
+        ".local/runtime.env"
+      ],
+      "Directory": ".",
+      "ProjectName": {
+        "$ref": "settings.SenseNet.StackName"
+      }
+    },
+    "process.run": {
+      "Environment": {
+        "PLOTMANAGER_SECRET_SENSENET_ADMIN_PASSWORD": {
+          "$ref": "settings.Authentication.AdminPassword"
+        }
+      }
+    }
+  },
+  "Plots": {
+    "prepare": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        }
+      ]
+    },
+    "install": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "validate-compose",
+          "Step": "compose.config",
+          "With": {
+            "Arguments": [
+              "--quiet"
+            ]
+          }
+        },
+        {
+          "Id": "start-services",
+          "Step": "compose.up",
+          "With": {
+            "Arguments": [
+              "--wait",
+              "--wait-timeout",
+              "240"
+            ]
+          }
+        },
+        {
+          "Id": "verify-repository-and-login",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "verify"
+            ],
+            "FilePath": "pwsh"
+          }
+        }
+      ]
+    },
+    "start": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "start-services",
+          "Step": "compose.up",
+          "With": {
+            "Arguments": [
+              "--wait",
+              "--wait-timeout",
+              "240"
+            ]
+          }
+        },
+        {
+          "Id": "verify-repository-and-login",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "verify"
+            ],
+            "FilePath": "pwsh"
+          }
+        }
+      ]
+    },
+    "verify": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "verify-repository-and-login",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "verify"
+            ],
+            "FilePath": "pwsh"
+          }
+        }
+      ]
+    },
+    "demo-content": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "create-or-read-demo-folder",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "demo-content"
+            ],
+            "FilePath": "pwsh"
+          }
+        }
+      ]
+    },
+    "verify-demo-content": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "verify-persistent-demo-folder",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "verify",
+              "-ExpectedContentPath",
+              "/Root/Content/PlotManagerDemo"
+            ],
+            "FilePath": "pwsh"
+          }
+        }
+      ]
+    },
+    "status": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "service-status",
+          "Step": "compose.ps",
+          "With": {
+            "Arguments": [
+              "--all"
+            ]
+          }
+        }
+      ]
+    },
+    "logs": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "service-logs",
+          "Step": "compose.logs",
+          "With": {
+            "Arguments": [
+              "--tail",
+              "80",
+              "--no-color"
+            ]
+          }
+        }
+      ]
+    },
+    "stop": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "stop-services-keep-data",
+          "Step": "compose.stop",
+          "With": {
+            "Arguments": [
+              "--timeout",
+              "30"
+            ]
+          }
+        }
+      ]
+    },
+    "restart": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "stop-services-keep-data",
+          "Step": "compose.stop",
+          "With": {
+            "Arguments": [
+              "--timeout",
+              "30"
+            ]
+          }
+        },
+        {
+          "Id": "start-services",
+          "Step": "compose.up",
+          "With": {
+            "Arguments": [
+              "--wait",
+              "--wait-timeout",
+              "240"
+            ]
+          }
+        },
+        {
+          "Id": "verify-repository-and-login",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "verify"
+            ],
+            "FilePath": "pwsh"
+          }
+        }
+      ]
+    },
+    "backup": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "offline-consistent-backup",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "backup"
+            ],
+            "FilePath": "pwsh"
+          }
+        }
+      ]
+    },
+    "restore": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "restore-confirmed-backup",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "restore",
+              "-BackupPath",
+              {
+                "$ref": "settings.Restore.BackupPath"
+              },
+              "-ConfirmRestore",
+              {
+                "$ref": "settings.Restore.ConfirmStackName"
+              }
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "start-services",
+          "Step": "compose.up",
+          "With": {
+            "Arguments": [
+              "--wait",
+              "--wait-timeout",
+              "240"
+            ]
+          }
+        },
+        {
+          "Id": "verify-repository-and-login",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "verify"
+            ],
+            "FilePath": "pwsh"
+          }
+        }
+      ]
+    },
+    "remove-containers-keep-data": {
+      "Steps": [
+        {
+          "Id": "runtime-directory",
+          "Step": "filesystem.mkdir",
+          "With": {
+            "Path": ".local"
+          }
+        },
+        {
+          "Id": "configuration",
+          "Step": "json.write",
+          "With": {
+            "Value": {
+              "$ref": "settings.SenseNet"
+            },
+            "Overwrite": true,
+            "Path": ".local/settings.json"
+          }
+        },
+        {
+          "Id": "prepare",
+          "Step": "process.run",
+          "With": {
+            "TimeoutSeconds": 900,
+            "Arguments": [
+              "-NoProfile",
+              "-File",
+              "scripts/Manage-SenseNet.ps1",
+              "-Action",
+              "prepare"
+            ],
+            "FilePath": "pwsh"
+          }
+        },
+        {
+          "Id": "remove-containers-keep-volumes",
+          "Step": "compose.down",
+          "With": {}
+        }
+      ]
+    }
+  }
+}

@@ -1,15 +1,34 @@
+<!-- documentation-anchors:start -->
+<a id="doc-implementation-tasks-and-project-analysis"></a>
+<!-- documentation-anchors:end -->
 # Implementation Tasks and Project Analysis
+
+<!-- documentation-navigation -->
+[English](implementation-tasks.md) | [Magyar](implementation-tasks-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 > 2026-09-14: the native package/runtime refactor is implemented. See [runtime status](powershell-standards-implementation-plan.md) and [tests](../tests/README.md). The story list below is the broader historical roadmap; it is not a claim that every old step or the GUI has been migrated.
 
 
+<!-- documentation-anchors:start -->
+<a id="doc-project-overview"></a>
+<!-- documentation-anchors:end -->
 ## Project Overview
 Plot Manager is a comprehensive PowerShell-based automation framework designed for operational task management and deployment orchestration. Originally developed for SenseNet CMS deployments, it has evolved into a general-purpose automation platform capable of managing diverse operational workflows including containerized deployments, cloud automation, and enterprise application lifecycle management.
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-driven-development-progress"></a>
+<!-- documentation-anchors:end -->
 ## Story-Driven Development Progress
 
+<!-- documentation-anchors:start -->
+<a id="doc-completed-stories"></a>
+<!-- documentation-anchors:end -->
 ### Completed Stories
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-01---foundation-transformation-"></a>
+<!-- documentation-anchors:end -->
 #### Story 01 - Foundation Transformation ✅
 **Goal**: Transform project to general-purpose Plot Manager with proper documentation and licensing
 **Status**: 100% Complete
@@ -24,8 +43,14 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [x] Update project overview references to Plot Manager
 - [x] Create story-driven development tracking system
 
+<!-- documentation-anchors:start -->
+<a id="doc-in-progress-stories"></a>
+<!-- documentation-anchors:end -->
 ### In Progress Stories
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-03---powershell-code-standardization-"></a>
+<!-- documentation-anchors:end -->
 #### Story 03 - PowerShell Code Standardization 🚧
 **Goal**: Standardize code formatting, modern practices, and error handling
 **Priority**: High - Foundation for reliable automation
@@ -43,8 +68,14 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [ ] Implement structured logging with severity levels
 - [ ] Create code review checklist for future changes
 
+<!-- documentation-anchors:start -->
+<a id="doc-planned-stories"></a>
+<!-- documentation-anchors:end -->
 ### Planned Stories
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-02---angular-frontend-modernization"></a>
+<!-- documentation-anchors:end -->
 #### Story 02 - Angular Frontend Modernization
 **Goal**: Upgrade Angular 5 to latest version (15+) with modern dependencies and security
 **Priority**: High - Critical for security and maintainability
@@ -62,6 +93,9 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [ ] Test all GUI functionality after migration
 - [ ] Update documentation for new development setup
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-04---comprehensive-testing-framework"></a>
+<!-- documentation-anchors:end -->
 #### Story 04 - Comprehensive Testing Framework
 **Goal**: Implement automated testing for PowerShell scripts and Angular frontend
 **Priority**: High - Critical for reliability
@@ -79,6 +113,9 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [ ] Create testing documentation and guidelines
 - [ ] Set up performance testing for large deployments
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-05---enhanced-security-and-authentication"></a>
+<!-- documentation-anchors:end -->
 #### Story 05 - Enhanced Security and Authentication
 **Goal**: Implement role-based access, secure credentials, and audit logging
 **Priority**: Medium - Important for enterprise adoption
@@ -96,6 +133,9 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [ ] Create security documentation and guidelines
 - [ ] Implement session management and timeout
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-06---docker-orchestration-and-container-management"></a>
+<!-- documentation-anchors:end -->
 #### Story 06 - Docker Orchestration and Container Management
 **Goal**: Enhanced Docker support with orchestration and Kubernetes
 **Priority**: Medium - Builds on existing Docker capabilities
@@ -113,6 +153,9 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [ ] Add container log aggregation and management
 - [ ] Create documentation for container deployment patterns
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-07---cloud-platform-integration"></a>
+<!-- documentation-anchors:end -->
 #### Story 07 - Cloud Platform Integration
 **Goal**: Add AWS, Google Cloud support beyond existing Azure integration
 **Priority**: Medium - Multi-cloud flexibility
@@ -130,6 +173,9 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [ ] Implement cloud security best practices
 - [ ] Add multi-cloud failover and disaster recovery
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-08---monitoring-and-observability-platform"></a>
+<!-- documentation-anchors:end -->
 #### Story 08 - Monitoring and Observability Platform
 **Goal**: Comprehensive logging, monitoring, and performance insights
 **Priority**: Medium - Operational excellence
@@ -147,6 +193,9 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [ ] Implement monitoring as code with version control
 - [ ] Add capacity planning and trend analysis
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-09---plugin-architecture-and-extensibility"></a>
+<!-- documentation-anchors:end -->
 #### Story 09 - Plugin Architecture and Extensibility
 **Goal**: Enable third-party extensions without core code modifications
 **Priority**: Low - Long-term ecosystem growth
@@ -164,6 +213,9 @@ Plot Manager is a comprehensive PowerShell-based automation framework designed f
 - [ ] Add plugin testing and validation framework
 - [ ] Create sample plugins for demonstration
 
+<!-- documentation-anchors:start -->
+<a id="doc-story-10---configuration-management-enhancement"></a>
+<!-- documentation-anchors:end -->
 #### Story 10 - Configuration Management Enhancement
 **Goal**: Advanced config validation, templating, and drift detection
 **Priority**: Low - Quality of life improvements
