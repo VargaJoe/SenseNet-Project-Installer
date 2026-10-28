@@ -1,7 +1,17 @@
+<!-- documentation-anchors:start -->
+<a id="doc-generic-operational-packages"></a>
+<!-- documentation-anchors:end -->
 # Generic operational packages
+
+<!-- documentation-navigation -->
+[English](operations-packages.md) | [Magyar](operations-packages-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 These packages expose general operations without application-specific charts, services, repository URLs or credentials. Install their complete folders under any Auto directory. **Git, Build and Docker also require Process**; folder names may differ from manifest names. Http is independent. The existing native runtime, sequential failure behavior and layered configuration apply.
 
+<!-- documentation-anchors:start -->
+<a id="doc-process-processrun"></a>
+<!-- documentation-anchors:end -->
 ## Process: `process.run`
 
 | Parameter | Meaning/default |
@@ -17,6 +27,9 @@ Paths with separators resolve against WorkDirectory. `.ps1`, `.cmd` and `.bat` r
 
 Timeout attempts to terminate the owned process tree (modern .NET) or uses Windows taskkill for PowerShell 5.1. A process that detaches or exits before its descendants cannot be guaranteed to leave no descendants. Waiting for inherited output pipes is still bounded. A timeout is a failure, not a rollback of filesystem, daemon or external effects. Errors omit arguments/environment and child output; inspect successful output or run the tool separately for detailed diagnostics. Every command can be previewed with plot `-Explain` / `-WhatIf`.
 
+<!-- documentation-anchors:start -->
+<a id="doc-http-and-tcp"></a>
+<!-- documentation-anchors:end -->
 ## HTTP and TCP
 
 | Step | Required inputs | Optional inputs | Output |
@@ -29,6 +42,9 @@ HTTP accepts only HTTP(S) URLs without embedded credentials. Certificate validat
 
 Download writes a random temporary file beside the destination, bounds declared and streamed bytes, verifies optional SHA256, then publishes the file. The destination's parent must exist. Failure leaves an existing destination intact and removes the temporary file. A successful download always returns its computed SHA256. Overwrite must be explicit. The deadline includes header/body transfer; local filesystem/hash work is synchronous and checked before publication. Readiness retries transient status and transport failures within one overall deadline. Error results omit URLs, headers and response bodies.
 
+<!-- documentation-anchors:start -->
+<a id="doc-git"></a>
+<!-- documentation-anchors:end -->
 ## Git
 
 All Git steps require Git on PATH. TimeoutSeconds defaults to 300 and Environment to `{}`. Configure noninteractive authentication outside argument strings (for example an existing credential helper and child environment).
@@ -41,6 +57,9 @@ All Git steps require Git on PATH. TimeoutSeconds defaults to 300 and Environmen
 
 Directory/Destination resolve against WorkDirectory. Remote/revision operands cannot begin with `-`. Outputs use the process result contract. A failed clone may leave a partial destination for inspection; choose a new directory or explicitly clean it after review. Git hooks and executable repository content remain governed by the installed Git/tool configuration.
 
+<!-- documentation-anchors:start -->
+<a id="doc-build-and-nuget"></a>
+<!-- documentation-anchors:end -->
 ## Build and NuGet
 
 Requires `dotnet` on PATH; no hardcoded SDK/Visual Studio paths or package lists. Both steps accept Directory (`.`), Arguments (`[]`), TimeoutSeconds (`300`) and Environment (`{}`). All paths resolve against WorkDirectory. Arguments are the tool's native argument vector; no string splitting occurs.
@@ -50,6 +69,9 @@ Requires `dotnet` on PATH; no hardcoded SDK/Visual Studio paths or package lists
 
 Outputs use the process result contract. Restore/build/test/publish may run project-defined code and contact configured feeds. Use native tool flags such as `--no-restore` or an explicit local source when that is intended.
 
+<!-- documentation-anchors:start -->
+<a id="doc-docker"></a>
+<!-- documentation-anchors:end -->
 ## Docker
 
 `docker.cli` requires Command and accepts Arguments (`[]`), Directory (`.`), TimeoutSeconds (`300`), Environment (`{}`). Requires Docker CLI on PATH and the selected daemon/context. Allowed commands:
@@ -58,8 +80,11 @@ Outputs use the process result contract. Restore/build/test/publish may run proj
 - Container: run, start, stop, rm.
 - Network: network-create, network-inspect, network-connect, network-disconnect, network-rm (mapped to `docker network <verb>`).
 
-Arguments are passed as individual strings. Resource names, tags, paths, ports and flags are supplied by the plot. Outputs use the process result contract. No implicit cleanup or daemon-wide prune occurs. Timeout stops the CLI process; an operation already accepted by the Docker daemon can continue. The separate [compose package](platform-packages.md#docker-compose-compose) supplies multi-container lifecycle steps.
+Arguments are passed as individual strings. Resource names, tags, paths, ports and flags are supplied by the plot. Outputs use the process result contract. No implicit cleanup or daemon-wide prune occurs. Timeout stops the CLI process; an operation already accepted by the Docker daemon can continue. The separate [compose package](platform-packages.md#doc-docker-compose-compose) supplies multi-container lifecycle steps.
 
+<!-- documentation-anchors:start -->
+<a id="doc-configuration-example-and-commands"></a>
+<!-- documentation-anchors:end -->
 ## Configuration example and commands
 
 See `src/Deployment/Scripts/Examples/operations.json` for separate source/build, container build and readiness plots. Adapt its Values section through project/environment files. All examples use placeholder paths and endpoints.

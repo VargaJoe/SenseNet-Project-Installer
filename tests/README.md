@@ -1,6 +1,15 @@
+<!-- documentation-anchors:start -->
+<a id="doc-runtime-regression-tests"></a>
+<!-- documentation-anchors:end -->
 # Runtime regression tests
 
-The shared desktop/browser application adds a [management test harness](../docs/management-deployment.md#tests-and-evidence)
+<!-- documentation-navigation -->
+[English](README.md) | [Magyar](README-hu.md) · [Documentation](../docs/README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
+
+Run `node ./scripts/management/Test-Documentation.mjs` for independent bilingual documentation parity and relative-link checks.
+
+The shared desktop/browser application adds a [management test harness](../docs/management-deployment.md#doc-tests-and-evidence)
 and [manual acceptance guide](../docs/management-acceptance.md). Run
 `./scripts/management/Test-Management.ps1` in PowerShell 7 after installing the
 documented .NET/Node/Playwright prerequisites. It uses real isolated PowerShell
@@ -35,16 +44,25 @@ The suite deletes only its own randomly named test directory after validating it
 
 The runner also includes Configuration.Tests.ps1 and GenericPackages.Tests.ps1. These cover ordered default/project/environment files, real CLI overrides, missing/invalid files, literal filesystem paths, scoped removal, ZIP roundtrips and invalid entries, JSON object merges, XML namespace/attribute updates, independent package installation, direct WhatIf and the shipped layered artifact example. Windows runs also create and remove a temporary junction to check link rejection. No live services or external downloads are used.
 
+<!-- documentation-anchors:start -->
+<a id="doc-operational-packages"></a>
+<!-- documentation-anchors:end -->
 ## Operational packages
 
 `Operations.Tests.ps1` runs automatically in the main suite. Requires Git on PATH; HTTP tests compile the small `HttpFixture.cs` loopback fixture with Add-Type and use an ephemeral port. No internet endpoints, Docker daemon or database are needed.
 
 Coverage includes ISO string preservation (JSON/config/CLI), blank CLI layer rejection, exact process argument boundaries, concurrent stdout/stderr draining, exit failures and timeouts, child-only environment, checksummed/atomic downloads, size limits, redirects, retries, slow response deadlines, TCP availability, real Git clone/fetch/checkout and dirty-worktree refusal. Build/NuGet and Docker command construction is tested against a process dependency fixture; their actual SDK/daemon behavior depends on the installed tools. Direct adapter WhatIf is also covered.
 
+<!-- documentation-anchors:start -->
+<a id="doc-recursive-settings-references"></a>
+<!-- documentation-anchors:end -->
 ## Recursive settings references
 
 `References.Tests.ps1` covers indirect environment values through actual layered CLI files, nested map/array expansion without input mutation, repeated sibling references, null/false/zero, a 64-reference chain and its depth limit, self/mutual/object cycles, missing values and type errors before earlier side effects. It also checks case-insensitive earlier-output aliases, forward/self-output rejection, missing runtime output properties and literal directive-shaped data returned by a step.
 
+<!-- documentation-anchors:start -->
+<a id="doc-platform-and-local-integration"></a>
+<!-- documentation-anchors:end -->
 ## Platform and local integration
 
 Platform.Tests.ps1 runs in the main suite: parameterized SQL/provider contracts and error sanitization, identifier/path quoting, restore mappings, user roles, bounded readiness, direct WhatIf, Compose argument ordering/scope, IIS provisioning/status/recycle fixtures, real maintenance files, failure recovery and the local JSON bridge (catalog/plan/preview/run). SQL/IIS providers are mocked here except the real closed-port SQL timeout check. No running service is needed.
@@ -62,6 +80,9 @@ The Windows Forms UI has a manual acceptance procedure in [local integration](..
 
 Hidden GUI bridge smoke test on Windows: `pwsh -NoProfile -File ./tests/Run-GuiSmoke.ps1` (also powershell.exe). It instantiates the real controls and drives catalog/preview/run with an STA child, pumps UI events and verifies actual file output without displaying a window. It does not assess visual layout, accessibility or real IIS.
 
+<!-- documentation-anchors:start -->
+<a id="doc-sensenet-docker-project"></a>
+<!-- documentation-anchors:end -->
 ## SenseNet Docker project
 
 `pwsh -NoProfile -File ./tests/Run-SenseNetExample.ps1` validates the portable

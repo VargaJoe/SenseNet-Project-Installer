@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-plot-configuration"></a>
+<!-- documentation-anchors:end -->
 # Plot configuration
+
+<!-- documentation-navigation -->
+[English](settings.md) | [Magyar](settings-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 Configuration is a JSON object. The CLI reads up to three files in this order:
 
@@ -22,7 +29,7 @@ $config = Read-PlotConfiguration -Path @('./default.json', './project.json', './
 
 Use `Merge-PlotSettings -Layers` for configuration objects already in memory. `-Explain` lists the loaded ConfigurationFiles in order together with invocation parameter-source labels; `-Verbose` logs the loaded paths without their values. Parameter-source labels describe invocation layers, not individual source JSON files.
 
-After the file layers are merged, the invocation precedence below applies. Explicit `-Params` overrides still win. An environment file overrides matching JSON property paths; a global default does not override a more specific invocation `With` value. See the complete [layered artifact example](generic-packages.md#complete-local-example).
+After the file layers are merged, the invocation precedence below applies. Explicit `-Params` overrides still win. An environment file overrides matching JSON property paths; a global default does not override a more specific invocation `With` value. See the complete [layered artifact example](generic-packages.md#doc-complete-local-example).
 
 ```json
 {
@@ -54,6 +61,9 @@ After the file layers are merged, the invocation precedence below applies. Expli
 
 A step ID identifies a definition; an invocation ID identifies one occurrence in a plot. The same step may occur any number of times. Invocation IDs must start with a letter and contain letters, numbers, underscores or hyphens. Omitted IDs become `step1`, `step2`, etc.; explicit IDs are preferable for references.
 
+<!-- documentation-anchors:start -->
+<a id="doc-precedence"></a>
+<!-- documentation-anchors:end -->
 ## Precedence
 
 Later layers override earlier layers:
@@ -75,6 +85,9 @@ Defaults apply only where appropriate: a common Defaults map must contain parame
 
 Objects merge recursively. Arrays replace as a whole, including an empty array. Explicit null replaces; the schema must allow null. False and zero are values, not missing settings. Every invocation receives a deep copy, so changing it cannot change the base configuration or another invocation's inputs.
 
+<!-- documentation-anchors:start -->
+<a id="doc-references"></a>
+<!-- documentation-anchors:end -->
 ## References
 
 - `{"$ref":"settings.Message.Name"}` selects a configuration value.
@@ -91,18 +104,27 @@ A settings alias may also select an earlier step's output reference. The engine 
 
 Environment references are resolved during planning, including indirect references through settings. There is no hidden environment overlay in native mode. Missing variables fail validation; string values are converted only for declared int/bool parameters. Boolean strings must be true or false, so "false" never becomes truthy through a string cast.
 
+<!-- documentation-anchors:start -->
+<a id="doc-schema-validation"></a>
+<!-- documentation-anchors:end -->
 ## Schema validation
 
 Types: `string`, `int`, `bool`, `array`, `object` (a map). Parameters may declare `Required`, `Default`, `AllowNull`, `ValidateSet`, numeric `Minimum`/`Maximum`, and `Secret`.
 
 Missing required settings, unknown parameters, invalid scalar types and invalid static references fail preflight before any step runs. Deferred output references are validated after their producing step, because those values do not exist at preflight.
 
+<!-- documentation-anchors:start -->
+<a id="doc-inspection"></a>
+<!-- documentation-anchors:end -->
 ## Inspection
 
 `-Explain` returns invocation IDs, resolved step IDs and parameter-source labels without executing package commands. `-Verbose` logs the selected step and source labels; it does not print settings values. `-WhatIf` returns skipped results and does not invoke any package command.
 
 Declared secret scalar values are redacted if they occur in a step exception message. This is not a general data-loss-prevention boundary: package authors must never emit secrets in their own outputs, logs or exception records.
 
+<!-- documentation-anchors:start -->
+<a id="doc-compatibility-forms"></a>
+<!-- documentation-anchors:end -->
 ## Compatibility forms
 
 A plot may use an array directly. String entries can use `package.step:Section` to select a settings section:

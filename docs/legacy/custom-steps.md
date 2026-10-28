@@ -1,6 +1,13 @@
-# Custom Step deklaráció
+<!-- documentation-anchors:start -->
+<a id="doc-custom-step-declaration"></a>
+<!-- documentation-anchors:end -->
+# Custom step declaration
 
-Ahhoz hogy a fenti automatizmus működhessen, illetve testzőleges lépésekkel lehessen kiegészíteni a lépésnek az alábbi módon kell felépülnie:
+<!-- documentation-navigation -->
+[English](custom-steps.md) | [Magyar](custom-steps-hu.md) · [Documentation](../README.md) · [Project](../../README.md)
+<!-- /documentation-navigation -->
+
+For the automation above to work and to allow arbitrary additional steps, a step must have the following structure:
 
 ```powershell
 Function Step-Lepesneve {
@@ -27,17 +34,17 @@ $script:Result = 1
 }
 ```
 
-A fenti példában a lépés közvetlenül meghívható a Run-on keresztül, ha nincs azonos nevű forgatókönyv:
+In the example above, the step can be invoked directly through Run if no scenario has the same name:
 ```powershell
 .\Run.ps1 -Legacy lepesneve
 ```
 
-vagy bővebben (itt ne tévesszen meg, hogy a paraméter neve plot):
+Or, more explicitly (do not be confused by the parameter being named plot here):
 ```powershell
 .\Run.ps1 -Legacy -Plot lepesneve -Settings local
 ```
 
-Az adott lépés futtatáskor a script leírásából megjelenítjük a synopsys részt, valahogy így:
+When the step runs, the synopsis from its script help is displayed, approximately as follows:
 
 ```console
 ================================================
@@ -47,9 +54,9 @@ Synopsis: Lépés rövid leírása
 Progress: 100
 ```
 
-A descriptiont érdemes a jövő felhasználói számára kitölteni, illetve itt használható egyéb komment lehetőség is. Ezek a Get-Help powershell függvénnyel hívhatók elő.
+Fill in the description for future users; other supported help comments can also be used here. These can be retrieved with the PowerShell Get-Help function.
 
-A következő paraméter biztosítja a step számára, hogy megcímezhető legyen a beállítás szekció. Példánkban a default szekció a "Project". Ha a lépés nem igényli, nem kötelező deklarálni, de azt vegyük figyelembe, hogy ha Section paraméterrel érkezik a hívás, a lépés hibát fog dobni.
+The following parameter lets the step target a settings section. In this example the default section is "Project". A step that does not need it does not have to declare it, but remember that the step will throw an error if called with a Section parameter.
 ```powershell
 [CmdletBinding(SupportsShouldProcess=$True)]
 Param(
@@ -58,14 +65,14 @@ Param(
 )
 ```
 
-Az üzleti logikát érdemes try/cacth feldolgozásba rakni, így biztosítható, hogy hiba esetén is legyen visszaadott érték. Általános hiba esetén megegyezés szerint 1-es értékkel térünk vissza. Ettől el lehet térni, tudomásom szerint - még - nem használja semmi a visszatérési értékeket, egyelőre csak információforrásként utazik.
+Wrap business logic in try/catch to ensure a return value is available even on failure. By convention, a general error returns 1. Other values may be used; to my knowledge nothing consumes the return values yet, and for now they are passed along only as information.
 
-A settings file beállításokat a section paraméterrel együtt egy globális változóból érjük el. Ebben már össze van fűzve a projekt és default beállítás is.
+The settings file values are accessed from a global variable together with the section parameter. This variable already contains the merged project and default settings.
 ```powershell
 $GlobalSettings."$section".beállításnév
 ```
 
-Végül érdemes normál lefutás esetén a exitcode környezeti változó értékével visszatérni. Console applikációk esetén valószínűleg ez megfelelő értéket fog adni, egyedi scriptek esetén érdemes emulálni:
+Finally, after a normal execution, return the value of the exitcode environment variable. For console applications this will probably provide an appropriate value; custom scripts should emulate it:
 ```powershell
 $script:Result = $LASTEXITCODE
 ```

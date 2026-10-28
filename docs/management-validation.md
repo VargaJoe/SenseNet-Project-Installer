@@ -1,10 +1,20 @@
+<!-- documentation-anchors:start -->
+<a id="doc-management-validation-record"></a>
+<!-- documentation-anchors:end -->
 # Management validation record
+
+<!-- documentation-navigation -->
+[English](management-validation.md) | [Magyar](management-validation-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 This records execution during the 2026-10-21–22 implementation sessions. Build,
 automated execution smoke, and interactive manual acceptance are separate claims.
 Use [acceptance](management-acceptance.md) for the remaining human review and
 [deployment](management-deployment.md) to reproduce builds and checks.
 
+<!-- documentation-anchors:start -->
+<a id="doc-source-and-review"></a>
+<!-- documentation-anchors:end -->
 ## Source and review
 
 - Preparation: [PR #31](https://github.com/VargaJoe/SenseNet-Project-Installer/pull/31),
@@ -18,6 +28,9 @@ Use [acceptance](management-acceptance.md) for the remaining human review and
 - Native engine remains 14 packages / 49 steps. CLI, PS5.1 entry points and the
   temporary Windows Forms launcher remain available.
 
+<!-- documentation-anchors:start -->
+<a id="doc-executed-checks"></a>
+<!-- documentation-anchors:end -->
 ## Executed checks
 
 | Check | Actual environment | Result |
@@ -139,6 +152,9 @@ with the same 49 steps and discovered tool results. A fresh PowerShell worker on
 mounted build storage has additional startup cost. Discovery reports executable
 or module availability; it does not establish Docker/database connectivity.
 
+<!-- documentation-anchors:start -->
+<a id="doc-limits-and-later-work"></a>
+<!-- documentation-anchors:end -->
 ## Limits and later work
 
 - This delivery has one execution host per service. Outbound authenticated agents,
@@ -157,6 +173,9 @@ or module availability; it does not establish Docker/database connectivity.
 - Hosted mode was exercised through actual isolated Kestrel HTTPS and access-control
   tests. No public production service was deployed.
 
+<!-- documentation-anchors:start -->
+<a id="doc-editing-safety-follow-up"></a>
+<!-- documentation-anchors:end -->
 ## Editing safety follow-up
 
 The `codex/management-editing-safety` branch starts at PR #33's `9b96153`.
@@ -230,3 +249,30 @@ service. The engine and backend implementations are unchanged in this follow-up;
 their earlier results above remain historical results, not new executions.
 Workflows remain manual only. No user AppData, existing Docker stacks, or the
 previous transfer ZIP are changed by these checks.
+
+<!-- documentation-anchors:start -->
+<a id="doc-bilingual-documentation-follow-up--2026-10-28"></a>
+<!-- documentation-anchors:end -->
+## Bilingual documentation follow-up — 2026-10-28
+
+All 49 repository documentation topics now have full English and Hungarian
+pages. Canonical filenames default to English; `-hu.md` siblings contain Hungarian.
+The complete GUI manual and four-demo catalog have equal coverage in both
+languages, as do the technical, testing, legacy and historical planning guides.
+Both indexes reach every page in their own language, and every page links to its
+counterpart and localized index. Explicit section IDs keep local deep links usable
+across translated headings. Original GUI labels, sample values and code remain
+recognizable rather than being translated into different executable inputs.
+
+The independent checks are `node ./scripts/management/Test-Documentation.mjs --self-test`
+and `node ./scripts/management/Test-Documentation.mjs`. They verify pair coverage,
+heading/table coverage, 68 identical executable examples and inline code literals,
+reciprocal language navigation, local targets/anchors and per-language reachability.
+Self-checks also prove rejection of missing pairs/targets/anchors, wrong-language
+links, changed examples/literals, unpaired pages and unreachable documents.
+The four explanatory text diagrams have localized labels, explicitly registered
+in the manifest. The full documentation graph passed with zero errors.
+
+This follow-up changes documentation and its independent validator only. Earlier
+application/runtime results above remain dated evidence; no new app, Docker,
+installer, browser, native desktop or Linux execution is claimed for translation.

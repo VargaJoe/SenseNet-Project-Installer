@@ -1,15 +1,27 @@
+<!-- documentation-anchors:start -->
+<a id="doc-plot-manager"></a>
+<!-- documentation-anchors:end -->
 # Plot Manager
+
+<!-- documentation-navigation -->
+[English](README.md) | [Magyar](README-hu.md) · [Documentation](docs/README.md) · [Project](README.md)
+<!-- /documentation-navigation -->
 
 Plot Manager composes scriptable tasks from small, parameterized steps. A plot describes the step invocations and their inputs. Operators install only the capability packages they need by copying their directories into `src/Deployment/Scripts/Auto/`.
 
 The repository's historical name, **SenseNet-Project-Installer**, describes its first use case. SenseNet installation is one of the retained legacy workflows; it is not a restriction on the engine.
 
-Documentation: [guide index](docs/README.md), [component and migration map](docs/migration-map.md).
+Documentation: [start here and choose a reading path](docs/management-guide-index.md),
+[complete documentation index](docs/README.md), [component and migration map](docs/migration-map.md).
 
-**Magyar felhasználói dokumentáció:** [olvasási sorrend és GitHub-áttekintés](docs/management-guide-index-hu.md),
-[a GUI teljes használata](docs/management-user-guide-hu.md),
-[a négy demó összes forgatókönyve és lépése](docs/management-demo-projects-hu.md).
+The [complete GUI manual](docs/management-user-guide.md) explains every page,
+button, view and panel. The [four-demo catalog](docs/management-demo-projects.md)
+describes every scenario, plot and step. Every repository documentation page has
+an English and a Hungarian version; use the language links at the top of a page.
 
+<!-- documentation-anchors:start -->
+<a id="doc-shared-management-application"></a>
+<!-- documentation-anchors:end -->
 ## Shared management application
 
 The React/TypeScript management UI runs in a local browser, on an authenticated
@@ -22,6 +34,9 @@ The portable [SenseNet Docker project](examples/sensenet-docker/README.md) adds 
 guided local installation with persistent SQL/repository data, authenticated
 verification, lifecycle commands and checked backup/restore using the same engine.
 
+<!-- documentation-anchors:start -->
+<a id="doc-run-a-plot"></a>
+<!-- documentation-anchors:end -->
 ## Run a plot
 
 Requires PowerShell 5.1 or PowerShell 7. The engine, text package and filesystem package do not require administrator privileges or external modules. IIS steps require Windows and WebAdministration when executed.
@@ -47,6 +62,9 @@ The example calls `text.join` twice with different inputs, then passes their out
 
 CLI success is exit code 0; validation or execution failure is exit code 1. Executed runs return JSON containing the run ID, plot status and each executed step's output, error and duration. Execution stops at the first failure.
 
+<!-- documentation-anchors:start -->
+<a id="doc-packages-and-configuration"></a>
+<!-- documentation-anchors:end -->
 ## Packages and configuration
 
 - `Auto/<package>/package.psd1`: package identity, version, module, dependencies and exported step schemas.
@@ -59,6 +77,9 @@ Installed native packages: **text**, **filesystem**, **archive**, **json**, **xm
 
 See [configuration and execution](docs/settings.md), [package authoring](docs/custom-steps.md), [architecture and compatibility](docs/plot-manager-runtime.md) and [testing](tests/README.md).
 
+<!-- documentation-anchors:start -->
+<a id="doc-layered-configuration"></a>
+<!-- documentation-anchors:end -->
 ## Layered configuration
 
 Default settings are inherited by the project, then overridden by the selected environment. Explicit run parameters override the resolved invocation settings.
@@ -67,8 +88,11 @@ Default settings are inherited by the project, then overridden by the selected e
 ./src/Deployment/Scripts/Run.ps1 my-plot -DefaultConfigPath ./default.json -ConfigPath ./project.json -EnvironmentConfigPath ./environment.json
 ```
 
-Layers are optional. Nested objects merge; arrays replace; explicit null, false and zero remain values. Existing single-file commands work unchanged. The [layered artifact example](docs/generic-packages.md#complete-local-example) exercises these layers with real JSON/XML, directory, ZIP and hash operations.
+Layers are optional. Nested objects merge; arrays replace; explicit null, false and zero remain values. Existing single-file commands work unchanged. The [layered artifact example](docs/generic-packages.md#doc-complete-local-example) exercises these layers with real JSON/XML, directory, ZIP and hash operations.
 
+<!-- documentation-anchors:start -->
+<a id="doc-historical-workflows"></a>
+<!-- documentation-anchors:end -->
 ## Historical workflows
 
 Existing section/global-variable scripts remain available in a separate PowerShell process:
@@ -80,8 +104,11 @@ Existing section/global-variable scripts remain available in a separate PowerShe
 
 Review the selected legacy configuration before executing it: these workflows can modify IIS, databases and deployments. The compatibility runner retains their platform/tool requirements and administrator requirement for execution. Historical steps are not native packages and cannot be mixed into a native plot. Legacy preview is rejected because those scripts do not consistently implement WhatIf.
 
-Use the [SQL/IIS/Compose packages and deployment scenarios](docs/platform-packages.md) and the [local Windows GUI / JSON integration](docs/local-integration.md). The Angular GUI and experimental HTTP listener remain historical clients. Native CLI/API functionality does not depend on them. Original historical guides are under [docs/legacy](docs/legacy/).
+Use the [SQL/IIS/Compose packages and deployment scenarios](docs/platform-packages.md) and the [local Windows GUI / JSON integration](docs/local-integration.md). The Angular GUI and experimental HTTP listener remain historical clients. Native CLI/API functionality does not depend on them. Original historical guides are under [docs/legacy](docs/README.md#doc-historical-guides).
 
+<!-- documentation-anchors:start -->
+<a id="doc-development"></a>
+<!-- documentation-anchors:end -->
 ## Development
 
 ```powershell

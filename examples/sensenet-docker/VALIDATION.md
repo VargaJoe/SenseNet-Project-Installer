@@ -1,8 +1,18 @@
+<!-- documentation-anchors:start -->
+<a id="doc-verification--2026-10-22"></a>
+<!-- documentation-anchors:end -->
 # Verification — 2026-10-22
+
+<!-- documentation-navigation -->
+[English](VALIDATION.md) | [Magyar](VALIDATION-hu.md) · [Documentation](../../docs/README.md) · [Project](../../README.md)
+<!-- /documentation-navigation -->
 
 This report covers the portable example, independently of the existing shared
 management application delivery. No engine, API or frontend code changed.
 
+<!-- documentation-anchors:start -->
+<a id="doc-actual-execution"></a>
+<!-- documentation-anchors:end -->
 ## Actual execution
 
 - Windows PowerShell7.6.6 native regression suite:110/110 passed.
@@ -36,6 +46,9 @@ Sanitized local evidence is under ignored
 project input or a committed credential store. Regenerate the disposable evidence
 with the two test commands above.
 
+<!-- documentation-anchors:start -->
+<a id="doc-reproduced-corrections"></a>
+<!-- documentation-anchors:end -->
 ## Reproduced corrections
 
 - A local API build's digest was not resolvable in the public registry. The
@@ -52,6 +65,9 @@ with the two test commands above.
   directory. Explicit FileSystemAclExtensions.SetAccessControl changes only the
   DACL and works repeatedly with the normal user token.
 
+<!-- documentation-anchors:start -->
+<a id="doc-scope"></a>
+<!-- documentation-anchors:end -->
 ## Scope
 
 This is a local development example with the official initial admin/admin

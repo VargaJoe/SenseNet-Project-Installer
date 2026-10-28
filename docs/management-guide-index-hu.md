@@ -1,10 +1,20 @@
+<!-- documentation-anchors:start -->
+<a id="doc-plot-manager--english-user-documentation"></a>
+<!-- documentation-anchors:end -->
 # Plot Manager – magyar felhasználói dokumentáció
+
+<!-- documentation-navigation -->
+[English](management-guide-index.md) | [Magyar](management-guide-index-hu.md) · [Dokumentáció](README-hu.md) · [Projekt](../README-hu.md)
+<!-- /documentation-navigation -->
 
 Ez a belépőoldal a közös asztali és böngészős Plot Manager jelenlegi változatához
 tartozik. A négy demó, a projektfájlok és az útmutatók a repóban vannak: az
 olvasásukhoz nem kell futnia a fejlesztői gépnek vagy a helyi szolgáltatásnak.
 A műveletek tényleges kipróbálásához természetesen szükséges egy futó Plot Manager.
 
+<!-- documentation-anchors:start -->
+<a id="doc-what-should-i-open-first"></a>
+<!-- documentation-anchors:end -->
 ## Mit érdemes először megnyitni?
 
 | Kérdés | Olvasnivaló |
@@ -12,12 +22,15 @@ A műveletek tényleges kipróbálásához természetesen szükséges egy futó 
 | Mit jelent a projekt, a plot, a step és a konfigurációs réteg? | [A teljes GUI-útmutató](management-user-guide-hu.md) eleje. |
 | Melyik oldal, gomb és panel mire való? | [A teljes GUI-útmutató](management-user-guide-hu.md): az angol képernyőfeliratok magyar magyarázattal. |
 | Mit csinál a négy konkrét demó, és mit kell látnom futtatás után? | [Demóprojektek és forgatókönyvek](management-demo-projects-hu.md). |
-| Hol van az első három demó tényleges konfigurációja? | [A három általános demó](../examples/management-demos/README.md) – tiszta projektfájlok, generált kimenetek nélkül. |
-| Hol van a SenseNet Docker projekt? | [SenseNet használat](../examples/sensenet-docker/README.md), [konfiguráció](../examples/sensenet-docker/default.json), [Compose-fájl](../examples/sensenet-docker/compose.yaml). |
-| Hogyan telepíthetem vagy indíthatom a kezelőfelületet? | [Build, desktop és böngészős telepítés](management-deployment.md) – technikai útmutató, angolul. |
-| Hogyan működik a natív JSON, az öröklés és a hivatkozás? | [Settings](settings.md), [natív motor](plot-manager-runtime.md) – részletes technikai háttér. |
-| Mely működést ellenőriztük ténylegesen? | [Kezelőfelület ellenőrzése](management-validation.md), [SenseNet projekt ellenőrzése](../examples/sensenet-docker/VALIDATION.md). |
+| Hol van az első három demó tényleges konfigurációja? | [A három általános demó](../examples/management-demos/README-hu.md) – tiszta projektfájlok, generált kimenetek nélkül. |
+| Hol van a SenseNet Docker projekt? | [SenseNet használat](../examples/sensenet-docker/README-hu.md), [konfiguráció](../examples/sensenet-docker/default.json), [Compose-fájl](../examples/sensenet-docker/compose.yaml). |
+| Hogyan telepíthetem vagy indíthatom a kezelőfelületet? | [Build, desktop és böngészős telepítés](management-deployment-hu.md) – technikai útmutató. |
+| Hogyan működik a natív JSON, az öröklés és a hivatkozás? | [Settings](settings-hu.md), [natív motor](plot-manager-runtime-hu.md) – részletes technikai háttér. |
+| Mely működést ellenőriztük ténylegesen? | [Kezelőfelület ellenőrzése](management-validation-hu.md), [SenseNet projekt ellenőrzése](../examples/sensenet-docker/VALIDATION-hu.md). |
 
+<!-- documentation-anchors:start -->
+<a id="doc-the-purpose-of-the-four-demos"></a>
+<!-- documentation-anchors:end -->
 ## A négy demó szerepe
 
 | Projekt | Ezzel tanulható meg | Külső függőség / hatás |
@@ -31,6 +44,9 @@ A [demókatalógus](management-demo-projects-hu.md) minden projektnél külön f
 a plotokat, az invocation ID-ket, a meghívott stepet, a bemeneteket, a kimeneteket,
 a sorrendi függéseket és a kipróbálható forgatókönyveket.
 
+<!-- documentation-anchors:start -->
+<a id="doc-suggested-learning-order"></a>
+<!-- documentation-anchors:end -->
 ## Javasolt tanulási sorrend
 
 1. Olvasd el a GUI-útmutató fogalmait és a képernyőtérképet.
@@ -47,6 +63,9 @@ a sorrendi függéseket és a kipróbálható forgatókönyveket.
    rendelkezésre állnak. A restore forgatókönyv adatot cserél: a dokumentált
    mentést és pontos stacknév-megerősítést használd.
 
+<!-- documentation-anchors:start -->
+<a id="doc-review-using-github-alone"></a>
+<!-- documentation-anchors:end -->
 ## Ellenőrzés csak GitHubról
 
 A PR-ban a **Files changed** nézet a változtatásokat mutatja. Egy hosszabb útmutató
@@ -57,6 +76,11 @@ A GUI a **PR #32** része. A SenseNet projekt, az első három demó verziózott
 definíciói és ez a teljes dokumentáció a ráépülő **PR #33** része. Amíg ezek
 nincsenek mergelve, a default branch dokumentációja eltérhet: a PR branchét vagy
 az átadásban hivatkozott commitot nézd.
+
+A mentett szerkesztési állapot javításai és a teljes angol–magyar dokumentációs
+párok a **PR #34** részei. A magyar és angol tartalomjegyzék ugyanazokat a
+témákat teszi elérhetővé; az angol az alapértelmezett. A korábbi `a8cb561b`
+telepítőcsomagok a szerkesztési javításokat még nem tartalmazzák.
 
 | Mit tudsz futtatás nélkül is ellenőrizni? | Hol látszik? |
 |---|---|
@@ -71,6 +95,9 @@ GitHub nem futtatja ezeket a plotokat, és a lekapcsolt gép localhost címei on
 nem érhetők el. A tartós futástörténet az alkalmazás saját adattárában marad;
 a repóba a hordozható bemenetek és az ellenőrzések leírása kerül.
 
+<!-- documentation-anchors:start -->
+<a id="doc-short-acceptance-checklist"></a>
+<!-- documentation-anchors:end -->
 ## Rövid átvételi lista
 
 - [ ] A négy projekt célját és fő kimenetét meg tudom nevezni.

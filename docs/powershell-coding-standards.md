@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-powershell-conventions"></a>
+<!-- documentation-anchors:end -->
 # PowerShell conventions
+
+<!-- documentation-navigation -->
+[English](powershell-coding-standards.md) | [Magyar](powershell-coding-standards-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 These conventions apply to the native runtime and packages. Historical AutoExt scripts remain behind the explicit compatibility runner.
 

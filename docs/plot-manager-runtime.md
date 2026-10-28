@@ -1,4 +1,11 @@
+<!-- documentation-anchors:start -->
+<a id="doc-plot-manager-runtime"></a>
+<!-- documentation-anchors:end -->
 # Plot Manager runtime
+
+<!-- documentation-navigation -->
+[English](plot-manager-runtime.md) | [Magyar](plot-manager-runtime-hu.md) · [Documentation](README.md) · [Project](../README.md)
+<!-- /documentation-navigation -->
 
 The engine is domain-independent. Operators choose installed packages; plots connect concrete invocations; every invocation receives its own resolved settings.
 
@@ -12,6 +19,9 @@ flowchart LR
   O --> E
 ```
 
+<!-- documentation-anchors:start -->
+<a id="doc-runtime-phases"></a>
+<!-- documentation-anchors:end -->
 ## Runtime phases
 
 1. Discover manifests and validate package IDs, step names, aliases, schemas, dependencies and module paths.
@@ -25,6 +35,9 @@ The output reference check cannot know a future runtime value's shape. A produce
 
 The CLI deep-merges explicit default, project and environment files, in that order. `Read-PlotConfiguration -Path` accepts an ordered array of files through the module API; `Merge-PlotSettings -Layers` merges in-memory objects. The resulting configuration feeds the invocation parameter layers. See [configuration](settings.md).
 
+<!-- documentation-anchors:start -->
+<a id="doc-module-api"></a>
+<!-- documentation-anchors:end -->
 ## Module API
 
 ```powershell
@@ -41,6 +54,9 @@ try {
 
 Preflight errors throw without executing steps. Execution errors become structured Failed results. CLI maps either category to exit code 1. WhatIf or declined confirmation results are Skipped. No script-scoped Result or mutable global configuration is required by native packages.
 
+<!-- documentation-anchors:start -->
+<a id="doc-compatibility-boundary"></a>
+<!-- documentation-anchors:end -->
 ## Compatibility boundary
 
 Run.ps1 -Legacy starts Run-Legacy.ps1 in another PowerShell process. The historical AutoExt files, scripts and settings remain available there. A static Step-* collision check runs before loading those files.
@@ -53,6 +69,9 @@ The previous unconnected Core-Helpers.ps1/System-Steps.ps1 prototypes have been 
 
 The historical GUI/HTTP listener is not part of this runtime and has not been modernized. A new local Windows Forms host and structured catalog/plan/run bridge use the native engine; see [local integration](local-integration.md). Existing caller integrations must choose the new CLI/API contract or explicitly use legacy mode.
 
+<!-- documentation-anchors:start -->
+<a id="doc-validation"></a>
+<!-- documentation-anchors:end -->
 ## Validation
 
 The suite in tests covers layered CLI files, ZIP roundtrips, directory operations, JSON/XML transformations, the complete layered artifact example, real temporary-file composition, repeated calls, configuration isolation, module isolation, duplicate rejection, parameter/reference validation, dependency errors, CLI exit codes and IIS mocks. The operational suite adds process argument/timeout checks, local HTTP/TCP servers, real local Git repositories and build/Docker adapter contract tests. The default suite also covers SQL/IIS/Compose provider contracts and the local integration bridge. An opt-in isolated SQL Server/Compose test performs real database backup/restore and container lifecycle checks; see [testing](../tests/README.md). Real IIS deployment and visual GUI acceptance remain manual. Git must be on PATH.

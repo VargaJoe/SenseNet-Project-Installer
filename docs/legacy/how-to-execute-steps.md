@@ -1,3 +1,10 @@
+<!-- documentation-anchors:start -->
+<a id="doc-how-to-execute-steps"></a>
+<!-- documentation-anchors:end -->
 # How to execute steps
+
+<!-- documentation-navigation -->
+[English](how-to-execute-steps.md) | [Magyar](how-to-execute-steps-hu.md) · [Documentation](../README.md) · [Project](../../README.md)
+<!-- /documentation-navigation -->
 
 Usually a scenario has multiple steps, but it is not a must, it is possible to create a scenario with only one step. The steps could be executed directly as well, we only have to keep in mind that step and scenario should have a different name. If the executer does not find an executable scenario with the given name (-Plot x), than it will searching for a step with the given name and executes the found one. Earlier the Plot parameter had another name and was less ambigous, so maybe later this things will be separated or the direct execution feature will be removed. However it seems to be really useful so far, this logic starts the process and if it is needed it provides a return value to the caller.
